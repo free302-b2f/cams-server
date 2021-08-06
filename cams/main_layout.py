@@ -21,6 +21,10 @@ navs = dbc.Nav(apps, pills=True)
 #메인 레이아웃 - 메뉴바 
 sidebar = dbc.Navbar(
     [        
+        html.A(
+            html.Img(src='/assets/logo_1140x742.png', id='b2f_logo_img'),
+            href="https://www.bit2farm.com", target='b2f-window', 
+        ),
         dbc.NavbarToggler(id="navbar-toggler", n_clicks=0),
         dbc.Collapse(navs, id="navbar-collapse", navbar=True, is_open=False),
     ],
