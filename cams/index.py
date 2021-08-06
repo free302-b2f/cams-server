@@ -7,12 +7,12 @@ import dash_html_components as html
 from dash.dependencies import Input, Output
 
 #from apps import *
-from app import app
-import app_layout # app's main layout
+from app import app, error, debug, info
+import main_layout # app's main layout
 
 #endregion
 
-app.layout = app_layout.layout
+app.layout = main_layout.layout
 
 # "complete" layout
 app.validation_layout = html.Div([

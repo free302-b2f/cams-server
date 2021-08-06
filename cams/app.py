@@ -37,4 +37,41 @@ cache = Cache(app.server, config={
 })
 
 
-  
+ 
+#region ---- logging ----
+
+import apps.utility as util
+from functools import singledispatch
+from types import FunctionType
+
+def log(level, caller, method, msg):
+    message = f'[{datetime.now()}] [{level}] [{caller}]'
+    if method != None: message += f' [{method.__name__}()]'
+    message += f' {msg}'
+    if   level == 'E': app.logger.error(message)
+    elif level == 'D': app.logger.debug(message)
+    elif level == 'I': app.logger.info(message)
+
+@singledispatch
+def error(method:FunctionType, msg): 
+    log('E', util.caller_module(3), method, msg)
+@error.register(str)
+def _(msg): 
+    log('E', util.caller_module(3), None, msg)
+
+@singledispatch
+def debug(method:FunctionType, msg): 
+    log('D', util.caller_module(3), method, msg)
+@debug.register
+def _(msg:str): 
+    log('D', util.caller_module(3), None, msg)
+
+@singledispatch
+def info(method:FunctionType, msg): 
+    log('I', util.caller_module(3), method, msg)
+@info.register(str)
+def _(msg): 
+    log('I', util.caller_module(3), None, msg)
+
+#endregion
+ 
