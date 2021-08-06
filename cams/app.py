@@ -1,5 +1,8 @@
-# -*- coding: utf-8 -*-
-
+"""
+Dash 객체를 생성하고 app 관련 기본 기능들을 정의
+ - 로깅 함수
+ - 메뉴바 관리 함수
+"""
 #region ---- imports ----
 
 import  sys, os, logging
@@ -8,9 +11,9 @@ from datetime import timedelta, datetime
 from flask_caching import Cache
 from dash import Dash
 
-# sidebar component
-import dash_bootstrap_components as dbc
+import dash_bootstrap_components as dbc # sidebar component
 
+import apps.utility as util
 #endregion
 
 print(f'[{datetime.now()}] [D] [{__name__}] loading...')
@@ -36,7 +39,6 @@ cache = Cache(app.server, config={
     'CACHE_REDIS_URL': os.environ.get('REDIS_URL', 'redis://localhost:6379')
 })
 
-
  
 #region ---- logging ----
 
@@ -45,9 +47,12 @@ from functools import singledispatch
 from types import FunctionType
 
 def log(level, caller, method, msg):
+    '''메시지를 dash.app.logger를 이용해 기록한다'''
+
     message = f'[{datetime.now()}] [{level}] [{caller}]'
     if method != None: message += f' [{method.__name__}()]'
     message += f' {msg}'
+    
     if   level == 'E': app.logger.error(message)
     elif level == 'D': app.logger.debug(message)
     elif level == 'I': app.logger.info(message)
@@ -75,3 +80,40 @@ def _(msg):
 
 #endregion
  
+
+#region ---- APIs to register sub apps ----
+ 
+router = {} # map routing path into page layout
+sidebar_items = {} # map order into (menu title, page path)
+
+def add_page(layout, menuName:str=None, menuOrder:int = 0):
+    '''페이지(dash app)의 이름과 레이아웃, 메뉴바에서의 순서를 저장한다.    
+    
+    :param layout: 등록할 레이아웃
+    :param menuName: 메뉴바에 표시할 텍스트
+    :param menuOrder: 순서값, 낮을 수록 먼저 나온다.'''
+
+    pathName =f'{app.config["url_base_pathname"]}{util.caller_module()}'
+
+    # display order in sidebar list
+    if(menuOrder == 0):
+        menuOrder = len(router) * 10 + 1000
+
+    #null name -> redirect url
+    if(menuName == None):
+        debug(add_page, 'menuName == None')
+        return
+    else:
+        # check duplicated menuName
+        name_count = len(list(filter(lambda x: x[0] == menuName, sidebar_items.values())))
+        if name_count > 0 : 
+            menuName = menuName + f'#{name_count + 1}'
+
+    # log
+    debug(add_page ,f'Adding: {menuOrder}, {menuName}, {pathName}')
+
+    # add to dict
+    router[pathName] = layout # add layout
+    sidebar_items[menuOrder] = (menuName, pathName) # add sidebar item
+
+#endregion

@@ -1,0 +1,8 @@
++ 사용자 인증기능 및 UI
+ - DB설계: 농장 센서 데이터 설정
+
++ 사용자 옵션 기능 및 UI
+ - dash popup/modal
+
++ Query speed up
+ - resampling

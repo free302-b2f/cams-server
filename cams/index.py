@@ -1,4 +1,8 @@
-# -*- coding: utf-8 -*-
+"""
+애플리케이션의 진입점
+메인 레이아웃을 표시하고 그에 대한 콜백 수행
+ - display_page(): 메인 콜백함수
+"""
 
 #region ---- imports ----
 
@@ -6,8 +10,9 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 
-#from apps import *
-from app import app, error, debug, info
+from app import app, router, error, debug, info
+from apps import *
+import apps
 import main_layout # app's main layout
 
 #endregion
@@ -17,10 +22,15 @@ app.layout = main_layout.layout
 # "complete" layout
 app.validation_layout = html.Div([
     app.layout,
+    *router.values(),
 ])
 
 @app.callback(Output('app-content', 'children'),
               Input('url', 'pathname'))
 def display_page(pathname):
-    return 'no page selected'
+    '''주어진 경로에 해당하는 레이아웃을 리턴한다.'''
+
+    v = router.get(pathname, apps.home.layout)
+    if(callable(v)): v = v()
+    return v
 

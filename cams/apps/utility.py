@@ -1,4 +1,7 @@
-# -*- coding: utf-8 -*-
+"""
+코드 중복 방지를 위한 자주 쓰는 함수 모음
+"""
+
 
 #region ---- imports ----
 from datetime import timedelta, datetime, timezone
@@ -15,6 +18,7 @@ import flask
 #endregion
  
 def caller_module(level=2):
-    '''Get calling module name'''
+    '''호출하는 함수가 정의된 모듈의 이름을 구한다'''
+
     f = sys._getframe(level)
     return f.f_globals['__name__']
