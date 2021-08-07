@@ -7,6 +7,7 @@ Dash 객체를 생성하고 app 관련 기본 기능들을 정의
 
 import  sys, os, logging
 from datetime import timedelta, datetime
+from typing import Any
 
 from flask_caching import Cache
 from dash import Dash
@@ -18,6 +19,8 @@ import apps.utility as util
 
 print(f'[{datetime.now()}] [D] [{__name__}] loading...')
 
+_logging = util.loadSettings('logging')
+
 ext_css = [
     'https://codepen.io/chriddyp/pen/bWLwgP.css', # graph
     dbc.themes.BOOTSTRAP, # sidebar
@@ -28,8 +31,8 @@ app = Dash(__name__, url_base_pathname='/')#, suppress_callback_exceptions=True)
 app.config['suppress_callback_exceptions'] = True
 app.config['external_stylesheets'] = ext_css
 app.config['external_scripts'] = ext_js
-app.logger.setLevel(logging.DEBUG)
-app.enable_dev_tools(dev_tools_ui=True, dev_tools_hot_reload=True)
+app.logger.setLevel(_logging['Level'])
+app.enable_dev_tools(dev_tools_ui=_logging['DevUi'], dev_tools_hot_reload=True)
 
 server = app.server
 
@@ -42,11 +45,10 @@ cache = Cache(app.server, config={
  
 #region ---- logging ----
 
-import apps.utility as util
 from functools import singledispatch
 from types import FunctionType
 
-def log(level, caller, method, msg):
+def log(level:str, caller:str, method:FunctionType, msg:Any):
     '''메시지를 dash.app.logger를 이용해 기록한다'''
 
     message = f'[{datetime.now()}] [{level}] [{caller}]'
