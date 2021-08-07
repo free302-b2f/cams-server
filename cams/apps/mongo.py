@@ -70,10 +70,8 @@ def build_data_table(df:pd.DataFrame) -> DataTable:
 #@cache.memoize(timeout=30)
 def query_sensor_data() -> Tuple[List[float], pd.DataFrame]:
     '''DB에서 하루동안의 데이터를 불러온다.
-    
     쿼리 시간과 DataFrame 변환시간의 리스트를 생성    
-    :return: 소요시간과 DataFrame의 튜플
-    '''
+    :return: 소요시간과 DataFrame의 튜플'''
     
     timing=[0,0]
     startTime = timer()
@@ -152,4 +150,4 @@ def layout():
         dt])
 
 #이 페이지를 메인 메뉴바에 등록한다.
-add_page(layout, "MongoDB", 16)
+add_page(layout, "MongoDB", 20)
