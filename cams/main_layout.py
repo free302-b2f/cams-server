@@ -15,16 +15,19 @@ from app import app, sidebar_items as sb
 #endregion
 
 #app.sidebar_items에 등록된 메뉴항목에 대한 NavLink 생성
-apps = [dbc.NavLink(sb[k][0], href=sb[k][1], active="partial") for k in sorted(sb)]
-navs = dbc.Nav(apps, pills=True)
+navs = dbc.Nav(
+    [dbc.NavLink(sb[k][0], href=sb[k][1], active="partial") for k in sorted(sb)], 
+    pills=True)
 
 #메인 레이아웃 - 메뉴바 
 sidebar = dbc.Navbar(
-    [        
+    [   
+        # company logo & link to web site     
         html.A(
-            html.Img(src='/assets/logo_1140x742.png', id='b2f_logo_img'),
+            html.Img(src='/assets/logo_1140x742.png', id='b2f-logo-img'),
             href="https://www.bit2farm.com", target='b2f-window', 
         ),
+
         dbc.NavbarToggler(id="navbar-toggler", n_clicks=0),
         dbc.Collapse(navs, id="navbar-collapse", navbar=True, is_open=False),
     ],
