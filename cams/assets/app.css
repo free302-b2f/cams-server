@@ -15,21 +15,40 @@ body{
     padding: 0.5rem 0.5rem;
 }
 
-/* sidebar & content layout */
+/* ----[ sidebar ]---- */
 .app-sidebar{
-    /*position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    width: 16rem;
-    padding: 1rem 1rem;
-    background-color: midnightblue */
     background-color: #fdb515;/* !important;*/
     /*#f8f9fa;*/
 }
 .app-sidebar.li{
     margin-bottom: 0rem;
 }
+ul.nav.nav-pills{
+    flex-grow: 1;
+    align-items: center;
+}
+#sidebar-brand
+{
+    font-size: inherit;
+}
+#sidebar-brand img
+{
+    height:32px;
+    /* margin-right: 5px; */
+}
+#sidebar-github
+{
+    display: flex;
+    flex-grow: 0;
+    justify-content: flex-end;
+}
+ #sidebar-login
+{
+    display: flex;
+    flex-grow: 1;
+    justify-content: flex-end;
+}
+
 
 /* home contents */
 .home-content{
@@ -62,22 +81,7 @@ body{
     font-weight: inherit;
 }
 
-.company-logo{
-    color: goldenrod;
-    text-align:left;
-    border: none;/*dashed;*/
-    padding-left: 0px;
-    height: 3rem;
-    /*background-image: url(/assets/logo_tr.png);
-    background-size: 114px 74px;*/
-}
 
-#b2f-logo-img
-{
-    /*width:67px;*/
-    height:32px;
-    margin-right: 5px;
-}
 
 
 /* log message */

@@ -14,25 +14,35 @@ import dash_bootstrap_components as dbc
 from app import app, sidebar_items as sb
 #endregion
 
+# company logo & link to web site 
+brand = dbc.NavLink([
+        html.Img(src='/assets/logo_1140x742.png'),
+        #'Bit2Farm',
+    ], href="https://www.bit2farm.com", target='brand-window', id='sidebar-brand')
+
 #app.sidebar_items에 등록된 메뉴항목에 대한 NavLink 생성
-navs = dbc.Nav(
-    [dbc.NavLink(sb[k][0], href=sb[k][1], active="partial") for k in sorted(sb)], 
-    pills=True)
+pages = [dbc.NavLink(sb[k][0], href=sb[k][1], active="partial") for k in sorted(sb)]
+
+#login status & link
+pages.append(
+    html.Div(dbc.NavLink('UserName', href="logout"), id='sidebar-login'))
+
+#----[임시항목: GitHub Repository ]----
+pages.append(
+    html.Div(dbc.NavLink('GitHub', 
+        href="https://github.com/free302-b2f/cams-server", target="github"), 
+    id='sidebar-github'))
 
 #메인 레이아웃 - 메뉴바 
 sidebar = dbc.Navbar(
     [   
-        # company logo & link to web site     
-        html.A(
-            html.Img(src='/assets/logo_1140x742.png', id='b2f-logo-img'),
-            href="https://www.bit2farm.com", target='b2f-window', 
-        ),
-
+        brand,
         dbc.NavbarToggler(id="navbar-toggler", n_clicks=0),
-        dbc.Collapse(navs, id="navbar-collapse", navbar=True, is_open=False),
+        dbc.Collapse(dbc.Nav(pages, pills=True), id="navbar-collapse", navbar=True, is_open=False),
     ],
     color='dark',#'dark',#'light', #"primary",
     dark=True,
+    sticky='top',
     className='app-sidebar',
 )
 

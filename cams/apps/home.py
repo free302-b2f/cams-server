@@ -40,12 +40,12 @@ def layout():
     updating = [f'{x}\n' for x in loadNotes('updating.txt')]
 
     return html.Div([
-        html.H3("Updating..."), 
-        html.Listing(updating),
+        html.H3("Updating..."),
+        html.Pre(updating),
         html.Hr(),
 
         html.H3("Update Notes"),
-        html.Listing(notes),        
+        html.Pre(notes),        
 
         ], className="home-content")
 
