@@ -8,11 +8,16 @@ from datetime import timedelta, datetime
 import random, sys
 from timeit import default_timer as timer
 from typing import List, Tuple
+import pandas as pd, numpy as np
 
 from bson.raw_bson import RawBSONDocument
 from pymongo import MongoClient, has_c as pm_has_c
 from pymongo.cursor import Cursor
-import pandas as pd, numpy as np
+
+import psycopg2 as pg
+import psycopg2.extensions as pge
+import psycopg2.extras as pga
+
 
 from flask import request
 
@@ -24,10 +29,6 @@ from dash.dependencies import Input, Output, State
 from dash_table import DataTable
 from dash_table.Format import Format, Scheme, Trim
 
-import psycopg2 as pg
-import psycopg2.extensions as pge
-import psycopg2.extras as pga
-
 from app import app, add_page, router, error, debug, info
 import apps.utility as util
 
@@ -38,7 +39,7 @@ debug('loading...')
 #region ---- DB Server & Connection ----
 
 _db = util.loadSettings('Postgres')
-_connPg = pg.connect(f'postgres://{_db["User"]}:{_db["Pw"]}@{_db["Ip"]}:{_db["Port"]}/{_db["Db"]}')
+_pgClient = pg.connect(f'postgres://{_db["User"]}:{_db["Pw"]}@{_db["Ip"]}:{_db["Port"]}/{_db["Db"]}')
 
 #endregion
 
@@ -46,11 +47,11 @@ _connPg = pg.connect(f'postgres://{_db["User"]}:{_db["Pw"]}@{_db["Ip"]}:{_db["Po
 #region ---- init & seed ----
 
 def f1_check_db_connection():
-        cursor:pge.cursor = _connPg.cursor()
+        cursor:pge.cursor = _pgClient.cursor()
         cursor.execute("SELECT 'hello world'")
         ds = cursor.fetchone()
         print(ds)
-        _connPg.commit()
+        _pgClient.commit()
         cursor.close()
         return ds
 
@@ -98,7 +99,7 @@ def f2_init_and_seed():
         cursor.execute(query_create_sensors_table)
         cursor.execute(query_create_sensordata_table)
         cursor.execute(query_create_sensordata_hypertable)
-        _connPg.commit()
+        _pgClient.commit()
 
         #하이퍼테이블 정보 출력
         query_table_info = """
@@ -118,7 +119,7 @@ def f2_init_and_seed():
         cursor.execute("INSERT INTO sensors (sn) VALUES (%s)", ('B2F_CAMs_1000000000001',))
         cursor.execute("INSERT INTO sensors (sn) VALUES (%s)", ('B2F_CAMs_1000000000002',))
         cursor.execute("INSERT INTO sensors (sn) VALUES (%s)", ('B2F_CAMs_1000000000003',))
-        _connPg.commit()
+        _pgClient.commit()
 
         #농장 ID 추출
         cursor.execute("SELECT id FROM farms ORDER BY id DESC LIMIT 1")
@@ -148,9 +149,9 @@ def f2_init_and_seed():
                 round(random.uniform(0, 10), 1), 
                 ))
                 
-        _connPg.commit()
+        _pgClient.commit()
 
-    cursor:pge.cursor = _connPg.cursor(cursor_factory=pga.DictCursor)
+    cursor:pge.cursor = _pgClient.cursor(cursor_factory=pga.DictCursor)
     create_hypertable(cursor)
     seed(cursor)
     cursor.close()
@@ -169,7 +170,7 @@ def f2_copy_mongo():
     _camsDb = _mongoClient[_db["Db"]]
     _sensors = _camsDb['sensors']
 
-    cursor:pge.cursor = _connPg.cursor(cursor_factory=pga.DictCursor)
+    cursor:pge.cursor = _pgClient.cursor(cursor_factory=pga.DictCursor)
     cursor.execute("SELECT id FROM farms ORDER BY id DESC LIMIT 1")
     farmId = cursor.fetchone()['id']
     cursor.execute("SELECT id, sn FROM sensors")
@@ -214,10 +215,10 @@ def f2_copy_mongo():
         startTime = timer()
         src = _sensors.find({'Date':date}).sort([('_id',1)])
 
-        cursor:pge.cursor = _connPg.cursor()
+        cursor:pge.cursor = _pgClient.cursor()
         for record in src: 
             insert(cursor, farmId, record, sensorIds)
-        _connPg.commit()
+        _pgClient.commit()
         cursor.close()
 
         elapsedTime = round(timer() - startTime, 3)
@@ -236,13 +237,13 @@ def f3_load_data() ->Tuple[List[float], pd.DataFrame]:
     :return: 소요시간과 DataFrame의 튜플'''
     
     #모든 센서의 ID 추출
-    cursor:pge.cursor = _connPg.cursor(cursor_factory=pga.DictCursor)    
+    cursor:pge.cursor = _pgClient.cursor(cursor_factory=pga.DictCursor)    
     cursor.execute("SELECT id, sn FROM sensors")
     sensorIds = [x['id'] for x in cursor.fetchall()]
     cursor.close()
 
     #테이블의 필드 이름 추출
-    cursor:pge.cursor = _connPg.cursor()
+    cursor:pge.cursor = _pgClient.cursor()
     cursor.execute("select * from sensor_data where false;")
     cols = [x.name for x in cursor.description]
 
@@ -253,7 +254,8 @@ def f3_load_data() ->Tuple[List[float], pd.DataFrame]:
     #첫번째 센서의 2021-02-16 데이터 추출
     start = datetime(2021, 2,16) #datetime.now().strftime('%Y-%m-%d')
     end = start + timedelta(hours=23, minutes=59, seconds=59, microseconds=999999)
-    sql = cursor.mogrify("""select * from sensor_data WHERE (sensor_id = %s) AND (time BETWEEN %s AND %s)
+    sql = cursor.mogrify("""select * from sensor_data 
+        WHERE (sensor_id = %s) AND (time BETWEEN %s AND %s)
         ORDER BY time DESC LIMIT 10000""", (sensorIds[0], start, end))
     debug(f'{sql}')
 

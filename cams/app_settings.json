@@ -10,7 +10,9 @@
         "Port": 27110,
         "Db" : "DB_CAMs",
         "User": "CAMs",
-        "Pw" : "best"
+        "Pw" : "best",
+        "DataColumns":["Light","Air_Temp","Leaf_Temp","Humidity","CO2","Dewpoint","EvapoTranspiration","HD","VPD"],
+        "MetaColumns":["_id", "SN", "FarmName", "Date", "Time"]
     },
 
     "Postgres": {
@@ -20,5 +22,10 @@
         "Db" : "db_cams",
         "User": "cams",
         "Pw" : "best"
+    },
+
+    "Cams":{
+        "DbmsKey":"Mongo"
     }
+
 }

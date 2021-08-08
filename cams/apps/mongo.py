@@ -8,11 +8,11 @@ from datetime import timedelta, datetime
 import random, sys
 from timeit import default_timer as timer
 from typing import List, Tuple
+import pandas as pd, numpy as np
 
 from bson.raw_bson import RawBSONDocument
 from pymongo import MongoClient, has_c as pm_has_c
 from pymongo.cursor import Cursor
-import pandas as pd, numpy as np
 
 from flask import request
 
@@ -34,12 +34,16 @@ import apps.utility as util
 debug('loading...')
 #print(f'{__name__}: {pm_has_c() = }')
 
+#region ---- DB Server & Connection ----
+
 _db = util.loadSettings('Mongo')
-_mongoClient = MongoClient(
+_mongo = MongoClient(
     f'mongodb://{_db["User"]}:{_db["Pw"]}@{_db["Ip"]}:{_db["Port"]}/{_db["Db"]}', 
     document_class=RawBSONDocument)
-_camsDb = _mongoClient[_db["Db"]]
+_camsDb = _mongo[_db["Db"]]
 debug(f'{_camsDb.list_collection_names()= }')
+
+#endregion
 
 data_columns = ['Date','Time','Light','Air_Temp','Leaf_Temp','Humidity','CO2','Dewpoint','EvapoTranspiration','HD','VPD']
 data_titles = ['Date','Time','Light','Tair','Tleaf','RH[%]','CO₂','DP','EvaTrans','HD','VPD']
@@ -68,7 +72,7 @@ def build_data_table(df:pd.DataFrame) -> DataTable:
     return table
 
 #@cache.memoize(timeout=30)
-def query_sensor_data() -> Tuple[List[float], pd.DataFrame]:
+def load_data() -> Tuple[List[float], pd.DataFrame]:
     '''DB에서 하루동안의 데이터를 불러온다.
     쿼리 시간과 DataFrame 변환시간의 리스트를 생성    
     :return: 소요시간과 DataFrame의 튜플'''
@@ -113,7 +117,7 @@ def _avg(arr):
 def test_resampling():
     '''pands.DataFrame.resample()을 테스트한다'''
 
-    df = query_sensor_data()
+    df = load_data()
     debug(test_resampling, f'{df.shape = }')
     df.to_csv('cams_org.txt')
 
@@ -133,7 +137,7 @@ def layout():
     debug(layout, f'entering...')
     app.title = 'B2F - Mongo Tester'
 
-    timing, df = query_sensor_data()
+    timing, df = load_data()
     cbc.record_timing('Query', timing[0], 'query DB')
     cbc.record_timing('DataFrame', timing[0], 'pandas DataFrame')
 

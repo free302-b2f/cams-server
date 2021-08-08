@@ -63,7 +63,7 @@ def formatTiming(flaskRequest, dbServer:list, timing:list, dataSize) -> List[str
     http = getHttpInfo(flaskRequest)
     pyVersion = sys.version_info[:3]
     return [
-        f'Client: {http[1]} {http[2]} @ {http[3]}\n',
+        f'Client: {http[2]} {http[3]} @ {http[1]}\n',
         f'Web Server: Python {pyVersion[0]}.{pyVersion[1]}.{pyVersion[2]} @ {http[0]}\n',
         f'DB Server: {dbServer[0]} @ {dbServer[1]}:{dbServer[2]}\n',
         f'Shape of records: {dataSize}\n',

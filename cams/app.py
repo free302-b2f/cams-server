@@ -102,7 +102,7 @@ def add_page(layout, menuName:str=None, menuOrder:int = 0):
         menuOrder = len(router) * 10 + 1000
 
     #null name -> redirect url
-    if(menuName == None):
+    if(menuName is None):
         debug(add_page, 'menuName == None')
         return
     else:
