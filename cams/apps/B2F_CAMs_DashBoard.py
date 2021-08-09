@@ -30,7 +30,7 @@ from dash.exceptions import PreventUpdate
 import plotly.express as px
 import plotly.graph_objects as go
 
-from app import app, cache, add_page, router, error, debug, info
+from app import app, cache, add_page, router, error, debug, info, getConfigSection
 import apps.utility as util
 
 #endregion
@@ -39,18 +39,17 @@ debug('loading...')
 
 #region ---- DB Server & Connection ----
 
-_cams = util.loadSettings('Cams')#CAMs 설정
+_cams = getConfigSection('Cams')#CAMs 설정
 
 if _cams['DbmsKey'] == 'Mongo':
-    _setDb = util.loadSettings(_cams['DbmsKey'])#CAMs DB 설정
+    _setDb = getConfigSection('Mongo')#CAMs DB 설정
     _mongoClient = MongoClient(
         f'mongodb://{_setDb["User"]}:{_setDb["Pw"]}@{_setDb["Ip"]}:{_setDb["Port"]}/{_setDb["Db"]}', 
         document_class=RawBSONDocument)
     _camsDb = _mongoClient[_setDb["Db"]]
-    debug(f'{_camsDb.list_collection_names()= }')
     
 else:
-    _setDb = util.loadSettings('Postgres')
+    _setDb = getConfigSection('Postgres')
     _connPg = pg.connect(f'postgres://{_setDb["User"]}:{_setDb["Pw"]}@{_setDb["Ip"]}:{_setDb["Port"]}/{_setDb["Db"]}')
 
 #endregion

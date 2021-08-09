@@ -27,7 +27,7 @@ from dash_table.Format import Format, Scheme, Trim
 
 import plotly.graph_objects as go
 
-from app import app, add_page, router, error, debug, info
+from app import app, add_page, router, error, debug, info, getConfigSection
 import apps.utility as util
 #endregion
 
@@ -36,7 +36,7 @@ debug('loading...')
 
 #region ---- DB Server & Connection ----
 
-_db = util.loadSettings('Mongo')
+_db = getConfigSection('Mongo')
 _mongo = MongoClient(
     f'mongodb://{_db["User"]}:{_db["Pw"]}@{_db["Ip"]}:{_db["Port"]}/{_db["Db"]}', 
     document_class=RawBSONDocument)

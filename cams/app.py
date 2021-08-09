@@ -7,7 +7,7 @@ Dash 객체를 생성하고 app 관련 기본 기능들을 정의
 
 import  sys, os, logging
 from datetime import timedelta, datetime
-from typing import Any
+from typing import Any, Dict
 
 from flask_caching import Cache
 from dash import Dash
@@ -19,8 +19,6 @@ import apps.utility as util
 
 print(f'[{datetime.now()}] [D] [{__name__}] loading...')
 
-_logging = util.loadSettings('logging')
-
 ext_css = [
     'https://codepen.io/chriddyp/pen/bWLwgP.css', # graph
     dbc.themes.BOOTSTRAP, # sidebar
@@ -31,16 +29,35 @@ app = Dash(__name__, url_base_pathname='/')#, suppress_callback_exceptions=True)
 app.config['suppress_callback_exceptions'] = True
 app.config['external_stylesheets'] = ext_css
 app.config['external_scripts'] = ext_js
+server = app.server
+
+os.chdir(server.root_path)
+_set = util.loadSettings('app_settings.json')
+
+_logging = _set['logging']
 app.logger.setLevel(_logging['Level'])
 app.enable_dev_tools(dev_tools_ui=_logging['DevUi'], dev_tools_hot_reload=True)
-
-server = app.server
 
 cache = Cache(app.server, config={
     'CACHE_TYPE': 'redis', # 'filesystem',
     'CACHE_DIR': 'cache_dir',
     'CACHE_REDIS_URL': os.environ.get('REDIS_URL', 'redis://localhost:6379')
 })
+
+
+#region ---- configuration API ----
+
+def getConfigSection(section:str) -> Dict[str, Any]:
+    '''설정파일에서 주어진 섹션을 딕셔너리로 리턴한다'''
+
+    return _set[section]
+
+def getConfigValue(section:str, key:str) -> Any:
+    '''설정파일에서 주어진 섹션의 주어진 키의 값을 구한다'''
+    
+    return _set[section][key]
+
+#endregion
 
  
 #region ---- logging ----

@@ -29,7 +29,7 @@ from dash.dependencies import Input, Output, State
 from dash_table import DataTable
 from dash_table.Format import Format, Scheme, Trim
 
-from app import app, add_page, router, error, debug, info
+from app import app, add_page, router, error, debug, info, getConfigSection
 import apps.utility as util
 
 #endregion
@@ -38,7 +38,7 @@ debug('loading...')
 
 #region ---- DB Server & Connection ----
 
-_db = util.loadSettings('Postgres')
+_db = getConfigSection('Postgres')
 _pgClient = pg.connect(f'postgres://{_db["User"]}:{_db["Pw"]}@{_db["Ip"]}:{_db["Port"]}/{_db["Db"]}')
 
 #endregion
@@ -163,7 +163,7 @@ def f2_init_and_seed():
 def f2_copy_mongo():
     '''MonogDB의 센서데이터를 PostgreSQL에 복사한다'''
 
-    _db = util.loadSettings('Mongo')
+    _db = getConfigSection('Mongo')
     _mongoClient = MongoClient(
         f'mongodb://{_db["User"]}:{_db["Pw"]}@{_db["Ip"]}:{_db["Port"]}/{_db["Db"]}', 
         document_class=RawBSONDocument)

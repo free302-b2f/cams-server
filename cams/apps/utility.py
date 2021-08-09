@@ -5,7 +5,7 @@
 #region ---- imports ----
 from typing import Any, Tuple, List, Dict
 from datetime import timedelta, datetime, timezone
-from os import path
+from os import path, getcwd
 import random, sys, json
 
 from dash import callback_context as cbc
@@ -103,16 +103,15 @@ def showPopup(id, header:str, body:_Body, footer:_Footer) -> dbc.Modal:
     ], id=id, )
 
 
-def loadSettings(section:str) -> Dict[str, Any]:
+def loadSettings(filePath:str) -> Dict[str, Any]:
     '''설정파일을 읽어 dict를 리턴한다.
 
-    :param: section: 설정파일에서 읽어올 섹션의 키
-    :return: 주어진 섹션의 설정값의 dict
+    :param: filePath: 설정파일의 절대경로
+    :return: 설정값의 dict
     '''
 
-    fn = 'app_settings.json'
-    with open(fn, 'r', encoding='utf-8') as fp:
-        config = json.load(fp)[section]
+    with open(filePath, 'r', encoding='utf-8') as fp:
+        config = json.load(fp)
 
     return config
 
