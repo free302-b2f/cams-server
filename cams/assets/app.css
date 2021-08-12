@@ -55,6 +55,9 @@ ul.nav.nav-pills{
     /*font-style:italic;*/
     font-size: 1.4rem;
 }
+.home-content pre{
+    font-size: inherit;
+}
 
 .camsGraphBorder{
     margin-top: 4px;

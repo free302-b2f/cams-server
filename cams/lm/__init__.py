@@ -1,23 +1,29 @@
+"""패키지 초기화
+
+ + __all__ 정의
+ + 사용자 정보 DB 초기화
+ + 로그인매니저 초기화"""
+
 # region ---- __all__ 정의 ----
 
-from os.path import dirname, basename, isfile, join
-import glob
-from typing import Any
-
-# modules = glob.glob(join(dirname(__file__), "*.py"))
-# __all__ = [ basename(f)[:-3] for f in modules if isfile(f) and not f.endswith('__init__.py')]
-# if 'utility' in __all__: __all__.remove('utility')
 __all__ = ["login", "create"]
 
 # endregion
+
+
+# region ---- imports ----
 
 import sys
 
 import flask as fl
 import flask_login as fli
 import apps.utility as util
-import sqlalchemy as sal  # import Table, create_engine
 from flask_sqlalchemy import SQLAlchemy
+
+# endregion
+
+
+# region ---- DB 초기화 ----
 
 _set = util.loadSettings("app_settings.json")["LoginManager"]
 # _engine = sal.create_engine(f'postgresql://{_set["User"]}:{_set["Pw"]}@{_set["Ip"]}:{_set["Port"]}/{_set["Db"]}')
@@ -26,6 +32,8 @@ _dbUri = (
 )
 _db: SQLAlchemy = None
 _lm: fli.LoginManager = None
+
+# endregion
 
 
 # region ---- 모듈의 global property 정의 ----
@@ -37,7 +45,9 @@ mpb.addProp("loginManager", lambda: _lm)
 # endregion
 
 
-# Login manager object will be used to login / logout users
+# region ---- LoginManager 초기화 ----
+
+
 def get_manager(server: fl.Flask) -> fli.LoginManager:
     """server 설정 및 로그인메니저 생성"""
 
@@ -52,16 +62,23 @@ def get_manager(server: fl.Flask) -> fli.LoginManager:
     _lm.init_app(server)
     _lm.login_view = "lm.login"
 
+    #! lm.user 모듈을 실행하기 전에 _db 초기화 필요
+    _db = SQLAlchemy(server)
+
     #! import all Model class before create_all()
     from lm.user import User
 
-    #! after Model loading create all model tables
-    _db = SQLAlchemy(server)
-    if _set['DropTables'] : _db.drop_all()
+    # create all model tables
+    if _set["DropTables"]:
+        _db.drop_all()
     _db.create_all()
 
+    # --- 로그인메니저 설정 ---
     @_lm.user_loader
     def load_user(username):
         return User.query.get(username)
 
     return _lm
+
+
+# endregion
