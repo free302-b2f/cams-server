@@ -3,7 +3,7 @@
 import sys
 print(f'{sys.path = }')
 
-from main import app, error, debug, info
+from main import app, debug
 application = app.server
 
 if __name__ == '__main__':

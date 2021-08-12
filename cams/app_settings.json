@@ -1,31 +1,52 @@
 {
-    "logging":{
+    "logging": {
         "Level": "DEBUG",
         "DevUi": true
     },
-
-    "Mongo" : {
+    "Mongo": {
         "Name": "MongoDB",
-        "Ip" : "192.168.0.46",
+        "Ip": "192.168.0.46",
         "Port": 27110,
-        "Db" : "DB_CAMs",
+        "Db": "DB_CAMs",
         "User": "CAMs",
-        "Pw" : "best",
-        "DataColumns":["Light","Air_Temp","Leaf_Temp","Humidity","CO2","Dewpoint","EvapoTranspiration","HD","VPD"],
-        "MetaColumns":["_id", "SN", "FarmName", "Date", "Time"]
+        "Pw": "best",
+        "DataColumns": [
+            "Light",
+            "Air_Temp",
+            "Leaf_Temp",
+            "Humidity",
+            "CO2",
+            "Dewpoint",
+            "EvapoTranspiration",
+            "HD",
+            "VPD"
+        ],
+        "MetaColumns": [
+            "_id",
+            "SN",
+            "FarmName",
+            "Date",
+            "Time"
+        ]
     },
-
     "Postgres": {
         "Name": "PostgreSQL",
-        "Ip" : "192.168.0.46",
+        "Ip": "192.168.0.46",
         "Port": 25432,
-        "Db" : "db_cams",
+        "Db": "db_cams",
         "User": "cams",
-        "Pw" : "best"
+        "Pw": "best"
     },
-
-    "Cams":{
-        "DbmsKey":"Mongo"
+    "Cams": {
+        "DbmsKey": "Mongo"
+    },
+    "LoginManager": {
+        "SECRET_KEY": "605feac2f60784caf7126e08f69932b4915b4fc3bf590881",
+        "DropTables": false,
+        "Ip": "192.168.0.46",
+        "Port": 25432,
+        "Db": "db_cams",
+        "User": "cams",
+        "Pw": "best"
     }
-
 }

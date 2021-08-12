@@ -10,10 +10,12 @@
 
 from dash.dependencies import Input, Output
 
-from app import app, router, error, debug, info
+from app import app, router, debug
 from apps import *
+from lm import *
 
-import main_layout  # app's main layout
+#main_layout을 임포트 하기전에 다른 페이지를 전부 임포트해야한다.
+import main_layout
 import apps.home
 
 # endregion
