@@ -75,8 +75,8 @@ def get_manager(server: fl.Flask) -> fli.LoginManager:
 
     # --- 로그인메니저 설정 ---
     @_lm.user_loader
-    def load_user(username):
-        return User.query.get(username)
+    def load_user(user_id):
+        return User.query.get(user_id)
 
     return _lm
 
