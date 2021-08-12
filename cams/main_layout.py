@@ -3,7 +3,7 @@
  - 컨테이너(div)  : app-container
  - 메뉴바(Navbar) : app-sidebar
  - 페이지 컨텐츠   : app-content
- - Location 제어기: url
+ - Location 제어기: app-url
 """
 
 #region ---- imports ----
@@ -50,7 +50,7 @@ sidebar = dbc.Navbar(
 content = html.Div(id="app-content", className="app-content")
 
 #메인 레이아웃 - 주소표시줄 제어
-locator = dcc.Location(id='url', refresh=False)
+locator = dcc.Location(id='app-url', refresh=False)
 
 #메인 레이아웃
 layout = html.Div([locator, sidebar, content], className="app-container")

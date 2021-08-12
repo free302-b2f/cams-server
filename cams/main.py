@@ -12,10 +12,12 @@ from dash.dependencies import Input, Output
 
 from app import app, router, error, debug, info
 from apps import *
-import apps
+
 import main_layout # app's main layout
+import apps.home
 
 #endregion
+
 
 app.layout = main_layout.layout
 
@@ -26,7 +28,7 @@ app.validation_layout = html.Div([
 ])
 
 @app.callback(Output('app-content', 'children'),
-              Input('url', 'pathname'))
+              Input('app-url', 'pathname'))
 def display_page(pathname):
     '''주어진 경로에 해당하는 레이아웃을 리턴한다.'''
 
