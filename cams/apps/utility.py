@@ -91,7 +91,7 @@ _Body = List[Tuple[dbc.Label, dbc.Input]]
 _Footer = List[dbc.Button]
 
 
-def showPopup(id, header: str, body: _Body, footer: _Footer) -> dbc.Modal:
+def buildPopup(id, header: str, body: _Body, footer: _Footer) -> dbc.Modal:
     '''HTML 팝업창을 만든다.
 
     :param id: 팝업창의 DOM ID

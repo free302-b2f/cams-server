@@ -26,6 +26,14 @@ layout = html.Div(
         ),
         html.Br(),
         dcc.Input(
+            id="lm-create-password-confirm",
+            type="password",
+            placeholder="password",
+            maxLength=User.max_password,
+            required=True,
+        ),
+        html.Br(),
+        dcc.Input(
             id="lm-create-email",
             type="email",
             placeholder="email",
@@ -52,7 +60,7 @@ layout = html.Div(
 
 
 def status_error(n_clicks):
-    return [html.H3(f'Sing up failed({n_clicks}). Please try again.')]
+    return [html.H3(f"Sing up failed({n_clicks}). Please try again.")]
 
 
 def status_success(username: str):
@@ -68,21 +76,22 @@ from app import app, add_page
 @app.callback(
     Output("lm-create-status", "children"),
     Input("lm-create-submit", "n_clicks"),
-    [
-        State("lm-create-username", "value"),
-        State("lm-create-password", "value"),
-        State("lm-create-email", "value"),
-    ],
+    State("lm-create-username", "value"),
+    State("lm-create-password", "value"),
+    State("lm-create-password-confirm", "value"),
+    State("lm-create-email", "value"),
 )
-def insert_users(n_clicks, un, pw, em):
+def insert_users(n_clicks, un, pw, pwc, em):
     """새 사용자를 추가한다"""
 
     if n_clicks > 0:
-        if un is None or pw is None or em is None:
+        if un is None or pw is None or em is None or (pw != pwc):
             return status_error(n_clicks)
 
         user = User(
-            username=un, email=em, password=wsec.generate_password_hash(pw, method="sha256")
+            username=un,
+            email=em,
+            password=wsec.generate_password_hash(pw, method="sha256"),
         )
         db.session.add(user)
         db.session.commit()
@@ -92,6 +101,5 @@ def insert_users(n_clicks, un, pw, em):
 
 
 # 이 페이지를 메인 라우터에 등록한다.
-add_page(layout, "Sign Up") #test
-#add_page(layout) #test
-
+add_page(layout, "Sign Up")  # test
+# add_page(layout) #test

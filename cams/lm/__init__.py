@@ -6,7 +6,7 @@
 
 # region ---- __all__ 정의 ----
 
-__all__ = ["login", "create"]
+__all__ = ["create", "login", 'logout']
 
 # endregion
 

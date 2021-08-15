@@ -1,7 +1,5 @@
 """로그인 뷰 및 콜백"""
 
-from dash_html_components.Br import Br
-from dash_html_components.Span import Span
 from lm.imports import *
 from lm.user import User
 
@@ -41,11 +39,11 @@ layout = html.Div(
 
 
 def status_success(username: str):
-    return [html.H3("Login successful."), dcc.Link("Home", href="/")]
+    return [html.H3(f"User '{username}' logged in."), dcc.Link("Home", href="apps.home")]
 
 
 def status_error(n_clicks):
-    return [html.H3(f"Log in Failed({n_clicks}). Please try again.")]
+    return [html.H3(f"Log in failed({n_clicks}). Please try again.")]
 
 
 from app import app, add_page
@@ -73,5 +71,5 @@ def login_button_click(n_clicks, input1, input2):
 
 
 # 이 페이지를 메인 라우터에 등록한다.
-add_page(layout, "Login") #test
+add_page(layout, "Log In") #test
 #add_page(layout) #test
