@@ -1,6 +1,6 @@
 '''패키지 db 에서 공통으로 사용하는 외부모듈 임포트 목록'''
 
-import sys
+import sys, json
 from db import db
 from db.action_builder import ActionBuilder
 from typing import List

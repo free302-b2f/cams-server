@@ -68,3 +68,4 @@ def login_status(url):
     return dbc.NavLink(status, href=pathname), userId
 
     
+application = app.server

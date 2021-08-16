@@ -16,6 +16,12 @@ class Farms(db.Model):
     def __repr__(self):
         return f"<Farm {self.name}>"
 
+    def to_dict(self):
+        dic = {}
+        dic['id'] = self.id
+        dic['name'] = self.name
+        return dic
+
 
 # 모듈 함수 추가
 ActionBuilder[Farms](sys.modules[__name__], Farms)
