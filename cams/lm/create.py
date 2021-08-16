@@ -2,7 +2,8 @@
 
 from dash_html_components.Br import Br
 from lm.imports import *
-from lm.user import User
+from db.user import User
+from db import db
 
 
 layout = html.Div(

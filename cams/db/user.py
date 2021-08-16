@@ -1,6 +1,7 @@
-'''로그인 사용자 모델 정의 및 관련 로직'''
+"""로그인 사용자 모델 정의 및 관련 로직"""
 
-from lm.imports import *
+import flask_login as fli
+from db import db
 
 
 class User(fli.UserMixin, db.Model):
@@ -17,4 +18,4 @@ class User(fli.UserMixin, db.Model):
     password = db.Column(db.String(max_password_hash))
 
     def __repr__(self):
-        return f'<User {self.username}>'
+        return f"<User {self.username}>"

@@ -35,18 +35,13 @@
         "Port": 25432,
         "Db": "db_cams",
         "User": "cams",
-        "Pw": "best"
+        "Pw": "best",
+        "DropTables": false
     },
     "Cams": {
         "DbmsKey": "Mongo"
     },
     "LoginManager": {
-        "SECRET_KEY": "605feac2f60784caf7126e08f69932b4915b4fc3bf590881",
-        "DropTables": false,
-        "Ip": "192.168.0.46",
-        "Port": 25432,
-        "Db": "db_cams",
-        "User": "cams",
-        "Pw": "best"
+        "SECRET_KEY": "605feac2f60784caf7126e08f69932b4915b4fc3bf590881"
     }
 }

@@ -19,12 +19,12 @@ from dash.dependencies import Input, Output, State
 #flask
 import flask as fl
 import flask_login as fli
-import werkzeug.security as wsec #import generate_password_hash, check_password_hash
+import werkzeug.security as wsec #generate_password_hash, check_password_hash
 
 #apps
 import apps.utility as util
 
-#lm
-from lm import _set as set
-from lm import db, loginManager # ml properties
+# #lm
+# from lm import _set as set
+# from lm import loginManager # lm properties
 

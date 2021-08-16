@@ -1,7 +1,7 @@
 """로그인 뷰 및 콜백"""
 
 from lm.imports import *
-from lm.user import User
+from db.user import User
 
 layout = html.Div(
     [

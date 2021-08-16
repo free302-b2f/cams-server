@@ -16,7 +16,7 @@ from dash import Dash
 import dash_bootstrap_components as dbc  # sidebar component
 
 import apps.utility as util
-import lm
+import db, lm
 
 # endregion
 
@@ -61,11 +61,10 @@ cache = Cache(
 # endregion
 
 
-# region ---- Login Manager ----
-"""LoginManager 생성 및 app 설정"""
+# region ---- DB * Login Manager 초기화 ----
 
-# Login manager object will be used to login / logout users
-login_manager = lm.get_manager(server)
+db.init_app(server)
+lm.init_app(server)
 
 # endregion
 

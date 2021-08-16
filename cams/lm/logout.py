@@ -1,7 +1,7 @@
 """로그아웃 뷰 및 콜백"""
 
 from lm.imports import *
-from lm.user import User
+from db.user import User
 from app import app, add_page
 
 layout = html.Div(
