@@ -1,3 +1,7 @@
+"""패키지 초기화
+ + __all__ 정의
+"""
+
 from os.path import dirname, basename, isfile, join
 import glob
 

@@ -31,6 +31,9 @@ _dbUri = (
 )
 _db: SQLAlchemy = None
 _load_user: FunctionType = None
+_load_farm: FunctionType = None
+_load_sensor: FunctionType = None
+_load_sensor_data: FunctionType = None
 
 # endregion
 
@@ -55,17 +58,23 @@ def init_app(server: fl.Flask) -> fli.LoginManager:
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
     )
 
-    global _db, _load_user
+    global _db, _load_user, _load_farm, _load_sensor, _load_sensor_data
 
     #! db.xxx 모듈을 실행하기 전에 _db 초기화 필요
     _db = SQLAlchemy(server)
 
     #! import all models
     from db.user import User
+    from db.farm import Farms
+    from db.sensor import Sensors
+    from db.sensor_data import Sensor_Data
 
     # import other model here...
 
     _load_user = User.query.get
+    _load_farm = Farms.query.get
+    _load_sensor = Sensors.query.get
+    _load_sensor_data = Sensor_Data.query.get
 
     # create all model tables
     if _set["DropTables"]:

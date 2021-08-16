@@ -2,8 +2,7 @@
 
 from dash_html_components.Br import Br
 from lm.imports import *
-from db.user import User
-from db import db
+import db.user as db  # import User, insertUser
 
 
 layout = html.Div(
@@ -14,7 +13,7 @@ layout = html.Div(
             id="lm-create-username",
             type="text",
             placeholder="login name",
-            maxLength=User.max_username,
+            maxLength=db.User.max_username,
             required=True,
         ),
         html.Br(),
@@ -22,7 +21,7 @@ layout = html.Div(
             id="lm-create-password",
             type="password",
             placeholder="password",
-            maxLength=User.max_password,
+            maxLength=db.User.max_password,
             required=True,
         ),
         html.Br(),
@@ -30,7 +29,7 @@ layout = html.Div(
             id="lm-create-password-confirm",
             type="password",
             placeholder="password",
-            maxLength=User.max_password,
+            maxLength=db.User.max_password,
             required=True,
         ),
         html.Br(),
@@ -38,7 +37,7 @@ layout = html.Div(
             id="lm-create-email",
             type="email",
             placeholder="email",
-            maxLength=User.max_email,
+            maxLength=db.User.max_email,
             required=True,
         ),
         html.Br(),
@@ -82,20 +81,14 @@ from app import app, add_page
     State("lm-create-password-confirm", "value"),
     State("lm-create-email", "value"),
 )
-def insert_users(n_clicks, un, pw, pwc, em):
+def insert_user(n_clicks, un, pw, pwc, em):
     """새 사용자를 추가한다"""
 
     if n_clicks > 0:
         if un is None or pw is None or em is None or (pw != pwc):
             return status_error(n_clicks)
 
-        user = User(
-            username=un,
-            email=em,
-            password=wsec.generate_password_hash(pw, method="sha256"),
-        )
-        db.session.add(user)
-        db.session.commit()
+        db.insert(username=un, password=pw, email=em)
 
         return status_success(un)
     return ""

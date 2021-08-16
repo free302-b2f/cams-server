@@ -1,7 +1,7 @@
 """로그인 뷰 및 콜백"""
 
 from lm.imports import *
-from db.user import User
+import db.user as db  # import User, getUserByName
 
 layout = html.Div(
     [
@@ -11,6 +11,7 @@ layout = html.Div(
             placeholder="login name",
             type="text",
             id="lm-login-uname-box",
+            maxLength=db.User.max_username,
             required=True,
         ),
         html.Br(),
@@ -18,6 +19,7 @@ layout = html.Div(
             placeholder="password",
             type="password",
             id="lm-login-pwd-box",
+            maxLength=db.User.max_password,
             required=True,
         ),
         html.Br(),
@@ -39,7 +41,10 @@ layout = html.Div(
 
 
 def status_success(username: str):
-    return [html.H3(f"User '{username}' logged in."), dcc.Link("Home", href="apps.home")]
+    return [
+        html.H3(f"User '{username}' logged in."),
+        dcc.Link("Home", href="apps.home"),
+    ]
 
 
 def status_error(n_clicks):
@@ -60,16 +65,16 @@ def login_button_click(n_clicks, input1, input2):
     """로그인 뷰의 콜백"""
 
     if n_clicks > 0:
-        user = User.query.filter_by(username=input1).first()
+        user = db.getBy(username=input1)
         if user:
             if wsec.check_password_hash(user.password, input2):
                 fli.login_user(user)
-                return dash.no_update, status_success(user.username)
+                return "apps.home", status_success(user.username)
 
         return dash.no_update, status_error(n_clicks)
     return dash.no_update, ""
 
 
 # 이 페이지를 메인 라우터에 등록한다.
-add_page(layout, "Log In") #test
-#add_page(layout) #test
+add_page(layout, "Log In")  # test
+# add_page(layout) #test
