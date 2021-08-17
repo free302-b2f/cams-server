@@ -2,33 +2,41 @@
 
 from db.imports import *
 
-class Sensor_Data(db.Model):
+db.Model.metadata.reflect(bind=db.engine, schema="db_cams")
+
+
+class SensorData(db.Model):
     """센서 데이터의 DB 모델"""
 
-    # 상수
+    def _reflect() -> sc.Table:
+        return sc.Table(
+            "sensor_data",
+            db.Model.metadata,
+            sc.Column("id", st.Integer, primary_key=True, autoincrement="auto"),
+            autoload_with=db.engine,
+        )
 
-    # 테이블 컬럼 정의
-    id = sc.Column(st.Integer, primary_key=True, autoincrement="auto")
-    time = sc.Column(st.DateTime, nullable=False)
-    farm_id = sc.Column(st.Integer)
-    sensor_id = sc.Column(st.Integer)
-    air_temp = sc.Column(st.Float)
-    leaf_temp = sc.Column(st.Float)
-    humidity = sc.Column(st.Float)
-    light = sc.Column(st.Float)
-    co2 = sc.Column(st.Float)
-    dewpoint = sc.Column(st.Float)
-    evapotrans = sc.Column(st.Float)
-    hd = sc.Column(st.Float)
-    vpd = sc.Column(st.Float)
+    __table__ = _reflect()
 
     def __repr__(self):
-        return f"<Farm {self.name}>"
+        return f"<SensorData {self.sensor_id}@{self.time}>"
+
+    def to_dict(self):
+        dic = {}
+        dic["id"] = self.id
+        dic["time"] = self.time
+        dic["farm_id"] = self.farm_id
+        dic["sendor_id"] = self.sensor_id
+        dic["air_temp"] = self.air_temp
+        dic["leaf_temp"] = self.leaf_temp
+        dic["humidity"] = self.humidity
+        dic["light"] = self.light
+        dic["co2"] = self.co2
+        dic["dewpoint"] = self.dewpoint
+        dic["evapotrans"] = self.evapotrans
+        dic["hd"] = self.hd
+        dic["vpd"] = self.vpd
+        return dic
 
 
-# 모듈 함수 추가
-ActionBuilder[Sensor_Data](sys.modules[__name__], Sensor_Data)
-
-# FOREIGN KEY (farm_id) REFERENCES farms (id),
-# FOREIGN KEY (sensor_id) REFERENCES sensors (id),
-# UNIQUE (time, sensor_id)
+ActionBuilder[SensorData](sys.modules[__name__], SensorData)

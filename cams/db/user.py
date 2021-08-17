@@ -23,6 +23,14 @@ class User(fli.UserMixin, db.Model):
     def __repr__(self):
         return f"<User {self.username}>"
 
+    def to_dict(self):
+        dic = {}
+        dic["id"] = self.id
+        dic["username"] = self.username
+        dic["email"] = self.email
+        dic["password"] = self.password
+        return dic
+
 
 class _UserAction(ActionBuilder[User]):
     """db.user 모듈의 insert() 함수를 오버라이딩하는 클래스"""

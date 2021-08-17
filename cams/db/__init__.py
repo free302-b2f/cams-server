@@ -67,14 +67,14 @@ def init_app(server: fl.Flask) -> fli.LoginManager:
     from db.user import User
     from db.farm import Farms
     from db.sensor import Sensors
-    from db.sensor_data import Sensor_Data
+    from db.sensor_data import SensorData
 
     # import other model here...
 
     _load_user = User.query.get
     _load_farm = Farms.query.get
     _load_sensor = Sensors.query.get
-    _load_sensor_data = Sensor_Data.query.get
+    _load_sensor_data = SensorData.query.get
 
     # create all model tables
     if _set["DropTables"]:

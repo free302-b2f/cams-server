@@ -16,6 +16,12 @@ class Sensors(db.Model):
     def __repr__(self):
         return f"<Sensor {self.sn}>"
 
+    def to_dict(self):
+        dic = {}
+        dic["id"] = self.id
+        dic["sn"] = self.sn
+        return dic
+
 
 # 모듈 함수 추가
 ActionBuilder[Sensors](sys.modules[__name__], Sensors)

@@ -18,8 +18,8 @@ class Farms(db.Model):
 
     def to_dict(self):
         dic = {}
-        dic['id'] = self.id
-        dic['name'] = self.name
+        dic["id"] = self.id
+        dic["name"] = self.name
         return dic
 
 

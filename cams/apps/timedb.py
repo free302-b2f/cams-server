@@ -53,6 +53,7 @@ def f2_init_and_seed():
         # 센서데이터 테이블
         query_create_sensordata_table = """
         CREATE TABLE IF NOT EXISTS sensor_data (
+            id SERIAL, 
             time TIMESTAMPTZ NOT NULL,
             farm_id INTEGER,
             sensor_id INTEGER,
@@ -67,12 +68,17 @@ def f2_init_and_seed():
             vpd DOUBLE PRECISION,
             FOREIGN KEY (farm_id) REFERENCES farms (id),
             FOREIGN KEY (sensor_id) REFERENCES sensors (id),
-            UNIQUE (time, sensor_id)
-        );"""
+            UNIQUE (time, sensor_id),
+            UNIQUE (id, time, sensor_id)
+        );
+        CREATE INDEX ON sensor_data (id);"""
 
         # 센서테이터에 대한 하이퍼테이블 생성
         query_create_sensordata_hypertable = """
-        SELECT create_hypertable('sensor_data', 'time', if_not_exists => TRUE);
+        SELECT create_hypertable('sensor_data', 'time', 
+            partitioning_column => 'sensor_id',
+			number_partitions => 100, 
+            if_not_exists => TRUE);
         SELECT set_chunk_time_interval('sensor_data', INTERVAL '7 days');
         """
         cursor.execute(query_create_sensors_table)
@@ -147,7 +153,7 @@ def f2_init_and_seed():
     cursor.close()
 
 
-# f2_init_and_seed();
+#f2_init_and_seed()
 # endregion
 
 
@@ -200,8 +206,8 @@ def f2_copy_mongo():
     first = _sensors.find().sort([("_id", 1), ("Date", 1)]).limit(1)[0]["Date"]
     last = _sensors.find().sort([("_id", -1), ("Date", -1)]).limit(1)[0]["Date"]
 
-    t1 = util.parseDate(first)
-    t2 = util.parseDate(last)
+    t1 = datetime(2020, 2, 10) #util.parseDate(first)
+    t2 = datetime(2020, 2, 20)#util.parseDate(last)
     numDays = (t2 - t1).days
     for d in range(0, numDays):
         date = (t1 + timedelta(days=d)).strftime("%Y%m%d")
@@ -222,7 +228,7 @@ def f2_copy_mongo():
     return
 
 
-# f2_copy_mongo() #test
+#f2_copy_mongo() #test
 
 
 # region ---- view ----
@@ -248,14 +254,14 @@ def f3_load_data() -> Tuple[List[float], pd.DataFrame]:
 
     startTime = timer()
 
-    # 첫번째 센서의 2021-02-16 데이터 추출
-    start = datetime(2021, 2, 16)  # datetime.now().strftime('%Y-%m-%d')
-    end = start + timedelta(hours=23, minutes=59, seconds=59, microseconds=999999)
+    # 첫번째 센서의 2020-02-16 데이터 추출
+    start = datetime(2020, 2, 16).date()  # datetime.now().strftime('%Y-%m-%d')
+    #end = start + timedelta(hours=23, minutes=59, seconds=59, microseconds=999999)
     sql = cursor.mogrify(
         """select * from sensor_data 
-        WHERE (sensor_id = %s) AND (time BETWEEN %s AND %s)
+        WHERE (sensor_id = %s) AND (date(time) = %s)
         ORDER BY time DESC LIMIT 10000""",
-        (sensorIds[0], start, end),
+        (sensorIds[0], start),
     )
     debug(f"{sql}")
 
