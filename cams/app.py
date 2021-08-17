@@ -165,7 +165,6 @@ def add_page(layout, menuName: str = None, menuOrder: int = 0):
     # null name -> redirect url
     if menuName is None:
         debug(add_page, "menuName == None")
-        return
     else:
         # check duplicated menuName
         name_count = len(
@@ -179,7 +178,8 @@ def add_page(layout, menuName: str = None, menuOrder: int = 0):
 
     # add to dict
     router[pathName] = layout  # add layout
-    sidebar_items[menuOrder] = (menuName, pathName)  # add sidebar item
+    if menuName:
+        sidebar_items[menuOrder] = (menuName, pathName)  # add sidebar item
 
 
 # endregion

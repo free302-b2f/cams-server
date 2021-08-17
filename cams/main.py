@@ -63,7 +63,7 @@ def login_status(url):
     status, pathname, userId = 'Login', 'lm.login', 'anonymous'
     if fli.current_user.is_authenticated: 
         status, pathname = fli.current_user.username, 'lm.logout'
-        data = fli.current_user.get_id()
+        userId = fli.current_user.get_id()
 
     return dbc.NavLink(status, href=pathname), userId
 

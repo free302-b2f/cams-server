@@ -60,5 +60,5 @@ def logout_handler(n_ok: int, n_cancel: int):
 
 
 # 이 페이지를 메인 라우터에 등록한다.
-add_page(layout, "Log Out")  # test
-# add_page(layout) #test
+# add_page(layout, "Log Out")  # test
+add_page(layout) #test

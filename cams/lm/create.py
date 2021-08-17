@@ -81,19 +81,30 @@ from app import app, add_page
     State("lm-create-password-confirm", "value"),
     State("lm-create-email", "value"),
 )
-def insert_user(n_clicks, un, pw, pwc, em):
+def insert_user(n_clicks: int, un: str, pw: str, pwc: str, em: str):
     """새 사용자를 추가한다"""
 
     if n_clicks > 0:
+
         if un is None or pw is None or em is None or (pw != pwc):
             return status_error(n_clicks)
 
-        db.insert(username=un, password=pw, email=em)
+        un = un.strip()
+        pw = pw.strip()
+        pwc = pwc.strip()
+        em = em.strip()
+        if pw != pwc:
+            return status_error(n_clicks)
 
-        return status_success(un)
+        user = db.firstBy(filterBy={"username": un})
+        if user:
+            return status_error(n_clicks)
+        else:
+            db.insert(username=un, password=pw, email=em)
+            return status_success(un)
     return ""
 
 
 # 이 페이지를 메인 라우터에 등록한다.
-add_page(layout, "Sign Up")  # test
-# add_page(layout) #test
+# add_page(layout, "Sign Up")  # test
+add_page(layout)  # test
