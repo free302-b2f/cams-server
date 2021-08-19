@@ -6,7 +6,7 @@ from dash import no_update
 
 
 # 팝업 레이아웃
-modal = util.buildPopup(
+_modal = util.buildPopup(
     id="app-sidebar-restart-modal",
     header="Restarting CAMs",
     body=[
@@ -34,6 +34,16 @@ modal = util.buildPopup(
         ),
         dcc.Location("app-sidebar-restart-url", refresh=True),
     ],
+)
+
+# 메인메뉴 레이아웃
+layout = html.Div(
+    [
+        dbc.Button(
+            "RESTART", n_clicks=0, id="app-sidebar-restart"
+        ),  # , color="primary"),
+        _modal,
+    ]
 )
 
 

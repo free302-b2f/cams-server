@@ -44,6 +44,7 @@ def toggle_navbar_collapse(n, is_open):
 
     return not is_open if n else is_open
 
+
 # endregion
 
 
@@ -62,29 +63,6 @@ def display_page(pathname):
     if callable(v):
         v = v()
     return v
-
-
-# endregion
-
-
-# region ----[ Login Callback ]----
-@app.callback(
-    Output("app-sidebar-login", "children"),
-    Output("app-storage", "data"),
-    Input("app-url", "pathname"),
-)
-def login_status(url):
-    """메인 메뉴바에 로그인 상태를 표시하는 콜백"""
-
-    status, pathname, userId = "Login", "lm.login", "anonymous"
-    if fli.current_user.is_authenticated:
-        status, pathname = fli.current_user.username, "lm.logout"
-        userId = fli.current_user.get_id()
-
-    # TODO: NavLink 대신 popup 사용
-    link = (dbc.NavLink(status, href=pathname), userId)
-
-    return link
 
 
 # endregion

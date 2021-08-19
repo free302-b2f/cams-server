@@ -43,8 +43,10 @@ pages = [
 ]
 
 
-# login status & link
-pages.append(html.Div(id="app-sidebar-login"))
+# login status & user profile
+import lm.status
+
+pages.append(lm.status.layout)
 
 # ----[임시항목: GitHub Repository ]----
 pages.append(
@@ -59,15 +61,9 @@ pages.append(
 )
 
 # ----[임시항목: restart CAMs ]----
-from apps.restart import modal
-pages.append(
-    html.Div(
-        [
-            dbc.Button("RESTART", n_clicks=0, id="app-sidebar-restart", color="primary"),
-            html.Div(modal, id="app-sidebar-restart-container"),
-        ]
-    )
-)
+import apps.restart
+
+pages.append(apps.restart.layout)
 
 
 # 메인 레이아웃 - 메뉴바
@@ -89,10 +85,7 @@ sidebar = dbc.Navbar(
 content = html.Div(id="app-content", className="app-content")
 
 # 메인 레이아웃 - 주소표시줄 제어
-locator = [
-    dcc.Location(id="app-url", refresh=False),
-    dcc.Store(id="app-storage", storage_type="session"),
-]
+locator = dcc.Location(id="app-url", refresh=False)
 
 # 메인 레이아웃 설정
-app.layout = html.Div([*locator, sidebar, content], className="app-container")
+app.layout = html.Div([locator, sidebar, content], className="app-container")

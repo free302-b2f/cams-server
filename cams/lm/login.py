@@ -27,7 +27,7 @@ layout = html.Div(
             children="Login", n_clicks=0, type="submit", id="lm-login-login-button"
         ),
         html.Br(),
-        html.Div(children="", id="lm-login-status", className="text-danger"),
+        html.Div(id="lm-login-status"),
         html.Div(
             [
                 html.Br(),
@@ -42,13 +42,17 @@ layout = html.Div(
 
 def status_success(username: str):
     return [
-        html.H3(f"User '{username}' logged in."),
+        html.H3(f"User '{username}' logged in.", className="text-info"),
         dcc.Link("Home", href="apps.home"),
     ]
 
 
 def status_error(n_clicks):
-    return [html.H3(f"Log in failed({n_clicks}). Please try again.")]
+    return [
+        html.H3(
+            f"Log in failed({n_clicks}). Please try again.", className="text-danger"
+        )
+    ]
 
 
 from app import app, add_page
@@ -65,7 +69,7 @@ def login_button_click(n_clicks, input1, input2):
     """로그인 뷰의 콜백"""
 
     if n_clicks > 0:
-        user = db.firstBy(filterBy={"username":input1})
+        user = db.firstBy(filterBy={"username": input1})
         if user:
             if wsec.check_password_hash(user.password, input2):
                 fli.login_user(user)
@@ -77,4 +81,4 @@ def login_button_click(n_clicks, input1, input2):
 
 # 이 페이지를 메인 라우터에 등록한다.
 # add_page(layout, "Log In")  # test
-add_page(layout) #test
+add_page(layout)  # test
