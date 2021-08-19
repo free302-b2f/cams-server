@@ -11,6 +11,7 @@ psycopg2-binary
 flask
 flask_caching
 flask-login
+Flask-SQLAlchemy
 
 dash
 dash_daq

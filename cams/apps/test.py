@@ -17,7 +17,7 @@ def load_data(db) -> List[dict]:
     return dics
 
 
-def load_sensor_data() -> List[dict]:
+def load_sensor_data(sensorId:int) -> List[dict]:
     """DB에서 sensor_data 테이블의 레코드를 추출한다"""
 
     sd = db.sensor_data
@@ -29,7 +29,7 @@ def load_sensor_data() -> List[dict]:
     dics = sd.listDictBy(
         limit=10000,
         orderBy=[SD.time.desc()],
-        filterBy={"sensor_id": 26},
+        filterBy={"sensor_id": sensorId},
         filter=[SD.time >= start, SD.time < end],
     )
 
@@ -85,7 +85,7 @@ def layout():
     cols = db.sensor.Sensors.__table__.columns.keys()
     dtSensors = build_data_table(cols, df, "test-dt-sensor")
 
-    df = load_sensor_data()
+    df = load_sensor_data(df[0]["id"])
     cols = db.sensor_data.SensorData.__table__.columns.keys()
     dtData = build_data_table(
         cols, df, "test-dt-sensor-data", ["id", "time", "farm_id", "sensor_id"]

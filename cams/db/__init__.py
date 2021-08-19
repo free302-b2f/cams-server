@@ -62,6 +62,7 @@ def init_app(server: fl.Flask) -> fli.LoginManager:
 
     #! db.xxx 모듈을 실행하기 전에 _db 초기화 필요
     _db = SQLAlchemy(server)
+    _db.Model.metadata.reflect(bind=_db.engine, schema=_set["Db"])
 
     #! import all models
     from db.user import User

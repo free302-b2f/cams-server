@@ -16,7 +16,6 @@ from dash import Dash
 import dash_bootstrap_components as dbc  # sidebar component
 
 import apps.utility as util
-import db, lm
 
 # endregion
 
@@ -42,6 +41,7 @@ app.config["external_stylesheets"] = ext_css
 app.config["external_scripts"] = ext_js
 server = app.server
 
+# Ubunut에서 os.chdir(server.root_path) 필요
 os.chdir(server.root_path)
 _set = util.loadSettings("app_settings.json")
 
@@ -63,6 +63,8 @@ cache = Cache(
 
 # region ---- DB * Login Manager 초기화 ----
 
+# Ubunut에서 os.chdir(server.root_path) 이후에
+import db, lm
 db.init_app(server)
 lm.init_app(server)
 

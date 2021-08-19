@@ -24,17 +24,17 @@ class User(fli.UserMixin, db.Model):
         return f"<User {self.username}>"
 
     def to_dict(self):
-        dic = {}
-        dic["id"] = self.id
-        dic["username"] = self.username
-        dic["email"] = self.email
-        dic["password"] = self.password
+        """인스턴스 객체의 dict 표현을 구한다"""
+
+        keys = self.__table__.columns.keys()
+        dic = {key: self.__getattribute__(key) for key in keys}
         return dic
 
 
 class _UserAction(ActionBuilder[User]):
-    """db.user 모듈의 insert() 함수를 오버라이딩하는 클래스"""
+    """db.user 모듈 ActionBuilder에 의해 정의된 함수를 오버라이딩하는 클래스"""
 
+    # override insert()
     def insert(self, **kwargs) -> User:
         """오버라이드 - 패스워드 암호화 추가"""
 

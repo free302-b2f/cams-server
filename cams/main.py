@@ -15,9 +15,9 @@ import dash_bootstrap_components as dbc
 import flask_login as fli
 
 from app import app, router, debug
-from apps import *
 from db import *
 from lm import *
+from apps import *
 
 #! main_layout을 임포트 하기전에 다른 페이지를 전부 임포트해야한다.
 import apps.home

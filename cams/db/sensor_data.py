@@ -1,8 +1,8 @@
 """센서데이터 모델 정의 및 관련 로직"""
 
+from types import LambdaType
+from typing import Dict
 from db.imports import *
-
-db.Model.metadata.reflect(bind=db.engine, schema="db_cams")
 
 
 class SensorData(db.Model):
@@ -12,30 +12,26 @@ class SensorData(db.Model):
         return sc.Table(
             "sensor_data",
             db.Model.metadata,
+            #
+            # TimescaleDB hypertable 제약조건과 SqlAlchemy의 제약조건간 충돌
+            #  -> id 컬럼에 PK 속성을 추가
+            # TODO: sqlalchemy에서 id 컬럼 없이 동작?
+            #
             sc.Column("id", st.Integer, primary_key=True, autoincrement="auto"),
+            #
             autoload_with=db.engine,
         )
 
     __table__ = _reflect()
+    _keys = __table__.columns.keys()
 
     def __repr__(self):
         return f"<SensorData {self.sensor_id}@{self.time}>"
 
     def to_dict(self):
-        dic = {}
-        dic["id"] = self.id
-        dic["time"] = self.time
-        dic["farm_id"] = self.farm_id
-        dic["sendor_id"] = self.sensor_id
-        dic["air_temp"] = self.air_temp
-        dic["leaf_temp"] = self.leaf_temp
-        dic["humidity"] = self.humidity
-        dic["light"] = self.light
-        dic["co2"] = self.co2
-        dic["dewpoint"] = self.dewpoint
-        dic["evapotrans"] = self.evapotrans
-        dic["hd"] = self.hd
-        dic["vpd"] = self.vpd
+        """인스턴스 객체의 dict 표현을 구한다"""
+
+        dic = {key: self.__getattribute__(key) for key in self._keys}
         return dic
 
 

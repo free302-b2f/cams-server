@@ -9,17 +9,20 @@ class Farms(db.Model):
     # 상수
     max_name = 64
 
-    # 테이블 컬럼 정의
-    id = db.Column(db.Integer, primary_key=True, autoincrement="auto")
-    name = db.Column(db.String(max_name), unique=True, nullable=False)
+    __table__ = sc.Table(
+        "farms",
+        db.Model.metadata,
+        autoload_with=db.engine,
+    )
+    _keys = __table__.columns.keys()
 
     def __repr__(self):
         return f"<Farm {self.name}>"
 
     def to_dict(self):
-        dic = {}
-        dic["id"] = self.id
-        dic["name"] = self.name
+        """인스턴스 객체의 dict 표현을 구한다"""
+
+        dic = {key: self.__getattribute__(key) for key in self._keys}
         return dic
 
 
