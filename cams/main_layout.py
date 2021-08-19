@@ -31,21 +31,44 @@ brand = dbc.NavLink(
 )
 
 # app.sidebar_items에 등록된 메뉴항목에 대한 NavLink 생성
-pages = [dbc.NavLink(sb[k][0], href=sb[k][1], active="partial") for k in sorted(sb)]
+pages = [
+    dbc.NavLink(
+        sb[k][0],
+        href=sb[k][1],
+        active="partial",
+        n_clicks=0,
+        id=f"app-sidebar-link-{sb[k][1].split('.')[-1]}",
+    )
+    for k in sorted(sb)
+]
+
 
 # login status & link
-pages.append(html.Div(id="sidebar-login"))
+pages.append(html.Div(id="app-sidebar-login"))
 
 # ----[임시항목: GitHub Repository ]----
 pages.append(
-    html.Div(
-        dbc.NavLink(
-            "GitHub", href="https://github.com/free302-b2f/cams-server", target="github"
-        ),
+    dbc.NavLink(
+        "GitHub",
+        href="https://github.com/free302-b2f/cams-server",
+        target="github",
+        n_clicks=0,
         id="sidebar-github",
-        style={'font-style':'italic'}
+        style={"font-style": "italic"},
     )
 )
+
+# ----[임시항목: restart CAMs ]----
+from apps.restart import modal
+pages.append(
+    html.Div(
+        [
+            dbc.Button("RESTART", n_clicks=0, id="app-sidebar-restart", color="primary"),
+            html.Div(modal, id="app-sidebar-restart-container"),
+        ]
+    )
+)
+
 
 # 메인 레이아웃 - 메뉴바
 sidebar = dbc.Navbar(
@@ -68,7 +91,6 @@ content = html.Div(id="app-content", className="app-content")
 # 메인 레이아웃 - 주소표시줄 제어
 locator = [
     dcc.Location(id="app-url", refresh=False),
-    dcc.Location(id="app-url-redirect", refresh=True),
     dcc.Store(id="app-storage", storage_type="session"),
 ]
 

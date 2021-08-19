@@ -65,6 +65,7 @@ cache = Cache(
 
 # Ubunut에서 os.chdir(server.root_path) 이후에
 import db, lm
+
 db.init_app(server)
 lm.init_app(server)
 

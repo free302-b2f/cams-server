@@ -6,7 +6,7 @@ import db.user as db  # import User, getUserByName
 layout = html.Div(
     [
         dcc.Location(id="lm-login-url", refresh=True),
-        html.H3("""Please log in to continue:""", id="h1"),
+        html.H3("Please log in to continue:", id="h1"),
         dcc.Input(
             placeholder="login name",
             type="text",

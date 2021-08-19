@@ -11,10 +11,11 @@
 import dash_core_components as dcc
 from dash.dependencies import Input, Output, State
 import dash_bootstrap_components as dbc
+from dash import no_update
 
 import flask_login as fli
 
-from app import app, router, debug
+from app import app, error, router, debug
 from db import *
 from lm import *
 from apps import *
@@ -30,6 +31,9 @@ import main_layout
 app.validation_layout = [app.layout, *router.values()]
 
 
+# region ----[ NavBar Status Callback ]----
+
+
 @app.callback(
     Output("navbar-collapse", "is_open"),
     Input("navbar-toggler", "n_clicks"),
@@ -40,6 +44,11 @@ def toggle_navbar_collapse(n, is_open):
 
     return not is_open if n else is_open
 
+# endregion
+
+
+# region ----[ Main Callback ]----
+
 
 @app.callback(Output("app-content", "children"), Input("app-url", "pathname"))
 def display_page(pathname):
@@ -47,25 +56,39 @@ def display_page(pathname):
 
     debug(f"{pathname = }")
     v = router.get(pathname, apps.home.layout)
+    if v is None:
+        error(f"Layout of {pathname=} is 'None'")
+        return no_update
     if callable(v):
         v = v()
     return v
 
 
+# endregion
+
+
+# region ----[ Login Callback ]----
 @app.callback(
-    Output("sidebar-login", "children"),
+    Output("app-sidebar-login", "children"),
     Output("app-storage", "data"),
     Input("app-url", "pathname"),
 )
 def login_status(url):
-    """callback to display login/logout link in the header"""
+    """메인 메뉴바에 로그인 상태를 표시하는 콜백"""
 
-    status, pathname, userId = 'Login', 'lm.login', 'anonymous'
-    if fli.current_user.is_authenticated: 
-        status, pathname = fli.current_user.username, 'lm.logout'
+    status, pathname, userId = "Login", "lm.login", "anonymous"
+    if fli.current_user.is_authenticated:
+        status, pathname = fli.current_user.username, "lm.logout"
         userId = fli.current_user.get_id()
 
-    return dbc.NavLink(status, href=pathname), userId
+    # TODO: NavLink 대신 popup 사용
+    link = (dbc.NavLink(status, href=pathname), userId)
 
-    
+    return link
+
+
+# endregion
+
+
+# flask app for vscode
 application = app.server
