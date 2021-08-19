@@ -1,19 +1,27 @@
 """사용자 확인을 받아 WSGI 앱 재시작하는 레이아웃과 콜백"""
 
+from dash_html_components.Div import Div
 from apps.imports import *
 import os
 from dash import no_update
 
 
 # 팝업 레이아웃
+_status = html.H4(
+    "Going to restart CAMs. Are you sure?",
+    className="text-info",
+)
+_statusOk = html.H4(
+    "Restarting...",
+    className="text-danger",
+)
 _modal = util.buildPopup(
     id="app-sidebar-restart-modal",
     header="Restarting CAMs",
     body=[
-        html.H4(
-            "Going to restart CAMs... Are you sure?",
+        html.Div(
+            _status,
             id="app-sidebar-restart-status",
-            className="text-info",
         ),
         html.Div(id="app-sidebar-restart-dummy"),
     ],
@@ -32,7 +40,6 @@ _modal = util.buildPopup(
             n_clicks=0,
             disabled=False,
         ),
-        dcc.Location("app-sidebar-restart-url", refresh=True),
     ],
 )
 
@@ -50,7 +57,6 @@ layout = html.Div(
 @app.callback(
     Output("app-sidebar-restart-modal", "is_open"),
     Output("app-sidebar-restart-status", "children"),
-    Output("app-sidebar-restart-status", "className"),
     Output("app-sidebar-restart-ok", "disabled"),
     Output("app-sidebar-restart-cancel", "disabled"),
     Input("app-sidebar-restart", "n_clicks"),
@@ -60,16 +66,16 @@ layout = html.Div(
 def show_modal(n_show, n_ok, n_cancel):
     """팝업을 띄우고 사용자 입력에 대한 반응을 처리하는 콜백"""
 
-    nop = (False, no_update, no_update, no_update, no_update)
+    nop = (False, no_update, no_update, no_update)
 
-    if n_show == 0 and n_ok == 0 and n_cancel == 0:
+    if not (n_show or n_ok or n_cancel):
         return nop
 
     if util.callback_triggered_by(["app-sidebar-restart"]):
-        return True, no_update, no_update, no_update, no_update
+        return True, no_update, no_update, no_update
 
     if util.callback_triggered_by(["app-sidebar-restart-ok"]):
-        return True, "Restarting...", "text-danger", True, True
+        return True, _statusOk, True, True
 
     return nop
 

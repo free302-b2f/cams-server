@@ -23,8 +23,12 @@ layout = html.Div(
             required=True,
         ),
         html.Br(),
-        html.Button(
-            children="Login", n_clicks=0, type="submit", id="lm-login-login-button"
+        dbc.Button(
+            children="Login",
+            n_clicks=0,
+            type="submit",
+            id="lm-login-login-button",
+            color="primary",
         ),
         html.Br(),
         html.Div(id="lm-login-status"),

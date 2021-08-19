@@ -3,7 +3,7 @@
 from lm.imports import *
 import db.user as db  # import User, getUserByName
 from app import app, add_page
-
+import lm.logout
 
 def layout():
 
@@ -25,7 +25,7 @@ def layout():
             dcc.Location(id="lm-profile-url", refresh=True),
             html.Div(
                 [
-                    dcc.Link("Logout", href="lm.logout", style=linkStyle),
+                    html.Div(lm.logout.layout, style=linkStyle),
                     dcc.Link("Change Password", href="lm.change", style=linkStyle),
                 ],
                 style=divStyle,
@@ -62,6 +62,7 @@ def layout():
             html.Div(id="lm-profile-status", className="text-danger"),
         ]
     )
+
 
 
 # 이 페이지를 메인 라우터에 등록한다.

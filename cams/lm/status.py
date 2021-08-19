@@ -8,7 +8,8 @@ layout = html.Div(
     [
         dcc.Store(id="lm-storage", storage_type="session"),
         html.Div(id="app-sidebar-login-link"),
-    ],id="app-sidebar-login"
+    ],
+    id="app-sidebar-login",
 )
 
 
