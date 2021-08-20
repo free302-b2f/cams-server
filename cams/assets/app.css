@@ -36,18 +36,55 @@ ul.nav.nav-pills{
     height:32px;
     /* margin-right: 5px; */
 }
-#sidebar-github
+
+/* ----[ app-sidebar: login ]---- */
+#app-sidebar-login
+{
+    display: flex;
+    flex-grow: 1;
+    justify-content: flex-end;
+    align-items: center;
+}
+.material-icons-two-tone
+{
+    align-items: center;
+    padding-right: 0.3rem;
+}
+.material-icons-two-tone.md-dark { filter: contrast(4) invert(0.5); }
+.material-icons-two-tone.md-light { filter: contrast(4) invert(0.8); }
+.material-icons-two-tone.md-color { color: #539BF5; }
+
+.material-icons.md-dark { color: rgba(0, 0, 0, 0.54); }
+.material-icons.md-dark.md-inactive { color: rgba(0, 0, 0, 0.26); }
+.material-icons.md-light { color: rgba(255, 255, 255, 1); }
+.material-icons.md-light.md-inactive { color: rgba(255, 255, 255, 0.3); }
+
+#app-sidebar-login a
+{
+    display: flex;
+    align-items: center;
+    align-content: center;
+}
+
+
+/* ----[ app-sidebar: GitHub ]---- */
+#app-sidebar-github
 {
     display: flex;
     flex-grow: 0;
     justify-content: flex-end;
 }
- #app-sidebar-login
+#app-sidebar-github div, #app-sidebar-github div:hover
 {
-    display: flex;
-    flex-grow: 1;
-    justify-content: flex-end;
+    width: 24px;
+    height: 24px;
+    background-image: url(/assets/github.svg);
 }
+#app-sidebar-github div{background-image: url(/assets/github.svg);}
+#app-sidebar-github div:hover {background-image: url(/assets/github_dark.svg);}
+/*  SVG fill color: not applied to svg wrapped by <img> */
+#app-sidebar-github path { fill:#444C56; }
+#app-sidebar-github path:hover { fill:#539BF5; }
 
 
 /* home contents */

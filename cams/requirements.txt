@@ -2,7 +2,7 @@ wheel
 redis
 pandas
 matplotlib
-python-dotenv
+Pillow
 
 pymongo
 #psycopg2

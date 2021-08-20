@@ -1,6 +1,5 @@
 """사용자 확인을 받아 WSGI 앱 재시작하는 레이아웃과 콜백"""
 
-from dash_html_components.Div import Div
 from apps.imports import *
 import os
 from dash import no_update
@@ -47,8 +46,11 @@ _modal = util.buildPopup(
 layout = html.Div(
     [
         dbc.Button(
-            "RESTART", n_clicks=0, id="app-sidebar-restart"
-        ),  # , color="primary"),
+            html.Span("restart_alt", className="material-icons-two-tone md-color"),
+            # "RESTART",
+            n_clicks=0,
+            id="app-sidebar-restart",
+            color="transparent"),
         _modal,
     ]
 )

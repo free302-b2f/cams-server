@@ -51,11 +51,11 @@ pages.append(lm.status.layout)
 # ----[임시항목: GitHub Repository ]----
 pages.append(
     dbc.NavLink(
-        "GitHub",
+        html.Div(),
         href="https://github.com/free302-b2f/cams-server",
         target="github",
         n_clicks=0,
-        id="sidebar-github",
+        id="app-sidebar-github",
         style={"font-style": "italic"},
     )
 )
@@ -87,5 +87,8 @@ content = html.Div(id="app-content", className="app-content")
 # 메인 레이아웃 - 주소표시줄 제어
 locator = dcc.Location(id="app-url", refresh=False)
 
+# 로그인 상태 스토리지
+store = dcc.Store(id="lm-storage", storage_type="session")
+
 # 메인 레이아웃 설정
-app.layout = html.Div([locator, sidebar, content], className="app-container")
+app.layout = html.Div([store, locator, sidebar, content], className="app-container")

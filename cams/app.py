@@ -30,15 +30,11 @@ ext_css = [
     "https://codepen.io/chriddyp/pen/bWLwgP.css",  # graph
     dbc.themes.BOOTSTRAP,  # sidebar
 ]
-ext_js = [
-    "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"
-]  # TeX
 
 # , suppress_callback_exceptions=True)
 app = Dash(__name__, url_base_pathname="/")
 app.config["suppress_callback_exceptions"] = True
 app.config["external_stylesheets"] = ext_css
-app.config["external_scripts"] = ext_js
 server = app.server
 
 # Ubunut에서 os.chdir(server.root_path) 필요
