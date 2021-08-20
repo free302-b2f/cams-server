@@ -53,12 +53,14 @@ def layout():
             html.Br(),
             dbc.Button("Edit/Save"),
             html.H3("Preference", style=sectionStyle),
-            html.Li("사용자 옵션..."),
+            html.Pre(" - 사용자 옵션..."),
             dbc.Button("Edit/Save"),
             html.H3("Farms", style=sectionStyle),
-            html.Li("로그인한 사용자가 관리하는 농장 목록"),
+            html.Pre(" - 로그인한 사용자가 관리하는 농장 목록"),
+            html.H3("Sensors", style=sectionStyle),
+            html.Pre(" - 로그인한 사용자가 관리하는 센서/장비 목록"),
             html.H3("Log", style=sectionStyle),
-            html.Li("보안/기술적인 기록"),
+            html.Pre(" - 보안/기술적인 기록"),
             html.Div(id="lm-profile-status", className="text-danger"),
         ]
     )
