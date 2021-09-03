@@ -18,10 +18,11 @@ import psycopg2.extras as pga
 
 from flask import request
 
-from dash import callback_context as cbc
-import dash_core_components as dcc
 import dash_html_components as html
+import dash_core_components as dcc
 import dash_bootstrap_components as dbc
+from dash import callback_context as cbc
+
 from dash.dependencies import Input, Output, State
 from dash_table import DataTable
 from dash_table.Format import Format, Scheme, Trim

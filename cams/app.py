@@ -7,7 +7,7 @@ Dash 객체를 생성하고 app 관련 기본 기능들을 정의
 # region ---- imports ----
 
 from typing import Any, Dict
-import sys, os, logging
+import sys, os, threading
 from datetime import timedelta, datetime
 
 from flask_caching import Cache
@@ -34,6 +34,7 @@ ext_css = [
 # , suppress_callback_exceptions=True)
 app = Dash(__name__, url_base_pathname="/")
 app.config["suppress_callback_exceptions"] = True
+app.config["prevent_initial_callbacks"] = True
 app.config["external_stylesheets"] = ext_css
 server = app.server
 
@@ -53,6 +54,14 @@ cache = Cache(
         "CACHE_REDIS_URL": os.environ.get("REDIS_URL", "redis://localhost:6379"),
     },
 )
+
+# endregion
+
+
+# --------[ WebSocket Server & CameraViewer ]---------
+
+wsLock = threading.Lock()
+wsBuffer = [bytearray(1)]
 
 # endregion
 

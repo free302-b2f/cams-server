@@ -14,10 +14,12 @@ flask-login
 Flask-SQLAlchemy
 
 dash
-dash_daq
-dash_bootstrap_components
+dash-daq
+dash-bootstrap-components
+dash-extensions
 
 opencv-python
+websockets
 
 #mod_wsgi
 # mod_wsgi는 apache에 wsgi 모듈을 추가하는 작업으로

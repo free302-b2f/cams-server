@@ -10,12 +10,15 @@
             "request": "launch",
             "module": "flask",
             "env": {
-                "FLASK_APP": "main.py",
+                "FLASK_APP": "wsgi.py",
                 "FLASK_ENV": "development"
             },
             "args": [
                 "run",
-                "--no-debugger"
+                "--no-debugger",
+                "--port",
+                "28050",
+                "--no-reload"
             ],
             "jinja": true
         },
@@ -25,13 +28,6 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal"
-        },
-        {
-            "name": "Python: wsgi.py",
-            "type": "python",
-            "request": "launch",
-            "program": "wsgi.py",
-            "console": "integratedTerminal"
-        }
+        },        
     ]
 }

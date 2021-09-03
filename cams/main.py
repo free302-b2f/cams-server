@@ -15,10 +15,11 @@ from dash import no_update
 
 import flask_login as fli
 
-from app import app, error, router, debug
+from app import app, error, router, debug, wsLock, wsBuffer
 from db import *
 from lm import *
 from apps import *
+from ws import *
 
 #! main_layout을 임포트 하기전에 다른 페이지를 전부 임포트해야한다.
 import apps.home
@@ -68,5 +69,8 @@ def display_page(pathname):
 # endregion
 
 
-# flask app for vscode
-application = app.server
+# ----[ websocket server ]----
+
+ws_server.run(wsLock, wsBuffer)
+
+# ----
