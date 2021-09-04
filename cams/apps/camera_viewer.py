@@ -32,18 +32,18 @@ def layout():
 
 # region ----[ WebSocket Img ]----
 
-receive = """
-function(msg)
-{
-    if (msg === undefined) return;
-    return URL.createObjectURL(msg.data);
-}
-"""
-app.clientside_callback(
-    receive,
-    Output("home-img", "src"),
-    Input("home-ws-img", "message"),
-)
+# receive = """
+# function(msg)
+# {
+#     if (msg === undefined) return;
+#     return URL.createObjectURL(msg.data);
+# }
+# """
+# app.clientside_callback(
+#     receive,
+#     Output("home-img", "src"),
+#     Input("home-ws-img", "message"),
+# )
 
 # endregion
 

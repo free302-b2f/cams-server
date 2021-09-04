@@ -8,9 +8,10 @@ pymongo
 #psycopg2
 psycopg2-binary
 
-flask
-flask_caching
-flask-login
+Flask           
+Flask-Caching   
+Flask-Login     
+Flask-Sockets   
 Flask-SQLAlchemy
 
 dash
