@@ -1,41 +1,47 @@
+/* ====[ app theme ]==== */
+
 body{
     background-color: #343a40;
 }
 
-/* whole page container */
-.app-container{
+/* ----[ app-container ]---- */
+#app-container{
     font-size: 1.6rem;
     background-color: #f8f9fa;
     /*line-height: 2.0;*/
 }
 
-.app-content{
+/* ----[ app-content ]---- */
+#app-content{
     margin-left: 0rem;
     margin-right: 1rem;
     padding: 0.5rem 0.5rem;
 }
 
-/* ----[ sidebar ]---- */
-.app-sidebar{
+/* ----[ app-sidebar ]---- */
+#app-sidebar{
     background-color: #fdb515;/* !important;*/
     /*#f8f9fa;*/
 }
-.app-sidebar.li{
+#app-sidebar.li{
     margin-bottom: 0rem;
 }
 ul.nav.nav-pills{
     flex-grow: 1;
     align-items: center;
 }
-#sidebar-brand
+
+/* ----[ app-sidebar: brand ]---- */
+#app-sidebar-brand
 {
     font-size: inherit;
 }
-#sidebar-brand img
+#app-sidebar-brand img
 {
     height:32px;
     /* margin-right: 5px; */
 }
+
 
 /* ----[ app-sidebar: login ]---- */
 #app-sidebar-login
@@ -85,6 +91,7 @@ ul.nav.nav-pills{
 /*  SVG fill color: not applied to svg wrapped by <img> */
 #app-sidebar-github path { fill:#444C56; }
 #app-sidebar-github path:hover { fill:#539BF5; }
+
 
 
 /* home contents */

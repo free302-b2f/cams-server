@@ -3,11 +3,11 @@ from typing import List, Tuple
 from app import error, debug, info, getConfigSection
 
 # TODO: load from appsettings.json
-_ws_host = "localhost"
-# _ws_host = "bit2farm.iptime.org"
-_ws_port = 28765  # websocket port
+_set = getConfigSection("WebSocket")
+_ws_host = _set[_set["HostName"]]
+_ws_port = _set["port"]  # websocket port
 _ws_base_url = f"ws://{_ws_host}:{_ws_port}"
-_ws_rate = 30  # 초당 업/다운로드할 이미지 수
+_ws_rate = _set["rate"]  # 초당 업/다운로드할 이미지 수
 
 
 def get_ws_info(path: str) -> Tuple[str, float]:
@@ -79,7 +79,7 @@ async def _client_handler(ws, path):
 
 
 async def _runAsync():
-    print(f"{__name__}._runAsync(): entering...")
+    debug(_runAsync, f"entering...")
     async with websockets.serve(
         _client_handler, "0.0.0.0", _ws_port, ping_interval=120, ping_timeout=120
     ):

@@ -19,7 +19,7 @@ import dash_bootstrap_components as dbc
 # endregion
 
 
-def caller_module(level=2):
+def caller_module(level=2) -> str:
     """호출하는 함수가 정의된 모듈의 이름을 구한다"""
 
     f = sys._getframe(level)

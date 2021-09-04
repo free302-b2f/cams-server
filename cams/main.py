@@ -21,7 +21,7 @@ from lm import *
 from apps import *
 from ws import *
 
-#! main_layout을 임포트 하기전에 다른 페이지를 전부 임포트해야한다.
+#! main_layout을 임포트 하기전에 메뉴등록하는 페이지를 전부 임포트해야한다.
 import apps.home
 import main_layout
 
@@ -32,13 +32,13 @@ import main_layout
 app.validation_layout = [app.layout, *router.values()]
 
 
-# region ----[ NavBar Status Callback ]----
+# region ----[ NavBar Toggler Callback ]----
 
 
 @app.callback(
-    Output("navbar-collapse", "is_open"),
-    Input("navbar-toggler", "n_clicks"),
-    State("navbar-collapse", "is_open"),
+    Output("app-sidebar-collapse", "is_open"),
+    Input("app-sidebar-toggler", "n_clicks"),
+    State("app-sidebar-collapse", "is_open"),
 )
 def toggle_navbar_collapse(n, is_open):
     """callback for toggling the collapse on small screens"""

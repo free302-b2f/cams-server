@@ -27,19 +27,19 @@ brand = dbc.NavLink(
     ],
     href="https://www.bit2farm.com",
     target="brand-window",
-    id="sidebar-brand",
+    id="app-sidebar-brand",
 )
 
 # app.sidebar_items에 등록된 메뉴항목에 대한 NavLink 생성
 pages = [
     dbc.NavLink(
-        sb[k][0],
-        href=sb[k][1],
+        sb[key][0], # menu title
+        href=sb[key][1],    # path
         active="partial",
         n_clicks=0,
-        id=f"app-sidebar-link-{sb[k][1].split('.')[-1]}",
+        id=f"app-sidebar-{sb[key][2]}",
     )
-    for k in sorted(sb)
+    for key in sorted(sb)
 ]
 
 
@@ -70,19 +70,19 @@ pages.append(apps.restart.layout)
 sidebar = dbc.Navbar(
     [
         brand,
-        dbc.NavbarToggler(id="navbar-toggler", n_clicks=0),
+        dbc.NavbarToggler(id="app-sidebar-toggler", n_clicks=0),
         dbc.Collapse(
-            dbc.Nav(pages, pills=True), id="navbar-collapse", navbar=True, is_open=False
+            dbc.Nav(pages, pills=True), id="app-sidebar-collapse", navbar=True, is_open=False
         ),
     ],
     color="dark",  #'dark',#'light', #"primary",
     dark=True,
     sticky="top",
-    className="app-sidebar",
+    id="app-sidebar",
 )
 
 # 메인 레이아웃 - 페이지 내용
-content = html.Div(id="app-content", className="app-content")
+content = html.Div(id="app-content")
 
 # 메인 레이아웃 - 주소표시줄 제어
 locator = dcc.Location(id="app-url", refresh=False)
@@ -91,4 +91,4 @@ locator = dcc.Location(id="app-url", refresh=False)
 store = dcc.Store(id="lm-storage", storage_type="session")
 
 # 메인 레이아웃 설정
-app.layout = html.Div([store, locator, sidebar, content], className="app-container")
+app.layout = html.Div([store, locator, sidebar, content], id="app-container")

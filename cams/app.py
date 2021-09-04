@@ -164,7 +164,8 @@ def add_page(layout, menuName: str = None, menuOrder: int = 0):
     :param menuName: 메뉴바에 표시할 텍스트
     :param menuOrder: 순서값, 낮을 수록 먼저 나온다."""
 
-    pathName = f'{app.config["url_base_pathname"]}{util.caller_module()}'
+    moduleName = util.caller_module().replace(".", "-")
+    pathName = f'{app.config["url_base_pathname"]}{moduleName}'
 
     # display order in sidebar list
     if menuOrder == 0:
@@ -187,7 +188,7 @@ def add_page(layout, menuName: str = None, menuOrder: int = 0):
     # add to dict
     router[pathName] = layout  # add layout
     if menuName:
-        sidebar_items[menuOrder] = (menuName, pathName)  # add sidebar item
+        sidebar_items[menuOrder] = (menuName, pathName, moduleName)  # add sidebar item
 
 
 # endregion
