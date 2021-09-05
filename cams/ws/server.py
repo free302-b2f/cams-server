@@ -8,14 +8,14 @@ from ws.pool import WsPool
 
 # TODO: load from appsettings.json
 _set = getConfigSection("WebSocket")
-_ws_host = _set[_set["HostName"]]
-_ws_port = _set["port"]  # websocket port
-_ws_base_url = f"ws://{_ws_host}:{_ws_port}"
-_ws_rate = _set["rate"]  # 초당 업/다운로드할 이미지 수
+_WS_HOST = _set[_set["HostName"]]
+_WS_PORT = _set["port"]  # websocket port
+_WS_BASE_URL = f"ws://{_WS_HOST}:{_WS_PORT}"
+_WS_RATE = _set["rate"]  # 초당 업/다운로드할 이미지 수
 
 
 def get_ws_info(path: str) -> Tuple[str, float]:
-    return (f"{_ws_base_url}/{path}", _ws_rate)
+    return (f"{_WS_BASE_URL}/{path}", _WS_RATE)
 
 
 _pool: WsPool = WsPool(debug, info)
@@ -74,9 +74,11 @@ async def _client_handler(ws, path: str):
 
 
 async def _runAsync():
+    """웹소켓 서버를 시작한다"""
+
     debug(f"{__name__}._runAsync(): entering...")
     async with websockets.serve(
-        _client_handler, "0.0.0.0", _ws_port, ping_interval=120, ping_timeout=120
+        _client_handler, "0.0.0.0", _WS_PORT, ping_interval=120, ping_timeout=120
     ) as ws:
         info(f"Websocket server started: {ws.server.sockets[0].getsockname()}")
         await asyncio.Future()  # run forever
