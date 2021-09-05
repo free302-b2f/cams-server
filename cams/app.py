@@ -12,6 +12,14 @@ from datetime import timedelta, datetime
 
 from flask_caching import Cache
 from dash import Dash
+from dash_extensions.enrich import (
+    DashProxy,
+    # Trigger,
+    # TriggerTransform,
+    # MultiplexerTransform,
+    # ServersideOutputTransform,
+    NoOutputTransform,
+)
 
 import dash_bootstrap_components as dbc  # sidebar component
 
@@ -32,7 +40,8 @@ ext_css = [
 ]
 
 # , suppress_callback_exceptions=True)
-app = Dash(__name__, url_base_pathname="/")
+# app = Dash(__name__, url_base_pathname="/")
+app = DashProxy(__name__, url_base_pathname="/", transforms=[NoOutputTransform()])
 app.config["suppress_callback_exceptions"] = True
 app.config["prevent_initial_callbacks"] = True
 app.config["external_stylesheets"] = ext_css
