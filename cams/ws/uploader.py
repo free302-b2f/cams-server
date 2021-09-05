@@ -1,36 +1,31 @@
 """WebSocket 프로토콜을 통해 서버에 카메라 캡쳐이미지를 업로드
 
-:param _files_per_second: 초당 업로드할 이미지 갯수
-:param _ws_host: 웹소켓 서버 DNS or IP
-:param _ws_port: 웹소켓 서버 포트
-
+:param WS_HOST: 웹소켓 서버 DNS name or IP
+:param WS_PORT: 웹소켓 서버 포트
+:param WS_RATE: 초당 업로드할 이미지 갯수
 """
 
 import asyncio, time, threading
 from asyncio.tasks import sleep
-import websockets
-
-if __name__ == "__main__":
-    import sys, os
-
-    if not "app" in sys.modules:
-        appPath = os.path.join(sys.path[0], "..")
-        sys.path.insert(0, appPath)
-
-    import camera, ws_server
-else: 
-    from ws import camera, ws_server
+import websockets # pip install websockets
+import camera
 
 
 # region ----[ 모듈 설정 변수 ]----
 
-_ws_url, _ws_rate = ws_server.get_ws_info("upload")
+#TODO: load from config file
+WS_HOST = "localhost"
+# WS_HOST = "bit2farm.iptime.org"
+WS_PORT = 28765
+WS_RATE = 30
+
+_ws_url = f"ws://{WS_HOST}:{WS_PORT}/upload"
 _counter = 0  # test
 
 # endregion
 
 
-async def _test_echo(ws) -> str:
+async def _testEcho(ws) -> str:
     """서버에 테스트 메시지를 보내고 응답을 받는다"""
 
     global _counter
@@ -79,7 +74,7 @@ async def _runAsync():
             except Exception as ex:
                 print(f"{__name__}._runAsync():\n{ex}")
 
-            await sleep(1.0 / _ws_rate)
+            await sleep(1.0 / WS_RATE)
 
 
 def _run():

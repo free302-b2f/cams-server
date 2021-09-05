@@ -1,8 +1,4 @@
-"""
-웹사이트의 기본 뷰
-현재 - 애플리케이션 업데이트 내역을 표시
-추후 - 공지사항 등 표시할 예정
-"""
+"""웹소켓 에코 테스터"""
 
 # region ---- imports ----
 
@@ -11,7 +7,7 @@ from dash import no_update
 
 from dash_extensions import WebSocket
 import base64
-from ws import ws_server
+from ws.server import get_ws_info
 
 # from dash_extensions.enrich import (
 #     DashProxy,
@@ -26,7 +22,7 @@ from ws import ws_server
 
 debug("loading...")
 
-_ws_url, _ = ws_server.get_ws_info("echo")
+_ws_url, _ = get_ws_info("echo")
 
 
 def layout():

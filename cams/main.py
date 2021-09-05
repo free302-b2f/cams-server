@@ -15,11 +15,11 @@ from dash import no_update
 
 import flask_login as fli
 
-from app import app, error, router, debug, wsLock, wsBuffer
+from app import app, router, debug, info, error
 from db import *
 from lm import *
 from apps import *
-from ws import *
+from ws.server import run as startWsServer
 
 #! main_layout을 임포트 하기전에 메뉴등록하는 페이지를 전부 임포트해야한다.
 import apps.home
@@ -69,8 +69,8 @@ def display_page(pathname):
 # endregion
 
 
-# ----[ websocket server ]----
+# ----[ start websocket server ]----
 
-ws_server.run(wsLock, wsBuffer)
+startWsServer()
 
 # ----
