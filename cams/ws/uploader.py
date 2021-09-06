@@ -14,10 +14,10 @@ import camera
 # region ----[ 모듈 설정 변수 ]----
 
 #TODO: load from config file
-WS_HOST = "localhost"
-# WS_HOST = "bit2farm.iptime.org"
+# WS_HOST = "localhost"
+WS_HOST = "bit2farm.iptime.org"
 WS_PORT = 28765
-WS_RATE = 30
+WS_RATE = 1
 
 _ws_url = f"ws://{WS_HOST}:{WS_PORT}/upload"
 _counter = 0  # test

@@ -5,7 +5,7 @@ from dash_extensions import WebSocket
 from ws.server import get_ws_info
 
 
-_ws_url, _ws_rate = get_ws_info("download")
+_ws_url = get_ws_info("download")
 
 
 def layout():
@@ -30,10 +30,10 @@ function(msg)
         buffer.slice(0, 4)
         let ts = new Float32Array(buffer.slice(0, 4))[0];
         var dt = new Date(ts);
-        console.log(dt);
+        console.log("ts=" + ts + "  dt=" + dt);
 
         let sn = new TextDecoder().decode(buffer.slice(4));
-        console.log(sn);
+        //console.log(sn);
 
         const imgInfo = document.querySelector('#apps-camera-img-info');
         imgInfo.textContent = sn + " @ " + dt.toLocaleString('ko-KR', { hour12: false });

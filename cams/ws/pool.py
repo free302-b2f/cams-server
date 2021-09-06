@@ -15,8 +15,8 @@ class WsPool:
             self._debug(*msg)
 
     def info(self, *msg):
-        if self._debug:
-            self._debug(*msg)
+        if self._info:
+            self._info(*msg)
 
     async def broadcast(self, message):
         """모든 클라이언트에게 데이터를 전송한다"""
@@ -27,7 +27,7 @@ class WsPool:
     async def _try_send(self, ws, message):
         """주어진 웹소켓을 통해 데이터를 전송한다"""
 
-        self.debug(f"sending: {round(len(message)/1024)} KiB")  # test
+        # self.debug(f"sending: {round(len(message)/1024)} KiB")  # test
         try:
             await ws.send(message)
         except ConnectionClosed as ex:
@@ -41,11 +41,11 @@ class WsPool:
     def add(self, ws):
         """클라이언트를 목록에 추가한다"""
 
-        self.debug(f"adding: {ws}")
+        self.info(f"adding: {ws}")
         self._pool.append(ws)
 
     def remove(self, ws):
         """클라이언트를 목록에서 제거한다"""
 
-        self.debug(f"removing: {ws}")
+        self.info(f"removing: {ws}")
         self._pool.remove(ws)

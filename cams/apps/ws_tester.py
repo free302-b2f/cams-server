@@ -22,7 +22,7 @@ from ws.server import get_ws_info
 
 debug("loading...")
 
-_ws_url, _ = get_ws_info("echo")
+_ws_url = get_ws_info("echo")
 
 
 def layout():

@@ -11,11 +11,11 @@ _set = getConfigSection("WebSocket")
 _WS_HOST = _set[_set["HostName"]]
 _WS_PORT = _set["port"]  # websocket port
 _WS_BASE_URL = f"ws://{_WS_HOST}:{_WS_PORT}"
-_WS_RATE = _set["rate"]  # 초당 업/다운로드할 이미지 수
+# _WS_RATE = _set["rate"]  # 초당 업/다운로드할 이미지 수
 
 
-def get_ws_info(path: str) -> Tuple[str, float]:
-    return (f"{_WS_BASE_URL}/{path}", _WS_RATE)
+def get_ws_info(path: str) -> str:
+    return (f"{_WS_BASE_URL}/{path}")
 
 
 _pool: WsPool = WsPool(debug, info)
