@@ -30,11 +30,14 @@ class WsPool:
         # self.debug(f"sending: {round(len(message)/1024)} KiB")  # test
         try:
             await ws.send(message)
+            
         except ConnectionClosed as ex:
             self.debug(f"ConnectionClosed: {ex}")
             self.remove(ws)
+
         except Exception as ex:
             self.debug(f"Exception: {ex}")
+
         if not ws.open or ws.closed:
             self.remove(ws)
 

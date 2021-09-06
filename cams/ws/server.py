@@ -39,7 +39,7 @@ async def _upload(ws) -> bool:
     """웹소켓 수신 데이터를 파일/버퍼에 저장"""
 
     async for data in ws:
-        debug(f"received: {round(len(data)/1024)} KiB")  # test
+        # debug(f"received: {round(len(data)/1024)} KiB")  # test
         try:
             await _pool.broadcast(data)  # TODO: wait until all download complete?
 
