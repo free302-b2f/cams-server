@@ -22,23 +22,34 @@ def layout():
 # region ----[ WebSocket Img ]----
 
 receive = """
+//dash not allow async callback
 function(msg)
 {
     if (msg === undefined) return;
-    msg.data.slice(-26).arrayBuffer().then(buffer =>
+
+    msg.data.slice(-4).arrayBuffer().then(header =>
     {
-        buffer.slice(0, 4)
-        let ts = new Float32Array(buffer.slice(0, 4))[0];
-        var dt = new Date(ts);
-        console.log("ts=" + ts + "  dt=" + dt);
+        var decoder = new TextDecoder();
+        var metaLen = parseInt(decoder.decode(header), 10);
+        //console.log("metaLen= " + metaLen);
 
-        let sn = new TextDecoder().decode(buffer.slice(4));
-        //console.log(sn);
+        msg.data.slice(-metaLen).arrayBuffer().then(meta => 
+        {
+            let ts = decoder.decode(meta.slice(0, 32));
+            var dt = new Date(ts);
+            //console.log("ts=" + ts + "  dt=" + dt);
 
-        const imgInfo = document.querySelector('#apps-camera-img-info');
-        imgInfo.textContent = sn + " @ " + dt.toLocaleString('ko-KR', { hour12: false });
+            let sn = decoder.decode(meta.slice(32, - 4));
+            //console.log(sn);
 
-        document.querySelector('#apps-camera-img').src = URL.createObjectURL(msg.data);
+            const imgInfo = document.querySelector('#apps-camera-img-info');
+            //imgInfo.textContent = sn + " @ " + dt.toLocaleString('ko-KR', { hour12: false });
+            imgInfo.textContent = sn + " @ " + dt.toString();
+
+            jpg = msg.data.slice(0, msg.data.size, "image/jpeg");
+            document.querySelector('#apps-camera-img').src = URL.createObjectURL(jpg);
+
+        });
     });
 }
 """
