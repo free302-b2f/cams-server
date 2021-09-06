@@ -3,6 +3,10 @@
 :param WS_HOST: 웹소켓 서버 DNS name or IP
 :param WS_PORT: 웹소켓 서버 포트
 :param WS_RATE: 초당 업로드할 이미지 갯수
+
+:실행방법:
+  - 단독 실행 : run(False)
+  - 백그라운드로 쓰레드로 실행: run()
 """
 
 import asyncio, time, threading
@@ -19,21 +23,10 @@ WS_HOST = "bit2farm.iptime.org"
 WS_PORT = 28765
 WS_RATE = 1
 
+# 이미지 업로드 주소
 _ws_url = f"ws://{WS_HOST}:{WS_PORT}/upload"
-_counter = 0  # test
 
 # endregion
-
-
-async def _testEcho(ws) -> str:
-    """서버에 테스트 메시지를 보내고 응답을 받는다"""
-
-    global _counter
-    _counter += 1
-    await ws.send(f"{_counter}")
-    res = await ws.recv()
-    return res
-
 
 async def _sendFile(ws):
     """카메라에서 이미지를 추출하여 웹소켓을 통해 전송한다"""
