@@ -43,3 +43,23 @@ link = document.createElement('link');
 link.rel = "javascript";
 link.href = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML";
 document.getElementsByTagName('head')[0].appendChild(link);
+
+//
+// Date 포맷 함수 : 로컬시간을 ISO 포맷의 문자열로 반환
+//
+function toLocalISOString(d) {
+    var z  = n =>  ('0' + n).slice(-2);
+    var zz = n => ('00' + n).slice(-3);
+    var off = d.getTimezoneOffset();
+    var sign = off < 0? '+' : '-';
+    off = Math.abs(off);
+  
+    return d.getFullYear() + '-'
+           + z(d.getMonth()+1) + '-' +
+           z(d.getDate()) + 'T' +
+           z(d.getHours()) + ':'  + 
+           z(d.getMinutes()) + ':' +
+           z(d.getSeconds()) + '.' +
+           zz(d.getMilliseconds()) +
+           sign + z(off/60|0) + ':' + z(off%60); 
+}

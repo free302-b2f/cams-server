@@ -43,8 +43,7 @@ function(msg)
             //console.log(sn);
 
             const imgInfo = document.querySelector('#apps-camera-img-info');
-            //imgInfo.textContent = sn + " @ " + dt.toLocaleString('ko-KR', { hour12: false });
-            imgInfo.textContent = sn + " @ " + dt.toString();
+            imgInfo.textContent = sn + " @ " + toLocalISOString(dt); //dt.toString();
 
             jpg = msg.data.slice(0, msg.data.size, "image/jpeg");
             document.querySelector('#apps-camera-img').src = URL.createObjectURL(jpg);
