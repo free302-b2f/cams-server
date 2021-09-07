@@ -4,8 +4,8 @@ from dash_extensions import WebSocket
 
 from ws.server import get_ws_info
 
-
-_ws_url = get_ws_info("download")
+SENSOR_ID = "B2F_CAMs_1000000000001"
+_ws_url = get_ws_info(f"download/{SENSOR_ID}")
 
 
 def layout():

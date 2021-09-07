@@ -19,13 +19,14 @@ import camera
 # region ----[ 모듈 설정 변수 ]----
 
 #TODO: load from config file
+SENSOR_ID = "B2F_CAMs_1000000000001"
 # WS_HOST = "localhost"
 WS_HOST = "bit2farm.iptime.org"
 WS_PORT = 28765
-WS_RATE = 1
+WS_RATE = 4
 
 # 이미지 업로드 주소
-_ws_url = f"ws://{WS_HOST}:{WS_PORT}/upload"
+_ws_url = f"ws://{WS_HOST}:{WS_PORT}/upload/{SENSOR_ID}"
 
 # endregion
 
@@ -53,7 +54,7 @@ async def _runAsync():
 
     print(f"{__name__}._runAsync(): entering...")
 
-    camera.init()
+    camera.init(SENSOR_ID)
     async with websockets.connect(_ws_url, ping_interval=120, ping_timeout=120) as ws:
         print(f"{ws = }")
 

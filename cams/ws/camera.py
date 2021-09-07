@@ -24,7 +24,7 @@ _header_len = 4
 # endregion
 
 
-def init(id: str = "B2F_CAMs_1000000000001"):
+def init(id: str):
     """카메라 초기화"""
 
     global _camera, _id, _id_bytes, _id_len
@@ -36,7 +36,7 @@ def init(id: str = "B2F_CAMs_1000000000001"):
     _id_len = len(_id_bytes)
 
 
-    print(f"{__name__}.init(): starting...: {os.environ[_os_opencv_key]}")
+    print(f"{__name__}.init(): <{_id}> starting...")
     # print(cv2.getBuildInformation())
 
     # 카메라 초기화 : IR 카메라용 파리미터?

@@ -1,5 +1,6 @@
 import asyncio, threading, websockets
-from typing import List, Tuple
+from db import sensor
+from typing import Dict, List, Tuple
 from websockets.exceptions import ConnectionClosed
 
 from app import error, debug, info, getConfigSection
@@ -15,10 +16,7 @@ _WS_BASE_URL = f"ws://{_WS_HOST}:{_WS_PORT}"
 
 
 def get_ws_info(path: str) -> str:
-    return (f"{_WS_BASE_URL}/{path}")
-
-
-_pool: WsPool = WsPool(debug, info)
+    return f"{_WS_BASE_URL}/{path}"
 
 
 async def _echo(ws):
@@ -34,41 +32,57 @@ async def _echo(ws):
         if not ws.open or ws.closed:
             break
 
+# WsPool 클래스 초기화
+WsPool.setLogger(debug, info)
 
-async def _upload(ws) -> bool:
+
+async def _upload(ws, sensorId: int):
     """웹소켓 수신 데이터를 파일/버퍼에 저장"""
+   
+    info(_upload, f"uploader connected to <{sensorId}>")
+    pool = WsPool.getPool(sensorId) # WsPool 인스턴스 생성
 
     async for data in ws:
         # debug(f"received: {round(len(data)/1024)} KiB")  # test
-        try:
-            await _pool.broadcast(data)  # TODO: wait until all download complete?
+            await pool.broadcast(data)  # TODO: wait until all download complete?        
 
-        except ConnectionClosed as ex:
-            error(_upload, ex)
-            break
-        except Exception as ex:
-            error(_upload, ex)
-        if not ws.open or ws.closed:
-            break
-
-    info(_upload, "uploader disconnected")
+    info(_upload, f"uploader disconnected from <{sensorId}>")
 
 
-async def _download(ws):
+async def _download(ws, sensorId: int):
     """파일/버퍼에서 웹소켓으로 데이터 전송"""
 
-    _pool.add(ws)
-    async for data in ws:
+    info(_download, f"downloader connected to <{sensorId}>")
+    pool = WsPool.getPool(sensorId) # WsPool 인스턴스 생성
+    pool.add(ws)
+
+    async for data in ws: # 연결유지
         pass
+
+    info(_download, f"downloader disconnected from <{sensorId}>")
+    pool.remove(ws)
+
+
+def getSensorId(path: str) -> int:
+    """주어진 경로에서 아이디를 추출한다"""
+
+    words = path.split("/")
+    if len(words) < 2:
+        return "_unknown_"
+    else:
+        return words[1].strip()
 
 
 async def _client_handler(ws, path: str):
-    debug(_client_handler, f"{path= }")
+    # debug(_client_handler, f"{path= }")
 
-    if path.startswith("/upload"):
-        await _upload(ws)
-    elif path.startswith("/download"):
-        await _download(ws)
+    path = path.strip().strip("/")
+    if path.startswith("upload"):
+        await _upload(ws, getSensorId(path))
+
+    elif path.startswith("download"):
+        await _download(ws, getSensorId(path))
+
     else:
         await _echo(ws)
 
