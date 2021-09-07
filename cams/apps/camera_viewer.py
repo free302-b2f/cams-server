@@ -1,3 +1,4 @@
+from dash_html_components.Div import Div
 from apps.imports import *
 from dash import no_update
 from dash_extensions import WebSocket
@@ -11,11 +12,20 @@ _ws_url = get_ws_info(f"download/{SENSOR_ID}")
 def layout():
     return html.Div(
         [
-            html.H3("Server Push Image Data by WebSocket"),
-            html.Img(id="apps-camera-img", src="", width="60%", alt="-img-"),
-            html.Div([html.Span("Image Info: "), html.Span(id="apps-camera-img-info")]),
+            html.Img(id="apps-camera-img"),
+            html.Div(
+                html.H3("Server Push through WebSocket Channel"), id="apps-camera-title"
+            ),
+            html.Div(
+                [
+                    html.Span("Image Info: "),
+                    html.Span("-none-", id="apps-camera-img-info"),
+                ],
+                id="apps-camera-img-info-box",
+            ),
             WebSocket(id="apps-camera-ws", url=_ws_url),
-        ]
+        ],
+        id="apps-camera-img-container",
     )
 
 

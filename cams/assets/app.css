@@ -14,8 +14,10 @@ body{
 /* ----[ app-content ]---- */
 #app-content{
     margin-left: 0rem;
-    margin-right: 1rem;
-    padding: 0.5rem 0.5rem;
+    /* margin-right: 1rem; */
+    margin-right: 0rem;
+    /* padding: 0.5rem 0.5rem; */
+    padding: 0;
 }
 
 /* ----[ app-sidebar ]---- */
@@ -91,6 +93,44 @@ ul.nav.nav-pills{
 /*  SVG fill color: not applied to svg wrapped by <img> */
 #app-sidebar-github path { fill:#444C56; }
 #app-sidebar-github path:hover { fill:#539BF5; }
+
+
+/* ----[ apps-camera-img ]---- */
+#apps-camera-img-container{
+    position: relative;
+    width: 100%;
+    margin: 0;
+    /* border: dashed red 1px; */
+}
+#apps-camera-title{
+    position: absolute; /* Position the background text */
+    top: 0; /* At the bottom. Use top:0 to append it to the top */
+    background: rgba(0, 0, 0, 0.5); /* Black background with 0.5 opacity */
+    color: #f1f1f1; /* Grey text */
+    width: 100%; /* Full width */
+    padding: 10px; /* Some padding */
+    font-variant: small-caps;
+}
+#apps-camera-img{
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4/3;
+    /* border: solid; */
+    border-color: cornflowerblue;
+    background-color: transparent;
+    background-image: url(/assets/b2f.png);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+#apps-camera-img-info-box {
+    position: absolute; /* Position the background text */
+    bottom: 0; /* At the bottom. Use top:0 to append it to the top */
+    background: rgba(0, 0, 0, 0.5); /* Black background with 0.5 opacity */
+    color: #f1f1f1; /* Grey text */
+    width: 100%; /* Full width */
+    padding: 10px; /* Some padding */
+  }
 
 
 
