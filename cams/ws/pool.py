@@ -83,11 +83,8 @@ class WsPool(object):
     def getPool(cls, id: str) -> WsPool:
         """주어진 아이디의 풀을 리턴, 없으면 생성"""
 
-        try:
-            cls._lock.acquire()
+        with cls._lock:
             if id not in cls._pools:
                 cls._pools[id] = WsPool()
             pool = cls._pools[id]
-        finally:
-            cls._lock.release()
-            return pool
+        return pool

@@ -12,15 +12,16 @@ _status = html.H4(
     className="text-info",
 )
 
-_modal = util.buildPopup(
-    id="lm-logout-modal",
-    header="Logging Out",
-    body=[
+_header = dbc.ModalHeader("Logging Out", className="font-small-caps")
+_body = dbc.ModalBody(
+    [
         html.Div(_status, id="lm-logout-status"),
         html.Div(id="lm-logout-dummy"),
         dcc.Location("lm-logout-url", refresh=True),
-    ],
-    footer=[
+    ]
+)
+_footer = dbc.ModalFooter(
+    [
         dbc.Button(
             " OK ",
             color="primary",
@@ -35,13 +36,13 @@ _modal = util.buildPopup(
             n_clicks=0,
             disabled=False,
         ),
-    ],
+    ]
 )
 
 layout = html.Div(
     [
         dbc.Button("LogOut", n_clicks=0, id="lm-logout-button", color="primary"),
-        _modal,
+        dbc.Modal([_header, _body, _footer], id="lm-logout-modal"),
     ]
 )
 
@@ -84,4 +85,3 @@ def logout_handler(n_show: int, n_ok: int, n_cancel: int):
             return no_update, status_error(n_ok), dash.no_update
 
     return nop
-    

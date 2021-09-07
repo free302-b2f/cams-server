@@ -17,11 +17,11 @@ def login_status(url):
     """메인 메뉴바에 로그인 상태를 표시하는 콜백"""
 
     username, userId = "Login", "0"
-    pathname, iconClass, icon = "lm.login", "material-icons-two-tone md-light", "account_circle"
+    pathname, iconClass, icon = "lm-login", "material-icons-two-tone md-light", "account_circle"
 
     if fli.current_user.is_authenticated:
         username, userId = fli.current_user.username, fli.current_user.get_id()
-        pathname  = "lm.profile"
+        pathname  = "lm-profile"
         iconClass, icon = "material-icons-two-tone md-light", "manage_accounts"
 
     # TODO: NavLink 대신 popup 사용?

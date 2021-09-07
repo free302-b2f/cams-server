@@ -3,45 +3,7 @@
 from lm.imports import *
 import db.user as db  # import User, getUserByName
 
-layout = html.Div(
-    [
-        dcc.Location(id="lm-login-url", refresh=True),
-        html.H3("Please log in to continue:", id="h1"),
-        dcc.Input(
-            placeholder="login name",
-            type="text",
-            id="lm-login-uname-box",
-            maxLength=db.User.max_username,
-            required=True,
-        ),
-        html.Br(),
-        dcc.Input(
-            placeholder="password",
-            type="password",
-            id="lm-login-pwd-box",
-            maxLength=db.User.max_password,
-            required=True,
-        ),
-        html.Br(),
-        dbc.Button(
-            children="Login",
-            n_clicks=0,
-            type="submit",
-            id="lm-login-login-button",
-            color="primary",
-        ),
-        html.Br(),
-        html.Div(id="lm-login-status"),
-        html.Div(
-            [
-                html.Br(),
-                "Have no account? ",
-                dcc.Link("Sign Up!", href="lm.create"),
-            ],
-            className="text-info",
-        ),
-    ]
-)
+from lm.login_view import layout
 
 
 def status_success(username: str):

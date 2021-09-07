@@ -43,7 +43,7 @@ ext_css = [
 # app = Dash(__name__, url_base_pathname="/")
 app = DashProxy(__name__, url_base_pathname="/", transforms=[NoOutputTransform()])
 app.config["suppress_callback_exceptions"] = True
-app.config["prevent_initial_callbacks"] = True
+app.config["prevent_initial_callbacks"] = False
 app.config["external_stylesheets"] = ext_css
 server = app.server
 

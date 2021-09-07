@@ -19,7 +19,7 @@ from app import app, sidebar_items as sb
 
 # endregion
 
-# company logo & link to web site
+# NavBar Brand - company logo & website link
 brand = dbc.NavLink(
     [
         html.Img(src="/assets/logo_1140x742.png"),
