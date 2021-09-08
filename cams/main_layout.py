@@ -10,21 +10,16 @@
 
 import dash_core_components as dcc
 import dash_html_components as html
-from dash.dependencies import Input, Output, State
 import dash_bootstrap_components as dbc
-
-import flask_login as fli
 
 from app import app, sidebar_items as sb
 
 # endregion
 
-# NavBar Brand - company logo & website link
+
+# NavBar Brand : company logo & website link
 brand = dbc.NavLink(
-    [
-        html.Img(src="/assets/logo_1140x742.png"),
-        #'Bit2Farm',
-    ],
+    html.Img(src="/assets/img/logo_1140x742.png"),
     href="https://www.bit2farm.com",
     target="brand-window",
     id="app-sidebar-brand",
@@ -33,11 +28,11 @@ brand = dbc.NavLink(
 # app.sidebar_items에 등록된 메뉴항목에 대한 NavLink 생성
 pages = [
     dbc.NavLink(
-        sb[key][0], # menu title
-        href=sb[key][1],    # path
+        sb[key][0],  # menu title
+        href=sb[key][1],  # path
         active="partial",
         n_clicks=0,
-        id=f"app-sidebar-{sb[key][2]}",
+        id=f"app-sidebar-{sb[key][2]}", # element id
     )
     for key in sorted(sb)
 ]
@@ -47,6 +42,7 @@ pages = [
 import lm.status
 
 pages.append(lm.status.layout)
+
 
 # ----[임시항목: GitHub Repository ]----
 pages.append(
@@ -60,6 +56,7 @@ pages.append(
     )
 )
 
+
 # ----[임시항목: restart CAMs ]----
 import apps.restart
 
@@ -72,7 +69,10 @@ sidebar = dbc.Navbar(
         brand,
         dbc.NavbarToggler(id="app-sidebar-toggler", n_clicks=0),
         dbc.Collapse(
-            dbc.Nav(pages, pills=True), id="app-sidebar-collapse", navbar=True, is_open=False
+            dbc.Nav(pages, pills=True),
+            id="app-sidebar-collapse",
+            navbar=True,
+            is_open=False,
         ),
     ],
     color="dark",  #'dark',#'light', #"primary",

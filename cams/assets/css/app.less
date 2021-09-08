@@ -1,59 +1,81 @@
-/* ====[ app theme ]==== */
+// ---------------------------------------------------
+// + v0.1
+// + 웹사이트 전체적인 테마를 설정
+// + 2021.09.09 by DrBAE, amadeus.bae@gmai.com
+// ---------------------------------------------------
 
-html{
-    font-size: 100%;
-}
-/* body{
-    background-color: #343a40;
-} */
+// ====[ 기본설정 - dash 설정 덮어쓰기 ]====
+@app_back_color : #343a40;
+
+html{ font-size: 100%; }    // reset font size set by dash 'bWLwgP.css'
+body{ background-color: @app_back_color; }
+
+
+// ====[ 페이지 전체 (dash/react 생성 요소는 제외 - body 등) ]====
 
 /* ----[ app-container ]---- */
-#app-container{
-    /* font-size: 1.5rem; */
-    background-color: #f8f9fa;
-    /*line-height: 2.0;*/
+#app-container
+{
+    //위치와 크기
     position: absolute;
     width: 100%;
     top: 0px;
     bottom: 0px;
+
+    //내용배치
     display: flex;
-    flex-direction: column;
+    flex-direction: column;//상->하로 배치
+
+    //색깔, 글꼴 등
+    //font-size: 1.5rem;
+    //line-height: 2.0;
+    background-color: #f8f9fa;
 }
+
+
+// ====[ 사이드바/메뉴바를 제외한 각 페이지의 내용 ]====
 
 /* ----[ app-content ]---- */
-#app-content{
+#app-content
+{
     margin-left: 0rem;
-    /* margin-right: 1rem; */
+    //margin-right: 1rem;
     margin-right: 0rem;
-    /* padding: 0.5rem 0.5rem; */
+    //padding: 0.5rem 0.5rem;
     padding: 0;
-    flex-grow: 1;
+    flex-grow: 1; //배치방향으로의 나머지 공간을 채운다
 }
 
+
+// ====[ 사이드바/메뉴바 ]====
+
 /* ----[ app-sidebar ]---- */
-#app-sidebar{
-    background-color: #fdb515;/* !important;*/
-    /*#f8f9fa;*/
+#app-sidebar
+{
+    // background-color: #fdb515; //#f8f9fa;
+    background-color: transparent;
+    font-size: 1.1rem; // 110% of html
 }
-#app-sidebar.li{
+#app-sidebar.li
+{
     margin-bottom: 0rem;
 }
-ul.nav.nav-pills{
+#app-sidebar ul.nav.nav-pills
+{
     flex-grow: 1;
     align-items: center;
 }
 
 /* ----[ app-sidebar: brand ]---- */
-#app-sidebar-brand
-{
-    font-size: inherit;
-}
+// #app-sidebar-brand
+// {
+//     font-size: inherit;
+// }
 #app-sidebar-brand img
 {
     height:32px;
     /* margin-right: 5px; */
 }
-
 
 /* ----[ app-sidebar: login ]---- */
 #app-sidebar-login
@@ -84,7 +106,6 @@ ul.nav.nav-pills{
     align-content: center;
 }
 
-
 /* ----[ app-sidebar: GitHub ]---- */
 #app-sidebar-github
 {
@@ -96,23 +117,40 @@ ul.nav.nav-pills{
 {
     width: 24px;
     height: 24px;
-    background-image: url(/assets/github.svg);
+    background-image: url(/assets/img/github.svg);
 }
-#app-sidebar-github div{background-image: url(/assets/github.svg);}
-#app-sidebar-github div:hover {background-image: url(/assets/github_dark.svg);}
+#app-sidebar-github div{background-image: url(/assets/img/github.svg);}
+#app-sidebar-github div:hover {background-image: url(/assets/img/github_dark.svg);}
 /*  SVG fill color: not applied to svg wrapped by <img> */
 #app-sidebar-github path { fill:#444C56; }
 #app-sidebar-github path:hover { fill:#539BF5; }
 
 
+// ====[ 페이지: Camera Viewer ]====
+
 /* ----[ apps-camera-img ]---- */
-#apps-camera-img-container{
+#apps-camera-img
+{
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4/3;
+    /* border: solid; */
+    border-color: cornflowerblue;
+    background-color: transparent;
+    background-image: url(/assets/img/b2f.png);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+#apps-camera-img-container
+{
     position: relative;
     width: 100%;
     margin: 0;
-    /* border: dashed red 1px; */
+    //border: dashed red 1px;
 }
-#apps-camera-title{
+#apps-camera-title
+{
     position: absolute; /* Position the background text */
     top: 0; /* At the bottom. Use top:0 to append it to the top */
     background: rgba(0, 0, 0, 0.5); /* Black background with 0.5 opacity */
@@ -121,19 +159,8 @@ ul.nav.nav-pills{
     padding: 10px; /* Some padding */
     font-variant: small-caps;
 }
-#apps-camera-img{
-    position: relative;
-    width: 100%;
-    aspect-ratio: 4/3;
-    /* border: solid; */
-    border-color: cornflowerblue;
-    background-color: transparent;
-    background-image: url(/assets/b2f.png);
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-}
-#apps-camera-img-info-box {
+#apps-camera-img-info-box 
+{
     position: absolute; /* Position the background text */
     bottom: 0; /* At the bottom. Use top:0 to append it to the top */
     background: rgba(0, 0, 0, 0.5); /* Black background with 0.5 opacity */
@@ -143,15 +170,19 @@ ul.nav.nav-pills{
   }
 
 
+// ====[ 페이지: Home ]====
 
 /* home contents */
-.home-content{
-    /*font-style:italic;*/
-    font-size: 1.4rem;
-}
-.home-content pre{
+.home-content
+{
     font-size: inherit;
 }
+.home-content pre
+{
+    font-size: inherit;
+}
+
+
 
 .camsGraphBorder{
     margin-top: 4px;
@@ -186,6 +217,6 @@ ul.nav.nav-pills{
 {
     width: 100%;
     color: darkblue;
-    font-size: 1.5rem;
+    font-size: 1.0em;
     font-family: Consolas;
 }

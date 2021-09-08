@@ -1,0 +1,115 @@
+/* Made with love by Mutiullah Samim*/
+
+@import url('https://fonts.googleapis.com/css?family=Numans');
+
+#app-loginpage
+{
+    background-color: rgba(0, 0, 0, 0.6);
+    background-blend-mode: darken;
+    background-image: url('http://getwallpapers.com/wallpaper/full/a/5/d/544750.jpg');
+    /* background-image: url('https://getwallpapers.com/wallpaper/full/a/9/b/34510.jpg'); */
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 100% !important;
+    height: 100%;
+    font-family: 'Numans', sans-serif;
+    height: 100%;
+    align-content: center;
+    
+    .card
+    {
+        width: 400px;
+        height: 370px;
+        margin-top: auto;
+        margin-bottom: auto;
+        background-color: rgba(0,0,0,0.5) !important;
+    }
+    .social_icon
+    {
+        position: absolute;
+        right: 20px;
+        top: -45px;
+    }
+    .social_icon span, #lm-login-kakao
+    {
+        font-size: 60px;
+        margin-left: 10px;
+        color: #FFC312;
+    }
+    .social_icon span:hover, #lm-login-kakao:hover
+    {
+        color: white;
+        cursor: pointer;
+    }
+
+    #lm-login-kakao
+    {
+        display: inline-block;
+        height: 60px;
+        aspect-ratio: 1;
+        margin-top: 10px;
+        // padding-top: 0px;
+        // margin-left: 10px;
+        // fill: #FFC312;
+        background: url(/assets/img/kakao.svg) no-repeat center;
+    }
+    #lm-login-kakao:hover
+    {
+        background: url(/assets/img/kakao_hover.svg) no-repeat center;
+        // fill: white;
+        // cursor: pointer;
+    }
+    
+    .card-header h3 { color: white; }
+    
+    .input-group-prepend span
+    {
+        width: 50px;
+        background-color: #FFC312;
+        color: black;
+        border:0 !important;
+    }
+    
+    input:focus
+    {
+        outline: 0 0 0 0  !important;
+        box-shadow: 0 0 0 0 !important;
+    }
+    
+    .remember{ color: white; }
+    
+    .remember input
+    {
+        width: 20px;
+        height: 20px;
+        margin-left: 15px;
+        margin-right: 5px;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center!important;
+    }
+    .remember label
+    {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center!important;
+    }
+    
+    .login_btn{
+        color: black;
+        background-color: #FFC312;
+        width: 100px;
+    }
+    
+    .login_btn:hover
+    {
+        color: black;
+        background-color: white;
+    }
+    
+    .links{ color: white; }
+    
+    .links a{ margin-left: 4px; }
+
+}

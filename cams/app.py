@@ -33,18 +33,18 @@ print(f"[{datetime.now()}] [D] [{__name__}] loading...")
 
 # region ---- Dash 초기화 ----
 
-"""설정파일 로딩 및 Dash 객체 생성/초기화"""
+# 설정파일 로딩 및 Dash 객체 생성/초기화
 ext_css = [
     "https://codepen.io/chriddyp/pen/bWLwgP.css",  # graph
     dbc.themes.BOOTSTRAP,  # sidebar
 ]
 
-# , suppress_callback_exceptions=True)
 # app = Dash(__name__, url_base_pathname="/")
 app = DashProxy(__name__, url_base_pathname="/", transforms=[NoOutputTransform()])
 app.config["suppress_callback_exceptions"] = True
 app.config["prevent_initial_callbacks"] = False
 app.config["external_stylesheets"] = ext_css
+# app.config["external_scripts"] = ext_js
 server = app.server
 
 # Ubunut에서 os.chdir(server.root_path) 필요

@@ -1,5 +1,6 @@
 """로그인 뷰"""
 
+from dash.resources import Scripts
 from lm.imports import *
 import db.user as db  # import User, getUserByName
 
@@ -17,10 +18,6 @@ layout = html.Div(
             integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU",
             crossOrigin="anonymous",
         ),
-        # html.Link(
-        #     rel="stylesheet",
-        #     href="/assets/login.css",
-        # ),
         dcc.Location(id="lm-login-url", refresh=True),
         html.Div(
             html.Div(
