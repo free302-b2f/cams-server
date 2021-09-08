@@ -20,17 +20,20 @@ def get_ws_info(path: str) -> str:
 
 
 async def _echo(ws):
-    async for msg in ws:
-        try:
+    
+    try:
+        async for msg in ws:
             debug(f"echoing: {msg}")  # test
             await ws.send(msg)
-        except ConnectionClosed as ex:
-            error(_echo, ex)
-            break
-        except Exception as ex:
-            error(_echo, ex)
-        if not ws.open or ws.closed:
-            break
+
+    except ConnectionClosed as ex:
+        debug(_echo, f"ConnectionClosed: {ex}")
+
+    except Exception as ex:
+        error(_echo, ex)
+    
+    info(_download, f"echo client disconnected")
+
 
 # WsPool 클래스 초기화
 WsPool.setLogger(debug, info)
@@ -38,13 +41,13 @@ WsPool.setLogger(debug, info)
 
 async def _upload(ws, sensorId: int):
     """웹소켓 수신 데이터를 파일/버퍼에 저장"""
-   
+
     info(_upload, f"uploader connected to <{sensorId}>")
-    pool = WsPool.getPool(sensorId) # WsPool 인스턴스 생성
+    pool = WsPool.getPool(sensorId)  # WsPool 인스턴스 생성
 
     async for data in ws:
         # debug(f"received: {round(len(data)/1024)} KiB")  # test
-            await pool.broadcast(data)  # TODO: wait until all download complete?        
+        await pool.broadcast(data)  # TODO: wait until all download complete?
 
     info(_upload, f"uploader disconnected from <{sensorId}>")
 
@@ -53,11 +56,18 @@ async def _download(ws, sensorId: int):
     """파일/버퍼에서 웹소켓으로 데이터 전송"""
 
     info(_download, f"downloader connected to <{sensorId}>")
-    pool = WsPool.getPool(sensorId) # WsPool 인스턴스 생성
+    pool = WsPool.getPool(sensorId)  # WsPool 인스턴스 생성
     pool.add(ws)
 
-    async for data in ws: # 연결유지
-        pass
+    try:
+        async for data in ws:  # 연결유지
+            pass
+
+    except ConnectionClosed as ex:
+        debug(_download, f"ConnectionClosed: {ex}")
+
+    except Exception as ex:
+        debug(_download, f"Exception: {ex}")
 
     info(_download, f"downloader disconnected from <{sensorId}>")
     pool.remove(ws)

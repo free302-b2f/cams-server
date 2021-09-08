@@ -32,7 +32,7 @@ def layout():
     return html.Div(
         [
             # html.Video(id="home-video", src="/assets/proximity.mp4", controls=True),
-            dcc.Input(id="home-input", autoComplete="off", value="a"),
+            dcc.Input(id="home-input", autoComplete="off", value=""),
             html.Div(id="home-message", children="-none-"),
             WebSocket(id="home-ws-echo", url=_ws_url),
         ],
@@ -43,15 +43,49 @@ def layout():
 # region ----[ WebSocket echo ]----
 
 # Send input value using websocket.
-send = "function(value){return value;}"
+send = """
+function(value)
+{
+    console.log("value= " + value);
+    if (value === undefined) return "";
+    return value;
+}
+"""
 app.clientside_callback(
     send, Output("home-ws-echo", "send"), Input("home-input", "value")
 )
 
 # Update div using websocket.
-receive = 'function(msg){return "Response from websocket: " + msg.data;}'
+receive = """
+function(msg, err)
+{
+    console.log("msg= " + msg + ", err= " + err);
+
+    if ( err !== undefined) 
+    {
+        let errMsg = "error: " + err;
+        console.log(errMsg);
+        return errMsg;
+    }
+    
+    if (msg === undefined) return;
+    try
+    {
+        let text = "Response from websocket: " + msg.data;
+        return text;
+    }
+    catch(ex)
+    {
+        console.log(ex);
+        return "-error-";
+    }
+}
+"""
 app.clientside_callback(
-    receive, Output("home-message", "children"), Input("home-ws-echo", "message")
+    receive,
+    Output("home-message", "children"),
+    Input("home-ws-echo", "message"),
+    Input("home-ws-echo", "error"),
 )
 
 # # input --> ws
