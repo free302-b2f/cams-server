@@ -1,21 +1,41 @@
 /* Made with love by Mutiullah Samim*/
 
 @import url('https://fonts.googleapis.com/css?family=Numans');
+@import "/assets/css/font.css";
 
+// singup page
+#app-loginpage.app-signuppage
+{
+    background-image: url('https://getwallpapers.com/wallpaper/full/a/9/b/34510.jpg');
+}
+
+// login page
 #app-loginpage
 {
+    //위치와 크기
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    width: 100% !important;
+    height: 100%;
+
+    //내용배치
+    display: flex;
+    flex-direction: column;//주축: 상하
+    align-content: center;//크로스축: 가로 중앙
+
+    //색깔 배경 등
     background-color: rgba(0, 0, 0, 0.6);
     background-blend-mode: darken;
     background-image: url('http://getwallpapers.com/wallpaper/full/a/5/d/544750.jpg');
-    /* background-image: url('https://getwallpapers.com/wallpaper/full/a/9/b/34510.jpg'); */
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
-    width: 100% !important;
-    height: 100%;
+
+    //글꼴
     font-family: 'Numans', sans-serif;
-    height: 100%;
-    align-content: center;
+    //font-size: 1.5rem;
+    //line-height: 2.0;
     
     .card
     {
@@ -25,6 +45,14 @@
         margin-bottom: auto;
         background-color: rgba(0,0,0,0.5) !important;
     }
+    .card.card-height-auto
+    {
+        height: auto;
+    }
+
+    .card-header h3 { color: white; }
+    .card-footer div { line-height: 200%; }
+
     .social_icon
     {
         position: absolute;
@@ -60,8 +88,6 @@
         // fill: white;
         // cursor: pointer;
     }
-    
-    .card-header h3 { color: white; }
     
     .input-group-prepend span
     {

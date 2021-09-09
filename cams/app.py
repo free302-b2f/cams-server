@@ -23,6 +23,7 @@ from dash_extensions.enrich import (
 
 import dash_bootstrap_components as dbc  # sidebar component
 
+#!TODO: app.py에서는 utility이외의 모듈을 임포트하면 안됨 ~ 크로스 레퍼런스 에러
 import apps.utility as util
 
 # endregion
@@ -63,25 +64,6 @@ cache = Cache(
         "CACHE_REDIS_URL": os.environ.get("REDIS_URL", "redis://localhost:6379"),
     },
 )
-
-# endregion
-
-
-# --------[ WebSocket Server & CameraViewer ]---------
-
-wsLock = threading.Lock()
-wsBuffer = [bytearray(1)]
-
-# endregion
-
-
-# region ---- DB * Login Manager 초기화 ----
-
-# Ubunut에서 os.chdir(server.root_path) 이후에
-import db, lm
-
-db.init_app(server)
-lm.init_app(server)
 
 # endregion
 

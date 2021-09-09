@@ -1,4 +1,4 @@
-"""로그인 뷰"""
+"""사인업 뷰 - 계정생성"""
 
 from lm.imports import *
 from lm._view_css_ import CSS_LINK
@@ -7,24 +7,17 @@ import db.user as db  # import User, getUserByName
 layout = html.Div(
     [
         *CSS_LINK,
-        dcc.Location(id="lm-login-url", refresh=True),
+        dcc.Location(id="lm-signup-url", refresh=True),
         html.Div(
+            # .card
             html.Div(
                 [
                     # card-header
                     html.Div(
                         [
-                            html.H3("Sign In", className="font-small-caps"),
+                            html.H3("Sign Up", className="font-small-caps"),
                             html.Div(
-                                [
-                                    html.Span(
-                                        html.I(className="fab fa-facebook-square")
-                                    ),
-                                    html.Span(
-                                        html.I(className="fab fa-google-plus-square")
-                                    ),
-                                    html.Div(id="lm-login-kakao"),
-                                ],
+                                
                                 className="d-flex justify-content-end social_icon",
                             ),
                         ],
@@ -44,7 +37,7 @@ layout = html.Div(
                                         className="input-group-prepend",
                                     ),
                                     dcc.Input(
-                                        id="lm-login-uname-box",
+                                        id="lm-signup-username",
                                         maxLength=db.User.max_username,
                                         type="text",
                                         className="form-control",
@@ -65,7 +58,7 @@ layout = html.Div(
                                         className="input-group-prepend",
                                     ),
                                     dcc.Input(
-                                        id="lm-login-pwd-box",
+                                        id="lm-signup-password",
                                         type="password",
                                         className="form-control",
                                         placeholder="password",
@@ -75,16 +68,53 @@ layout = html.Div(
                                 ],
                                 className="input-group form-group",
                             ),
-                            # remember me
-                            dcc.Checklist(
-                                options=[{"label": "Remember Me", "value": 1}],
-                                className="row align-items-center remember",
+                            # password confirm
+                            html.Div(
+                                [
+                                    html.Div(
+                                        html.Span(
+                                            html.I(className="fas fa-key"),
+                                            className="input-group-text",
+                                        ),
+                                        className="input-group-prepend",
+                                    ),
+                                    dcc.Input(
+                                        id="lm-signup-password-confirm",
+                                        type="password",
+                                        className="form-control",
+                                        placeholder="password",
+                                        maxLength=db.User.max_password,
+                                        required=True,
+                                    ),
+                                ],
+                                className="input-group form-group",
+                            ),
+                            # email
+                            html.Div(
+                                [
+                                    html.Div(
+                                        html.Span(
+                                            html.I(className="fas fa-key"),
+                                            className="input-group-text",
+                                        ),
+                                        className="input-group-prepend",
+                                    ),
+                                    dcc.Input(
+                                        id="lm-signup-email",
+                                        type="email",
+                                        className="form-control",
+                                        placeholder="email address",
+                                        maxLength=db.User.max_email,
+                                        required=True,
+                                    ),
+                                ],
+                                className="input-group form-group",
                             ),
                             # submit
                             html.Div(
                                 dbc.Button(
-                                    id="lm-login-login-button",
-                                    children="Login",
+                                    id="lm-signup-submit",
+                                    children="Sign Up",
                                     n_clicks=0,
                                     type="submit",
                                     className="btn float-right login_btn",
@@ -99,8 +129,8 @@ layout = html.Div(
                         [
                             html.Div(
                                 [
-                                    "Don't have an account?",
-                                    dcc.Link("Sign Up!", href="lm-signup"),
+                                    "Already have an account?",
+                                    dcc.Link("Log In!", href="lm-login"),
                                 ],
                                 className="d-flex justify-content-center links",
                             ),
@@ -112,11 +142,11 @@ layout = html.Div(
                         className="card-footer",
                     ),
                 ],
-                className="card",
+                className="card", id="lm-signup-card"
             ),
             className="d-flex justify-content-center h-100",
         ),
-        html.Div(id="lm-login-status"),
+        html.Div(id="lm-signup-status"),
     ],
-    id="app-loginpage",
+    id="app-loginpage", className="app-signuppage"
 )

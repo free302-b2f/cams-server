@@ -13,9 +13,21 @@ from dash.dependencies import Input, Output, State
 import dash_bootstrap_components as dbc
 from dash import no_update
 
+import flask as fl
 import flask_login as fli
 
 from app import app, router, debug, info, error
+
+
+# region ----[ DB & Login Manager 초기화 ]----
+# db,lm 패키지를 사용하기전에 초기화 해야한다.
+import db, lm
+
+db.init_app(app.server)
+lm.init_app(app.server, "/login", "/signup")
+# endregion
+
+# load modules & add pages
 from db import *
 from lm import *
 from apps import *
@@ -30,6 +42,8 @@ import main_layout
 
 # "complete" layout
 app.validation_layout = [app.layout, *router.values()]
+
+from test import *
 
 
 # region ----[ NavBar Toggler Callback ]----

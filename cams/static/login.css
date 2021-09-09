@@ -1,22 +1,30 @@
 /* Made with love by Mutiullah Samim*/
+@import "/assets/css/font.css";
 @font-face {
   font-family: 'Numans';
   font-style: normal;
   font-weight: 400;
   src: url(https://fonts.gstatic.com/s/numans/v10/SlGRmQmGupYAfH84ZhIk.ttf) format('truetype');
 }
+#app-loginpage.app-signuppage {
+  background-image: url('https://getwallpapers.com/wallpaper/full/a/9/b/34510.jpg');
+}
 #app-loginpage {
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  width: 100% !important;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-content: center;
   background-color: rgba(0, 0, 0, 0.6);
   background-blend-mode: darken;
   background-image: url('http://getwallpapers.com/wallpaper/full/a/5/d/544750.jpg');
-  /* background-image: url('https://getwallpapers.com/wallpaper/full/a/9/b/34510.jpg'); */
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
-  width: 100% !important;
   font-family: 'Numans', sans-serif;
-  height: 100%;
-  align-content: center;
 }
 #app-loginpage .card {
   width: 400px;
@@ -24,6 +32,15 @@
   margin-top: auto;
   margin-bottom: auto;
   background-color: rgba(0, 0, 0, 0.5) !important;
+}
+#app-loginpage .card.card-height-auto {
+  height: auto;
+}
+#app-loginpage .card-header h3 {
+  color: white;
+}
+#app-loginpage .card-footer div {
+  line-height: 200%;
 }
 #app-loginpage .social_icon {
   position: absolute;
@@ -50,9 +67,6 @@
 }
 #app-loginpage #lm-login-kakao:hover {
   background: url(/assets/img/kakao_hover.svg) no-repeat center;
-}
-#app-loginpage .card-header h3 {
-  color: white;
 }
 #app-loginpage .input-group-prepend span {
   width: 50px;

@@ -1,0 +1,77 @@
+<!doctype html>
+<title>{% block title %}{% endblock %} - Bit2Farm</title>
+
+<link rel="icon" type="image/x-icon" href="/assets/img/favicon.ico">
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+    integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css"
+    integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+<!-- <link rel="stylesheet" href="/assets/css/app.css"> -->
+<link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
+
+<div id="app-loginpage">
+    <div class="d-flex justify-content-center h-100">
+
+        <!-- card -->
+        <div class="card card-height-auto">
+
+            <!-- card header -->
+            <div class="card-header">
+                <h3 class="font-small-caps">{% block card_header_text %}{% endblock %}</h3>
+                <div class="d-flex justify-content-end social_icon">
+                    <span><i class="fab fa-facebook-square"></i></span>
+                    <span><i class="fab fa-google-plus-square"></i></span>
+                    <span><i class="fab fa-twitter-square"></i></span>
+                    <div id="lm-login-kakao"></div>
+                </div>
+            </div>
+
+            <!-- card body -->
+            <div class="card-body"><form>
+
+                <!-- username -->
+                <div class="input-group form-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                    </div>
+                    <input name="lm-login-username" class="form-control" maxlength={{username_max}} placeholder="login id"
+                        required type="text">
+                </div>
+
+                <!-- password -->
+                <div class="input-group form-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-key"></i></span>
+                    </div>
+                    <input name="lm-login-password" class="form-control" maxlength={{password_max}} placeholder="password"
+                        required type="password">
+                </div>
+                
+                {% block card_body_1 %}{% endblock %}
+                {% block card_body_2 %}{% endblock %}
+                
+                <!-- submit -->
+                <div class="form-group">
+                    <button name="lm-login-button" type="submit" 
+                    class="btn float-right login_btn btn btn-secondary"
+                    formaction={% block form_action_path %}{% endblock %} formmethod="POST"
+                    formenctype="application/x-www-form-urlencoded">{% block form_button_text %}{% endblock %}</button>
+                </div>                
+            </form></div>
+            <!-- end of card body -->
+
+            <!-- card footer -->
+            <div class="card-footer">
+                {% block card_footer_1 %}{% endblock %}                
+                <div class="d-flex justify-content-center">
+                    <a href="#">Forgot your password?</a>
+                </div>
+                <div id="lm-login-status"></div>
+            </div>
+
+        </div>
+        <!-- end of card -->
+
+    </div>    
+</div>
