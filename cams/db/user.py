@@ -14,6 +14,17 @@ class User(fli.UserMixin, db.Model):
     max_password = 32
     max_password_hash = 88
 
+    @classmethod
+    def max_len(cls):
+        """각 필드의 최대길이를 리턴"""
+        
+        return {
+            "max_un": cls.max_username,
+            "max_pw": cls.max_password,
+            "max_em": cls.max_email,
+            "max_pwd": cls.max_password_hash,
+        }
+
     # 테이블 컬럼 정의
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(max_username), unique=True, nullable=False)

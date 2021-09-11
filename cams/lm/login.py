@@ -1,47 +1,39 @@
 from lm.imports import *
 import db.user as db  # import User, getUserByName
-from app import app
+from app import app, debug
+import json
 
-_ctx = dict()
+_ctx = db.User.max_len()
 
 
 @app.server.route("/login", methods=["GET", "POST"])
-def test_login():
-
-    global _ctx
+def login():
 
     if fl.request.method == "GET":
-        _ctx.update(
-            {
-                "ph_un": "login id",
-                "ph_pw": "password",
-            }
-        )
         return fl.render_template("login.html")
 
     un = fl.request.form["lm-login-username"]
     pw = fl.request.form["lm-login-password"]
-    _ctx.update({"ph_un": un, "ph_pw": pw})
+
+    response = {"isOK": False, "cause": "", "next": "/"}
 
     user = db.firstBy(filterBy={"username": un})
-    if user:
+    if not user:
+        response["cause"] = "lm-login-username"
+    else:
         if wsec.check_password_hash(user.password, pw):
             fli.login_user(user)
-            fl.flash("Logged in successfully.")
-            return fl.redirect(fl.url_for("/"))
-    return "no user"
+            # fl.flash("Logged in successfully.")
+            response["isOK"] = True
+            response["next"] = "/"
+            # return fl.redirect(fl.url_for("/"))
+        else:
+            response["cause"] = "lm-login-password"
+
+    return json.dumps(response)
 
 
 @app.server.context_processor
 def set_login_context():
 
-    global _ctx
-
-    _ctx.update(
-        {
-            "max_un": db.User.max_username,
-            "max_pw": db.User.max_password,
-            "max_em": db.User.max_email,
-        }
-    )
     return _ctx
