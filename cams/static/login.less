@@ -2,9 +2,12 @@
 
 @import url('https://fonts.googleapis.com/css?family=Numans');
 @import "/assets/css/font.css";
+@icon_color : #FFC312;
+@icon_hover : #FFFFFF;
+@icon_height : 60px;
 
 // singup page
-#app-loginpage.app-signuppage
+#app-loginpage.app-signup
 {
     background-image: url('https://getwallpapers.com/wallpaper/full/a/9/b/34510.jpg');
 }
@@ -58,35 +61,32 @@
         position: absolute;
         right: 20px;
         top: -45px;
+        line-height: 100%;
     }
-    .social_icon span, #lm-login-kakao
+    .social_icon span //, #lm-login-kakao
     {
-        font-size: 60px;
+        font-size: @icon_height;
         margin-left: 10px;
-        color: #FFC312;
+        color: @icon_color;
+        fill: @icon_color;
     }
-    .social_icon span:hover, #lm-login-kakao:hover
+    .social_icon span:hover //, #lm-login-kakao:hover
     {
-        color: white;
+        color: @icon_hover;
+        fill: @icon_hover;
         cursor: pointer;
     }
 
     #lm-login-kakao
     {
         display: inline-block;
-        height: 60px;
+        height: @icon_height;
         aspect-ratio: 1;
-        margin-top: 10px;
+        // margin-top: 10px;
         // padding-top: 0px;
         // margin-left: 10px;
         // fill: #FFC312;
-        background: url(/assets/img/kakao.svg) no-repeat center;
-    }
-    #lm-login-kakao:hover
-    {
-        background: url(/assets/img/kakao_hover.svg) no-repeat center;
-        // fill: white;
-        // cursor: pointer;
+        // content: url(/assets/img/kakao.svg);
     }
     
     .input-group-prepend span

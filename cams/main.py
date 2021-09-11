@@ -24,7 +24,7 @@ from app import app, router, debug, info, error
 import db, lm
 
 db.init_app(app.server)
-lm.init_app(app.server, "/login", "/signup")
+lm.init_app(app.server, "/login", "/signup", "/lm-profile")
 # endregion
 
 # load modules & add pages
@@ -66,12 +66,15 @@ def toggle_navbar_collapse(n, is_open):
 # region ----[ Main Callback ]----
 
 
-@app.callback(Output("app-content", "children"), Input("app-url", "pathname"))
+@app.callback(
+    Output("app-content", "children"),
+    Input("app-url", "pathname"),
+)
 def display_page(pathname):
     """주어진 경로에 해당하는 레이아웃을 리턴한다."""
 
     debug(f"{pathname = }")
-    v = router.get(pathname, apps.home.layout)
+    v = router.get(pathname, None)
     if v is None:
         error(f"Layout of {pathname=} is 'None'")
         return no_update

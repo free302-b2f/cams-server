@@ -52,7 +52,6 @@ pages.append(
         target="github",
         n_clicks=0,
         id="app-sidebar-github",
-        style={"font-style": "italic"},
     )
 )
 

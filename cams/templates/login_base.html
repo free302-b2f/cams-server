@@ -1,3 +1,10 @@
+{#<!----------------------------------------------------- 
+    + v0.1
+    + 로그인 뷰의 베이스 템플릿
+    + 2021-09-09 by DrBAE : amadeus.bae@gmail.com
+    ***extends 이후 block 밖이 있는 것은 무시된다***
+ ----------------------------------------------------->#}
+
 <!doctype html>
 <title>{% block title %}{% endblock %} - Bit2Farm</title>
 
@@ -7,10 +14,11 @@
     integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css"
     integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
-<!-- <link rel="stylesheet" href="/assets/css/app.css"> -->
+{#<!-- <link rel="stylesheet" href="/assets/css/app.css"> -->#}
 <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
+{# <script src="{{url_for('static', filename='login.js')}}"></script> #}
 
-<div id="app-loginpage">
+<div id="app-loginpage" {% block page_container_class %}{% endblock %}>
     <div class="d-flex justify-content-center h-100">
 
         <!-- card -->
@@ -23,20 +31,25 @@
                     <span><i class="fab fa-facebook-square"></i></span>
                     <span><i class="fab fa-google-plus-square"></i></span>
                     <span><i class="fab fa-twitter-square"></i></span>
-                    <div id="lm-login-kakao"></div>
+                    <span>
+                        <svg id="lm-login-kakao"><use xlink:href="/assets/img/kakao.svg#icon"></use></svg>
+                    </span>
                 </div>
             </div>
 
             <!-- card body -->
-            <div class="card-body"><form>
+            <div class="card-body">
+                <form id="lm-form" enctype="multipart/form-data" method="POST"
+                    action={% block form_action_path %}{% endblock %}
+                    onsubmit="lmSubmit(event)">
 
                 <!-- username -->
                 <div class="input-group form-group">
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fas fa-user"></i></span>
                     </div>
-                    <input name="lm-login-username" class="form-control" maxlength={{username_max}} placeholder="login id"
-                        required type="text">
+                    <input name="lm-login-username" id="lm-login-username" class="form-control" 
+                        maxlength={{max_un}} placeholder="{{ph_un}}" required type="text">
                 </div>
 
                 <!-- password -->
@@ -44,19 +57,22 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fas fa-key"></i></span>
                     </div>
-                    <input name="lm-login-password" class="form-control" maxlength={{password_max}} placeholder="password"
-                        required type="password">
+                    <input name="lm-login-password" id="lm-login-password" class="form-control" 
+                        maxlength={{max_pw}} placeholder="password" required type="password">
                 </div>
                 
                 {% block card_body_1 %}{% endblock %}
                 {% block card_body_2 %}{% endblock %}
-                
+
+                <!-- status: server side validation result -->
+                <div id="lm-login-status" class="d-flex justify-content-center text-danger"></div>
+
                 <!-- submit -->
                 <div class="form-group">
-                    <button name="lm-login-button" type="submit" 
+                    <button name="lm-login-button" 
+                    type="submit"
                     class="btn float-right login_btn btn btn-secondary"
-                    formaction={% block form_action_path %}{% endblock %} formmethod="POST"
-                    formenctype="application/x-www-form-urlencoded">{% block form_button_text %}{% endblock %}</button>
+                    >{% block form_button_text %}{% endblock %}</button>
                 </div>                
             </form></div>
             <!-- end of card body -->
@@ -67,7 +83,6 @@
                 <div class="d-flex justify-content-center">
                     <a href="#">Forgot your password?</a>
                 </div>
-                <div id="lm-login-status"></div>
             </div>
 
         </div>
@@ -75,3 +90,6 @@
 
     </div>    
 </div>
+
+<script src="{{url_for('static', filename='login.js')}}"></script>
+

@@ -1,57 +1,63 @@
-"""사용자 추가 뷰 및 콜백"""
-
-from dash_html_components.Br import Br
+from sqlalchemy.sql.expression import false
 from lm.imports import *
-import db.user as db  # import User, insertUser
-
-from lm.signup_view import layout
-
-def status_error(n_clicks):
-    return [html.H3(f"Sing up failed({n_clicks}). Please try again.")]
+import db.user as db  # import User, getUserByName
+from app import app
+import json
 
 
-def status_success(username: str):
-    return [
-        html.H3(f'Account "{username}" registered.'),
-        dcc.Link("Click here to Log In", href="lm-login"),
-    ]
+_ctx = dict()
 
 
-from app import app, add_page
+@app.server.route("/signup", methods=["GET", "POST"])
+def signup():
 
+    global _ctx
 
-@app.callback(
-    Output("lm-signup-status", "children"),
-    Input("lm-signup-submit", "n_clicks"),
-    State("lm-signup-username", "value"),
-    State("lm-signup-password", "value"),
-    State("lm-signup-password-confirm", "value"),
-    State("lm-signup-email", "value"),
-)
-def insert_user(n_clicks: int, un: str, pw: str, pwc: str, em: str):
-    """새 사용자를 추가한다"""
+    if fl.request.method == "GET":
+        _ctx.update(
+            {
+                "ph_un": "login id",
+                "ph_pw": "password",
+                "ph_pwc": "password",
+                "ph_em": "email address",
+            }
+        )
+        return fl.render_template("signup.html")
 
-    if n_clicks > 0:
+    un = fl.request.form["lm-login-username"].strip()
+    pw = fl.request.form["lm-login-password"].strip()
+    pwc = fl.request.form["lm-login-password-confirm"].strip()
+    em = fl.request.form["lm-login-email"].strip()
+    _ctx.update({"ph_un": un, "ph_pw": pw, "ph_pwc": pwc, "ph_em": em})
 
-        if un is None or pw is None or em is None or (pw != pwc):
-            return status_error(n_clicks)
+    response = {"isOK": False, "cause": "", "next": "/"}
 
-        un = un.strip()
-        pw = pw.strip()
-        pwc = pwc.strip()
-        em = em.strip()
-        if pw != pwc:
-            return status_error(n_clicks)
-
-        user = db.firstBy(filterBy={"username": un})
+    user = db.firstBy(filterBy={"username": un})
+    if user:
+        response["cause"] = "lm-login-username"
+    else:
+        user = db.firstBy(filterBy={"email": em})
         if user:
-            return status_error(n_clicks)
+            response["cause"] = "lm-login-email"
         else:
-            db.insert(username=un, password=pw, email=em)
-            return status_success(un)
-    return ""
+            try:
+                db.insert(username=un, password=pw, email=em)
+                response["result"] = True
+            except:
+                response["cause"] = "unknown"
+    return json.dumps(response)
 
 
-# 이 페이지를 메인 라우터에 등록한다.
-# add_page(layout, "Sign Up")  # test
-add_page(layout, "SIGNUP")  # test
+@app.server.context_processor
+def set_login_context():
+
+    global _ctx
+
+    _ctx.update(
+        {
+            "max_un": db.User.max_username,
+            "max_pw": db.User.max_password,
+            "max_em": db.User.max_email,
+        }
+    )
+    return _ctx

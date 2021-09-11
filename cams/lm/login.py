@@ -1,50 +1,47 @@
-"""로그인 뷰 및 콜백"""
-
 from lm.imports import *
 import db.user as db  # import User, getUserByName
+from app import app
 
-from lm.login_view import layout
-
-
-def status_success(username: str):
-    return [
-        html.H3(f"User '{username}' logged in.", className="text-info"),
-        dcc.Link("Home", href="apps.home"),
-    ]
+_ctx = dict()
 
 
-def status_error(n_clicks):
-    return [
-        html.H3(
-            f"Log in failed({n_clicks}). Please try again.", className="text-danger"
+@app.server.route("/login", methods=["GET", "POST"])
+def test_login():
+
+    global _ctx
+
+    if fl.request.method == "GET":
+        _ctx.update(
+            {
+                "ph_un": "login id",
+                "ph_pw": "password",
+            }
         )
-    ]
+        return fl.render_template("login.html")
+
+    un = fl.request.form["lm-login-username"]
+    pw = fl.request.form["lm-login-password"]
+    _ctx.update({"ph_un": un, "ph_pw": pw})
+
+    user = db.firstBy(filterBy={"username": un})
+    if user:
+        if wsec.check_password_hash(user.password, pw):
+            fli.login_user(user)
+            fl.flash("Logged in successfully.")
+            return fl.redirect(fl.url_for("/"))
+    return "no user"
 
 
-from app import app, add_page
+@app.server.context_processor
+def set_login_context():
 
+    global _ctx
 
-@app.callback(
-    Output("lm-login-url", "pathname"),
-    Output("lm-login-status", "children"),
-    Input("lm-login-login-button", "n_clicks"),
-    State("lm-login-uname-box", "value"),
-    State("lm-login-pwd-box", "value"),
-)
-def login_button_click(n_clicks, input1, input2):
-    """로그인 뷰의 콜백"""
-
-    if n_clicks > 0:
-        user = db.firstBy(filterBy={"username": input1})
-        if user:
-            if wsec.check_password_hash(user.password, input2):
-                fli.login_user(user)
-                return "apps.home", status_success(user.username)
-
-        return dash.no_update, status_error(n_clicks)
-    return dash.no_update, ""
-
-
-# 이 페이지를 메인 라우터에 등록한다.
-# add_page(layout, "Log In")  # test
-add_page(layout)  # test
+    _ctx.update(
+        {
+            "max_un": db.User.max_username,
+            "max_pw": db.User.max_password,
+            "max_em": db.User.max_email,
+        }
+    )
+    return _ctx

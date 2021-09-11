@@ -100,7 +100,7 @@ async def _client_handler(ws, path: str):
 async def _runAsync():
     """웹소켓 서버를 시작한다"""
 
-    debug(f"{__name__}._runAsync(): entering...")
+    debug(_runAsync, f"entering...")
     async with websockets.serve(
         _client_handler, "0.0.0.0", _WS_PORT, ping_interval=120, ping_timeout=120
     ) as ws:

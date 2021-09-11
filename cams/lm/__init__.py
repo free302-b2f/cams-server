@@ -29,6 +29,9 @@ _lm: fli.LoginManager = None
 
 mpb = util.ModulePropertyBuilder(sys.modules[__name__])
 mpb.addProp("loginManager", lambda: _lm)
+mpb.addProp("login_view", lambda: _lm.login_view)
+mpb.addProp("signup_view", lambda: _lm.signup_view)
+mpb.addProp("profile_view", lambda: _lm.profile_view)
 
 # endregion
 
@@ -39,7 +42,9 @@ mpb.addProp("loginManager", lambda: _lm)
 _PUBLIC_PATH = ["/static", "/_dash", "/assets", "/favicon.ico"]
 
 
-def init_app(server: fl.Flask, loginView: str, signupView: str) -> fli.LoginManager:
+def init_app(
+    server: fl.Flask, loginView: str, signupView: str, profileView: str
+) -> fli.LoginManager:
     """server 설정 및 로그인메니저 생성"""
 
     server.config.update(
@@ -51,6 +56,7 @@ def init_app(server: fl.Flask, loginView: str, signupView: str) -> fli.LoginMana
     _lm.init_app(server)
     _lm.login_view = loginView
     _lm.signup_view = signupView
+    _lm.profile_view = profileView
 
     # region ----[ request middle ware ]----
     # @server.before_request
@@ -80,7 +86,6 @@ def init_app(server: fl.Flask, loginView: str, signupView: str) -> fli.LoginMana
 
     # endregion
 
-
     # --- 로그인메니저 user_loader 설정 ---
     from db import loadUser
 
@@ -92,7 +97,6 @@ def init_app(server: fl.Flask, loginView: str, signupView: str) -> fli.LoginMana
 
 
 # endregion
-
 
 
 # decorator: no needs login

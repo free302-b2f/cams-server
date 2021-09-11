@@ -6,7 +6,7 @@
   font-weight: 400;
   src: url(https://fonts.gstatic.com/s/numans/v10/SlGRmQmGupYAfH84ZhIk.ttf) format('truetype');
 }
-#app-loginpage.app-signuppage {
+#app-loginpage.app-signup {
   background-image: url('https://getwallpapers.com/wallpaper/full/a/9/b/34510.jpg');
 }
 #app-loginpage {
@@ -46,27 +46,23 @@
   position: absolute;
   right: 20px;
   top: -45px;
+  line-height: 100%;
 }
-#app-loginpage .social_icon span,
-#app-loginpage #lm-login-kakao {
+#app-loginpage .social_icon span {
   font-size: 60px;
   margin-left: 10px;
   color: #FFC312;
+  fill: #FFC312;
 }
-#app-loginpage .social_icon span:hover,
-#app-loginpage #lm-login-kakao:hover {
-  color: white;
+#app-loginpage .social_icon span:hover {
+  color: #FFFFFF;
+  fill: #FFFFFF;
   cursor: pointer;
 }
 #app-loginpage #lm-login-kakao {
   display: inline-block;
   height: 60px;
   aspect-ratio: 1;
-  margin-top: 10px;
-  background: url(/assets/img/kakao.svg) no-repeat center;
-}
-#app-loginpage #lm-login-kakao:hover {
-  background: url(/assets/img/kakao_hover.svg) no-repeat center;
 }
 #app-loginpage .input-group-prepend span {
   width: 50px;

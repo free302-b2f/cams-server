@@ -24,6 +24,26 @@ document.getElementsByTagName('head')[0].appendChild(_element);
 
 
 //<link rel="preconnect" href="https://fonts.gstatic.com">
+//<link rel="preload" href="/fonts/my-font.woff2" as="font">
+// MDN example
+//<link rel="preload" href="style.css" as="style">
+//<link rel="preload" href="main.js" as="script">
+//
+//<link rel="stylesheet" href="style.css"></link>
+// ...
+//<script src="main.js" defer></script>
+//</body>
+
+// var preloadLink = document.createElement("link");
+// preloadLink.href = "myscript.js";
+// preloadLink.rel = "preload";
+// preloadLink.as = "script";
+// document.head.appendChild(preloadLink);
+// ...
+// var preloadedScript = document.createElement("script");
+// preloadedScript.src = "myscript.js";
+// document.body.appendChild(preloadedScript);
+
 
 //<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Two+Tone" rel="stylesheet"></link>
 _element = document.createElement('link');

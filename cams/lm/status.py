@@ -1,9 +1,16 @@
-"""메인 메뉴바에 로그인 상태를 출력하는 모듈"""
+"""메인 메뉴바에 로그인 상태를 출력하는 모듈
 
-from dash_html_components.Span import Span
++ app-url의 pathname 변경시마다 로그인 상태가 반영된 링크를 생성한다.
++ 링크 주소에 따라 페이지 갱신여부 결정하며 갱신시 flask page로 이동한다.
+"""
+
 from lm.imports import *
 import db.user as db  # import User, getUserByName
-from app import app, add_page
+from app import app, add_page, debug
+
+import lm
+from dash import no_update
+
 
 layout = html.Div(id="app-sidebar-login")
 
@@ -13,23 +20,27 @@ layout = html.Div(id="app-sidebar-login")
     Output("lm-storage", "data"),
     Input("app-url", "pathname"),
 )
-def login_status(url):
+def login_status(appPath):
     """메인 메뉴바에 로그인 상태를 표시하는 콜백"""
 
     username, userId = "Login", "0"
-    pathname, iconClass, icon = "lm-login", "material-icons-two-tone md-light", "account_circle"
+    pathname, refresh = lm.login_view, True
+    icon, iconClass = "account_circle", "material-icons-two-tone md-light"
 
     if fli.current_user.is_authenticated:
         username, userId = fli.current_user.username, fli.current_user.get_id()
-        pathname  = "lm-profile"
-        iconClass, icon = "material-icons-two-tone md-light", "manage_accounts"
+        pathname, refresh = lm.profile_view, False
+        icon, iconClass = "manage_accounts", "material-icons-two-tone md-light"
 
-    # TODO: NavLink 대신 popup 사용?
     # <span class="material-icons-two-tone">account_circle</span>
-    link = [
-        html.Span(icon, className=iconClass),
-        username,
-    ]
-    nav = (dbc.NavLink(link, href=pathname), userId)
+    link = dbc.NavLink(
+        [
+            html.Span(icon, className=iconClass),
+            username,
+        ],
+        href=pathname,
+        external_link=refresh,
+    )
+    debug(login_status, f"{appPath= }, {refresh= }")
 
-    return nav
+    return link, userId
