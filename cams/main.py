@@ -68,19 +68,37 @@ def toggle_navbar_collapse(n, is_open):
 
 @app.callback(
     Output("app-content", "children"),
+    Output("app-url-refresh", "pathname"),
     Input("app-url", "pathname"),
 )
-def display_page(pathname):
+def display_page(appPath:str):
     """주어진 경로에 해당하는 레이아웃을 리턴한다."""
 
-    debug(f"{pathname = }")
-    v = router.get(pathname, None)
+    debug(display_page, f"{appPath = }")
+
+    # TEST: Dash/Flask 경로 테스트 - 로그인, 사인업 페이지
+    if appPath.startswith(lm.login_view) or appPath.startswith(lm.signup_view):
+        debug(display_page, "*** flask route in dash? ***")
+    
+    # 사용자 인증 상태 체크
+    else:
+        if not fli.current_user or not fli.current_user.is_authenticated:
+            debug(display_page, f"redirecting: {appPath} -> {lm.login_view}")
+            return no_update, lm.login_view
+
+    # 경로의 레이아웃 얻기
+    v = router.get(appPath, None)
+
+    # 레이아웃이 없는 경우 Flask 경로로 보고 refresh 
     if v is None:
-        error(f"Layout of {pathname=} is 'None'")
-        return no_update
+        error(f"Layout of {appPath=} is 'None'")
+        return no_update, appPath
+
+    # 함수형 레아아웃에 대하여 함수 출력 얻기
     if callable(v):
         v = v()
-    return v
+    
+    return v, no_update
 
 
 # endregion

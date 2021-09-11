@@ -148,7 +148,7 @@ router = {}  # map routing path into page layout
 sidebar_items = {}  # map order into (menu title, page path)
 
 
-def add_page(layout, menuName: str = None, menuOrder: int = 0):
+def add_page(layout, menuName: str = None, menuOrder: int = 0, addPath: str = None):
     """페이지(dash app)의 이름과 레이아웃, 메뉴바에서의 순서를 저장한다.
 
     :param layout: 등록할 레이아웃
@@ -178,6 +178,11 @@ def add_page(layout, menuName: str = None, menuOrder: int = 0):
 
     # add to dict
     router[pathName] = layout  # add layout
+    if addPath:
+        if addPath in router:
+            raise KeyError(f"route path '{addPath}' is registered already")
+        router[addPath] = layout  # additional path
+
     if menuName:
         sidebar_items[menuOrder] = (menuName, pathName, moduleName)  # add sidebar item
 

@@ -32,7 +32,7 @@ pages = [
         href=sb[key][1],  # path
         active="partial",
         n_clicks=0,
-        id=f"app-sidebar-{sb[key][2]}", # element id
+        id=f"app-sidebar-{sb[key][2]}",  # element id
     )
     for key in sorted(sb)
 ]
@@ -84,10 +84,13 @@ sidebar = dbc.Navbar(
 content = html.Div(id="app-content")
 
 # 메인 레이아웃 - 주소표시줄 제어
-locator = dcc.Location(id="app-url", refresh=False)
+locator = [
+    dcc.Location(id="app-url", refresh=False),
+    dcc.Location(id="app-url-refresh", refresh=True),
+]
 
 # 로그인 상태 스토리지
 store = dcc.Store(id="lm-storage", storage_type="session")
 
 # 메인 레이아웃 설정
-app.layout = html.Div([store, locator, sidebar, content], id="app-container")
+app.layout = html.Div([store, *locator, sidebar, content], id="app-container")
