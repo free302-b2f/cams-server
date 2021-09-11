@@ -38,6 +38,9 @@ body {
   flex-grow: 1;
   align-items: center;
 }
+#app-sidebar .nav-link {
+  padding: 0.5rem 0.5rem;
+}
 /* ----[ app-sidebar: brand ]---- */
 #app-sidebar-brand img {
   height: 32px;

@@ -106,7 +106,7 @@ app.clientside_callback(
 # endregion
 
 
-add_page(layout, "WsTester")
+# add_page(layout, "WsTester")
 
 # testing
 # layout()

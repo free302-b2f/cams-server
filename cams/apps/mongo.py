@@ -177,4 +177,4 @@ def layout():
 
 
 # 이 페이지를 메인 메뉴바에 등록한다.
-add_page(layout, "MongoDB", 20)
+# add_page(layout, "MongoDB", 20)
