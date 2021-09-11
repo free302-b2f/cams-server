@@ -24,6 +24,7 @@ document.getElementsByTagName('head')[0].appendChild(_element);
 
 
 //<link rel="preconnect" href="https://fonts.gstatic.com">
+
 //<link rel="preload" href="/fonts/my-font.woff2" as="font">
 // MDN example
 //<link rel="preload" href="style.css" as="style">

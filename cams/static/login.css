@@ -1,10 +1,10 @@
 /* Made with love by Mutiullah Samim*/
 @import "/assets/css/font.css";
 @font-face {
-  font-family: 'Numans';
+  font-family: 'Varela Round';
   font-style: normal;
   font-weight: 400;
-  src: url(https://fonts.gstatic.com/s/numans/v10/SlGRmQmGupYAfH84ZhIk.ttf) format('truetype');
+  src: url(https://fonts.gstatic.com/s/varelaround/v13/w8gdH283Tvk__Lua32TysjIfp8uK.ttf) format('truetype');
 }
 #app-loginpage.app-signup {
   background-image: url('https://getwallpapers.com/wallpaper/full/a/9/b/34510.jpg');
@@ -24,7 +24,8 @@
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
-  font-family: 'Numans', sans-serif;
+  font-family: Varela Round, sans-serif;
+  font-weight: normal;
 }
 #app-loginpage .card {
   width: 400px;
@@ -69,6 +70,12 @@
   background-color: #FFC312;
   color: black;
   border: 0 !important;
+}
+#app-loginpage span.input-group-text {
+  justify-content: center;
+}
+#app-loginpage input.form-control {
+  font-family: Consolas, Courier, monospace;
 }
 #app-loginpage input:focus {
   outline: 0 0 0 0  !important;

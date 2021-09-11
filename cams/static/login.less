@@ -1,10 +1,14 @@
 /* Made with love by Mutiullah Samim*/
 
-@import url('https://fonts.googleapis.com/css?family=Numans');
+// @import url('https://fonts.googleapis.com/css?family=Numans');
+@import url('https://fonts.googleapis.com/css?family=Varela%20Round');
+// @import url('https://fonts.googleapis.com/css?family=Tangerine');
 @import "/assets/css/font.css";
 @icon_color : #FFC312;
 @icon_hover : #FFFFFF;
 @icon_height : 60px;
+@font_page : Varela Round;//Myriad Semibold;
+@font_input : Consolas;
 
 // singup page
 #app-loginpage.app-signup
@@ -36,7 +40,8 @@
     background-position: center;
 
     //글꼴
-    font-family: 'Numans', sans-serif;
+    font-family: @font_page, sans-serif;
+    font-weight: normal;
     //font-size: 1.5rem;
     //line-height: 2.0;
     
@@ -97,6 +102,13 @@
         border:0 !important;
     }
     
+    span.input-group-text{
+        justify-content: center;
+    }
+    input.form-control{
+        font-family: @font_input, Courier, monospace;
+    }
+
     input:focus
     {
         outline: 0 0 0 0  !important;
