@@ -1,5 +1,6 @@
 """로그아웃 뷰 및 콜백"""
 
+from dash_html_components.A import A
 from dash_html_components.Div import Div
 from sqlalchemy.sql.expression import false
 from lm.imports import *
@@ -7,23 +8,28 @@ from db.user import User
 from app import app, add_page
 from dash import no_update
 
-_status = html.H4(
-    "Going to log out.  Are you sure?",
-    className="text-info",
+_body_msg = html.H4(
+    "Going to log out.  Are you sure?", className="text-info", id="lm-logout-status"
 )
 
 _header = dbc.ModalHeader("Logging Out", className="font-small-caps")
 _body = dbc.ModalBody(
     [
-        html.Div(_status, id="lm-logout-status"),
-        html.Div(id="lm-logout-dummy"),
+        _body_msg,  # html.Div(_body_msg, id="lm-logout-status"),
+        # html.Div(id="lm-logout-dummy"),
         dcc.Location("lm-logout-url", refresh=True),
     ]
 )
+
+# <span class="material-icons-two-tone">check_circle</span>
+_footer_ok = [
+    html.Span("done", className="material-icons-two-tone"),
+    html.Span("OK"),
+]
 _footer = dbc.ModalFooter(
     [
         dbc.Button(
-            " OK ",
+            _footer_ok,  # " OK ",
             color="primary",
             id="lm-logout-ok",
             n_clicks=0,
@@ -39,12 +45,24 @@ _footer = dbc.ModalFooter(
     ]
 )
 
-layout = html.Div(
-    [
-        dbc.Button("LogOut", n_clicks=0, id="lm-logout-button", color="primary"),
-        dbc.Modal([_header, _body, _footer], id="lm-logout-modal"),
-    ]
-)
+# 로그아웃 링크/버튼 - 다른 페이지에서 사용
+# <span class="material-icons-two-tone">logout</span>
+_logout_button = [
+    html.Span("Logout"),
+    html.Span("logout", className="material-icons-two-tone"),
+]
+layout = [
+    # dbc.Button(_layout_button, n_clicks=0, id="lm-logout-button", color="primary"),
+    html.A(
+        _logout_button,
+        n_clicks=0,
+        id="lm-logout-button",
+        href="#",  # "javascript:void()",
+        className="flex-display",
+    ),
+    # dcc.Link(_logout_button, id="lm-logout-button", href=""),
+    dbc.Modal([_header, _body, _footer], id="lm-logout-modal"),
+]
 
 
 def status_success(username: str):

@@ -9,6 +9,21 @@ html {
 body {
   background-color: #343a40;
 }
+.btn,
+.flex-display {
+  display: flex;
+}
+.flex-horizontal {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-content: center;
+  align-items: flex-end;
+}
+.flex-horizontal > * {
+  margin-right: 1rem;
+}
 /* ----[ app-container ]---- */
 #app-container {
   position: absolute;
@@ -56,6 +71,7 @@ body {
 .material-icons-two-tone {
   align-items: center;
   padding-right: 0.3rem;
+  padding-left: 0.3rem;
 }
 .material-icons-two-tone.md-dark {
   filter: contrast(4) invert(0.5);
@@ -161,6 +177,23 @@ body {
 }
 .home-content pre {
   font-size: inherit;
+}
+#lm-profile-container {
+  width: 80%;
+  min-width: 800px;
+  margin-left: 1rem;
+  border: yellowgreen dashed 2px;
+}
+#lm-profile-container header {
+  display: flex;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+#lm-profile-container section {
+  margin-bottom: 1rem;
+}
+#lm-profile-container section > h5 ~ * {
+  margin-left: 1rem;
 }
 .camsGraphBorder {
   margin-top: 4px;

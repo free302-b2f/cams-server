@@ -1,37 +1,51 @@
 """로그인한 사용자의 프로파일 뷰 및 콜백"""
 
+from dash_html_components.Br import Br
 from lm.imports import *
 import db.user as db  # import User, getUserByName
 from app import app, add_page
 import lm.logout
+
 
 def layout():
 
     user = fli.current_user
     userId = fli.current_user.get_id()
 
-    divStyle = {
-        "display": "flex",
-        "flex-direction": "row",
-        "justify-content": "flex-start",
-    }
-    linkStyle = {"margin-right": "15px"}
     sectionStyle = {"margin-top": "20px", "margin-bottom": "10px"}
-    labelStyle = {"width":"100px"}
 
-    return html.Div(
+    _header = html.Header(
         [
-            html.H1("User Account"),
-            dcc.Location(id="lm-profile-url", refresh=True),
-            html.Div(
+            html.H4(
                 [
-                    html.Div(lm.logout.layout, style=linkStyle),
-                    dcc.Link("Change Password", href="lm.change", style=linkStyle),
+                    html.Span("manage_accounts", className="material-icons-two-tone"),
+                    "User Account",
                 ],
-                style=divStyle,
+                className="flex-horizontal",
             ),
-            html.H3("Profile", style=sectionStyle),
-            html.Label("Login ID", htmlFor="lm-profile-username", style=labelStyle),
+        ],
+        className="lm-profile-header",
+    )
+    _menu = html.Section(
+        [
+            *(lm.logout.layout),
+            # <span class="material-icons-two-tone">password</span>
+            dcc.Link(
+                [
+                    "Change Password",
+                    html.Span("password", className="material-icons-two-tone"),
+                ],
+                href="lm.change",
+                className="flex-horizontal",
+            ),
+        ],
+        className="flex-horizontal",
+    )
+
+    _profile = html.Section(
+        [
+            html.H5("Personal Profile"),
+            html.Label("Login ID", htmlFor="lm-profile-username"),
             dcc.Input(
                 id="lm-profile-username",
                 type="text",
@@ -41,7 +55,7 @@ def layout():
                 readOnly=True,
             ),
             html.Br(),
-            html.Label("Email", htmlFor="lm-profile-email", style=labelStyle),
+            html.Label("Email", htmlFor="lm-profile-email"),
             dcc.Input(
                 id="lm-profile-email",
                 type="email",
@@ -50,6 +64,15 @@ def layout():
                 required=True,
                 readOnly=True,
             ),
+        ]
+    )
+
+    return html.Div(
+        [
+            _header,
+            _menu,
+            _profile,
+            dcc.Location(id="lm-profile-url", refresh=True),
             html.Br(),
             dbc.Button("Edit/Save"),
             html.H3("Preference", style=sectionStyle),
@@ -62,9 +85,9 @@ def layout():
             html.H3("Log", style=sectionStyle),
             html.Pre(" - 보안/기술적인 기록"),
             html.Div(id="lm-profile-status", className="text-danger"),
-        ]
+        ],
+        id="lm-profile-container",
     )
-
 
 
 # 이 페이지를 메인 라우터에 등록한다.

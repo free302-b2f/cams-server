@@ -10,6 +10,21 @@
 html{ font-size: 100%; }    // reset font size set by dash 'bWLwgP.css'
 body{ background-color: @app_back_color; }
 
+.btn, .flex-display { display: flex; }
+.flex-horizontal
+{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-content: center;
+    align-items: flex-end;
+}
+.flex-horizontal>*
+{
+    margin-right: 1rem;
+}
+
 
 // ====[ 페이지 전체 (dash/react 생성 요소는 제외 - body 등) ]====
 
@@ -25,6 +40,7 @@ body{ background-color: @app_back_color; }
     //내용배치
     display: flex;
     flex-direction: column;//상->하로 배치
+    
 
     //색깔, 글꼴 등
     //font-size: 1.5rem;
@@ -92,6 +108,7 @@ body{ background-color: @app_back_color; }
 {
     align-items: center;
     padding-right: 0.3rem;
+    padding-left: 0.3rem;
 }
 .material-icons-two-tone.md-dark { filter: contrast(4) invert(0.5); }
 .material-icons-two-tone.md-light { filter: contrast(4) invert(0.8); }
@@ -184,6 +201,39 @@ body{ background-color: @app_back_color; }
 {
     font-size: inherit;
 }
+
+
+// ====[ 페이지: Profile ]====
+
+#lm-profile-container
+{
+    width:80%;
+    min-width: 800px;
+    margin-left: 1rem;
+    border: yellowgreen dashed 2px;
+}
+#lm-profile-container header
+{
+    // background: linear-gradient(135deg, gold 20%, skyblue 100%);
+    display: flex;
+    width: 100%;
+    margin-bottom: 1rem;
+    // height: 4rem;    
+    // align-items: center;
+    // color: #fff;
+    // text-shadow: #00F 0 0 .5em;
+}
+
+#lm-profile-container section
+{
+    margin-bottom: 1rem;
+}
+
+#lm-profile-container section>h5~*
+{
+    margin-left: 1rem;
+}
+
 
 
 

@@ -9,10 +9,12 @@ import werkzeug.security as wsec
 class User(fli.UserMixin, db.Model):
     """로그인 사용자 DB모델"""
 
+    # 클래스 변수: 각 필드 최대 길이 등 
     max_username = 32
     max_email = 64
     max_password = 32
     max_password_hash = 88
+    max_realname = 32
 
     @classmethod
     def max_len(cls):
@@ -23,6 +25,7 @@ class User(fli.UserMixin, db.Model):
             "max_pw": cls.max_password,
             "max_em": cls.max_email,
             "max_pwd": cls.max_password_hash,
+            "max_rn": cls.max_realname
         }
 
     # 테이블 컬럼 정의
@@ -30,6 +33,7 @@ class User(fli.UserMixin, db.Model):
     username = db.Column(db.String(max_username), unique=True, nullable=False)
     email = db.Column(db.String(max_email), unique=True)
     password = db.Column(db.String(max_password_hash))
+    # realname = db.Column(db.String(max_password_hash))
 
     def __repr__(self):
         return f"<User {self.username}>"

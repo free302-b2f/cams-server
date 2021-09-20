@@ -9,12 +9,23 @@ class Farms(db.Model):
     # 상수
     max_name = 64
 
+    @classmethod
+    def max_len(cls):
+        """각 필드의 최대길이를 리턴"""
+        
+        return {
+            "max_name": cls.max_name,
+        }
+        
+
     __table__ = sc.Table(
         "farms",
         db.Model.metadata,
         autoload_with=db.engine,
     )
     _keys = __table__.columns.keys()
+
+
 
     def __repr__(self):
         return f"<Farm {self.name}>"
