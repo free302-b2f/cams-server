@@ -34,8 +34,8 @@ _dbUri = (
 # module global variables
 _db: SQLAlchemy = None
 _load_user: FunctionType = None
-_load_farm: FunctionType = None
-_load_sensor: FunctionType = None
+# _load_farm: FunctionType = None
+# _load_sensor: FunctionType = None
 # _seed_meta: FunctionType = None
 
 # endregion
@@ -64,8 +64,8 @@ def init_app(server: fl.Flask) -> fli.LoginManager:
     from db.sensor import Sensor
 
     _load_user = User.query.get
-    _load_farm = Farm.query.get
-    _load_sensor = Sensor.query.get
+    # _load_farm = Farm.query.get
+    # _load_sensor = Sensor.query.get
 
     # create all model tables & seed
     if _set["DropTables"]:
@@ -110,10 +110,11 @@ def _seed_meta():
 
 # region ---- 모듈의 global property 정의 ----
 
+#flask-login 에서 사용
 mpb = util.ModulePropertyBuilder(sys.modules[__name__])
 mpb.addProp("db", lambda: _db)
 mpb.addProp("loadUser", lambda: _load_user)
-mpb.addProp("loadFarm", lambda: _load_farm)
-mpb.addProp("loadSensor", lambda: _load_sensor)
+# mpb.addProp("loadFarm", lambda: _load_farm)
+# mpb.addProp("loadSensor", lambda: _load_sensor)
 
 # endregion

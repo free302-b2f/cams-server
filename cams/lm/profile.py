@@ -12,8 +12,6 @@ def layout():
     user = fli.current_user
     userId = fli.current_user.get_id()
 
-    sectionStyle = {"margin-top": "20px", "margin-bottom": "10px"}
-
     _header = html.Header(
         [
             html.H4(
@@ -36,10 +34,10 @@ def layout():
                     html.Span("password", className="material-icons-two-tone"),
                 ],
                 href="lm.change",
-                className="flex-h",
+                className="flex-h mr1",
             ),
         ],
-        className="flex-h",
+        className="flex-h-right",
     )
 
     _profile = html.Section(
@@ -75,14 +73,18 @@ def layout():
             dcc.Location(id="lm-profile-url", refresh=True),
             html.Br(),
             dbc.Button("Edit/Save"),
-            html.H3("Preference", style=sectionStyle),
+
+            html.H5("Preference"),
             html.Pre(" - 사용자 옵션..."),
             dbc.Button("Edit/Save"),
-            html.H3("Farms", style=sectionStyle),
+
+            html.H5("Farms"),
             html.Pre(" - 로그인한 사용자가 관리하는 농장 목록"),
-            html.H3("Sensors", style=sectionStyle),
+
+            html.H5("Sensors"),
             html.Pre(" - 로그인한 사용자가 관리하는 센서/장비 목록"),
-            html.H3("Log", style=sectionStyle),
+            
+            html.H5("Log"),
             html.Pre(" - 보안/기술적인 기록"),
             html.Div(id="lm-profile-status", className="text-danger"),
         ],

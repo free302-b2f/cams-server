@@ -102,7 +102,7 @@ def _seed(cursor):
     cursor.execute("SELECT id, sn FROM sensor")
     ids = {x["sn"]: x["id"] for x in cursor.fetchall()}
 
-    start = datetime.combine(datetime.now().date(), time())
+    start = datetime.combine(datetime.now().date(), datetime.min.time())
     dates = [start + timedelta(days=x) for x in range(-30, 30)]
 
     sql = """INSERT INTO sensor_data 
@@ -121,7 +121,7 @@ def _seed(cursor):
                 cursor.execute(
                     sql,
                     (
-                        datetime.now() + timedelta(0, 0, x),
+                        d,
                         farmId,
                         ids[id],
                         round(random.uniform(10, 30), 1),  # air temp

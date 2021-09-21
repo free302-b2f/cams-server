@@ -155,12 +155,12 @@ def layout():
                 [
                     html.Td(
                         html.Label(label, htmlFor=elId if (elId != None) else label),
-                        style={"width": "15%", "padding": "2px 5px"},
+                        style={"width": "20%", "padding": "2px 5px"},
                         className="cams_table_td",
                     ),
                     html.Td(
                         el,
-                        style={"width": "40%", "padding": "2px 5px"},
+                        style={"width": "50%", "padding": "2px 5px"},
                         className="cams_table_td",
                     ),
                     html.Td(
@@ -211,20 +211,23 @@ def layout():
         merge=True,
     )
 
-    return [
-        html.H3("B2F CAMs Viewer"),
-        html.Hr(),
-        html.Table(
-            [
-                tr("", "", merge=True),
-                sensorTr,
-                dateTr,
-                # fracTr,
-                graphTr,
-            ],
-            className="cams_contents_table",
-        ),  # ~table
-    ]
+    return html.Div(
+        [
+            html.H3("B2F CAMs Viewer"),
+            html.Hr(),
+            html.Table(
+                [
+                    tr("", "", merge=True),
+                    sensorTr,
+                    dateTr,
+                    # fracTr,
+                    graphTr,
+                ],
+                className="cams_contents_table",
+            ),  # ~table
+        ],
+        id="app-cams-container",
+    )
 
 
 # layout()#test

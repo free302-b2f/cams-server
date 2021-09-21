@@ -58,7 +58,7 @@ layout = [
         n_clicks=0,
         id="lm-logout-button",
         href="#",  # "javascript:void()",
-        className="flex-display",
+        className="flex-h mr1",
     ),
     # dcc.Link(_logout_button, id="lm-logout-button", href=""),
     dbc.Modal([_header, _body, _footer], id="lm-logout-modal"),

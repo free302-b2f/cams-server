@@ -83,7 +83,7 @@ sidebar = dbc.Navbar(
 # 메인 레이아웃 - 페이지 내용
 content = html.Div(
     id="app-content",
-    className="d-flex flex-v",
+    className="flex-v-center",
 )
 
 # 메인 레이아웃 - 주소표시줄 제어
