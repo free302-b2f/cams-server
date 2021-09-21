@@ -107,5 +107,5 @@ def layout():
 # layout()#test
 
 # 이 페이지를 메인 라우터에 등록한다.
-add_page(layout, "DbTester")  # test
+# add_page(layout, "DbTester")  # test
 # add_page(layout) #test

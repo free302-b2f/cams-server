@@ -349,7 +349,7 @@ def layout():
 
 
 # 이 페이지를 메인 메뉴바에 등록한다.
-add_page(layout, "PostgreSQL", 30)
+# add_page(layout, "PostgreSQL", 30)
 # layout();#test
 
 # endregion

@@ -38,7 +38,7 @@ def layout():
             html.H3("Update Notes"),
             html.Pre(notes),
         ],
-        className="home-content",
+        id="app-home-container", className="content-pad"
     )
 
 

@@ -75,13 +75,16 @@ sidebar = dbc.Navbar(
         ),
     ],
     color="dark",  #'dark',#'light', #"primary",
-    dark=True,
+    dark=False,
     sticky="top",
     id="app-sidebar",
 )
 
 # 메인 레이아웃 - 페이지 내용
-content = html.Div(id="app-content")
+content = html.Div(
+    id="app-content",
+    className="d-flex flex-v",
+)
 
 # 메인 레이아웃 - 주소표시줄 제어
 locator = [

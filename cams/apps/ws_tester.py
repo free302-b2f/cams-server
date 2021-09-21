@@ -36,7 +36,7 @@ def layout():
             html.Div(id="home-message", children="-none-"),
             WebSocket(id="home-ws-echo", url=_ws_url),
         ],
-        className="home-content",
+        className="app-home-container",
     )
 
 

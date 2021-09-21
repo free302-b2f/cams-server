@@ -21,7 +21,7 @@ def layout():
                     html.Span("manage_accounts", className="material-icons-two-tone"),
                     "User Account",
                 ],
-                className="flex-horizontal",
+                className="flex-h",
             ),
         ],
         className="lm-profile-header",
@@ -36,10 +36,10 @@ def layout():
                     html.Span("password", className="material-icons-two-tone"),
                 ],
                 href="lm.change",
-                className="flex-horizontal",
+                className="flex-h",
             ),
         ],
-        className="flex-horizontal",
+        className="flex-h",
     )
 
     _profile = html.Section(
@@ -87,6 +87,7 @@ def layout():
             html.Div(id="lm-profile-status", className="text-danger"),
         ],
         id="lm-profile-container",
+        className="content-pad",
     )
 
 
