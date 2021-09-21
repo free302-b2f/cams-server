@@ -31,7 +31,7 @@ def load_data(sn: str, date) -> Tuple[pd.DataFrame, List[str]]:
         sql = cursor.mogrify(
             """SELECT time, air_temp, leaf_temp, humidity, light, co2, dewpoint, evapotrans, hd, vpd 
             FROM sensor_data 
-            WHERE (sensor_id = (SELECT id FROM sensors WHERE sn = %s)) 
+            WHERE (sensor_id = (SELECT id FROM sensor WHERE sn = %s)) 
             AND (date(time) = %s)
             ORDER BY time DESC LIMIT 10000""",
             (sn, start),
@@ -134,7 +134,7 @@ def layout():
 
     # 센서 ID 추출
     cursor: pg.cursor = _pgc.cursor(cursor_factory=pga.DictCursor)
-    cursor.execute("SELECT id, sn FROM sensors")
+    cursor.execute("SELECT id, sn FROM sensor")
     ids = {x["sn"]: x["id"] for x in cursor.fetchall()}
     cursor.close()
 

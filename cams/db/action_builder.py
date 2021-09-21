@@ -1,4 +1,6 @@
-"""db패키지의 각 모듈에 모델의 연산을 수행하는 함수를 추가하는 도움클래스"""
+"""db패키지의 각 모듈에 모델연산을 수행하는 함수 추가
+    제너릭 클래스 정의
+"""
 
 from types import ModuleType
 from typing import Any, Dict, List, Generic, TypeVar
@@ -23,6 +25,7 @@ class ActionBuilder(Generic[M]):
     def __init__(self, module: ModuleType, m: M) -> None:
         """인스턴스 객체 생성
 
+        :param module: 모델을 정의하는 모듈 ex) db.user <-- sys.modules[__name__]
         :param m: 연산할 대상 모델의 클래스 ex) db.user.User
         """
 

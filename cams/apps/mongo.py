@@ -100,12 +100,6 @@ def load_data() -> Tuple[List[float], pd.DataFrame]:
     ).sort([("Time", 1)])
     ds = list(cursor)
 
-    # ----------[ testing: get last 10k documents ]----------
-    # ds = sensors.find({'SN':'B2F_CAMs_1000000000001'},
-    #    projection={'_id': False, 'FarmName':False, 'SN':False}#, 'Date':False}
-    #    ).sort([('_id', -1),('Date',1),('Time', 1)]).limit(10000)
-    # ----------
-
     timing[0] = round(timer() - startTime, 3)
 
     startTime = timer()

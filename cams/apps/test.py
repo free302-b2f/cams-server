@@ -78,11 +78,11 @@ def layout():
     dtUser = build_data_table(cols, df, "test-dt-user")
 
     df = load_data(db.farm)
-    cols = db.farm.Farms.__table__.columns.keys()
+    cols = db.farm.Farm.__table__.columns.keys()
     dtFarms = build_data_table(cols, df, "test-dt-farm")
 
     df = load_data(db.sensor)
-    cols = db.sensor.Sensors.__table__.columns.keys()
+    cols = db.sensor.Sensor.__table__.columns.keys()
     dtSensors = build_data_table(cols, df, "test-dt-sensor")
 
     df = load_sensor_data(df[0]["id"])

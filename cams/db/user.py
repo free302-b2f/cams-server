@@ -9,7 +9,8 @@ import werkzeug.security as wsec
 class User(fli.UserMixin, db.Model):
     """로그인 사용자 DB모델"""
 
-    # 클래스 변수: 각 필드 최대 길이 등 
+    # region ---- View에서 사용할 필드 정보 ----
+    # 클래스 변수: 각 필드 최대 길이 등
     max_username = 32
     max_email = 64
     max_password = 32
@@ -19,24 +20,26 @@ class User(fli.UserMixin, db.Model):
     @classmethod
     def max_len(cls):
         """각 필드의 최대길이를 리턴"""
-        
+
         return {
             "max_un": cls.max_username,
             "max_pw": cls.max_password,
             "max_em": cls.max_email,
             "max_pwd": cls.max_password_hash,
-            "max_rn": cls.max_realname
+            "max_rn": cls.max_realname,
         }
+
+    # endregion
 
     # 테이블 컬럼 정의
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(max_username), unique=True, nullable=False)
     email = db.Column(db.String(max_email), unique=True)
     password = db.Column(db.String(max_password_hash))
-    # realname = db.Column(db.String(max_password_hash))
+    realname = db.Column(db.String(max_password_hash))
 
     def __repr__(self):
-        return f"<User {self.username}>"
+        return f"<User: {self.username}>"
 
     def to_dict(self):
         """인스턴스 객체의 dict 표현을 구한다"""
@@ -46,6 +49,7 @@ class User(fli.UserMixin, db.Model):
         return dic
 
 
+# region ---- 테이블 조작 연산 추가 -----
 class _UserAction(ActionBuilder[User]):
     """db.user 모듈 ActionBuilder에 의해 정의된 함수를 오버라이딩하는 클래스"""
 
@@ -65,3 +69,5 @@ class _UserAction(ActionBuilder[User]):
 
 # 모듈 함수 추가
 _UserAction(sys.modules[__name__], User)
+
+# endregion

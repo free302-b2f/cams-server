@@ -20,7 +20,7 @@ debug("loading...")
 # region ---- DB Server & Connection ----
 
 _set = getConfigSection("Postgres")
-_pgClient = pg.connect(
+_pgc = pg.connect(
     f'postgres://{_set["User"]}:{_set["Pw"]}@{_set["Ip"]}:{_set["Port"]}/{_set["Db"]}'
 )
 
@@ -31,114 +31,99 @@ _pgClient = pg.connect(
 
 
 def f1_check_db_connection():
-    cursor: pge.cursor = _pgClient.cursor()
+    cursor: pge.cursor = _pgc.cursor()
     cursor.execute("SELECT 'hello world'")
     ds = cursor.fetchone()
     print(ds)
-    _pgClient.commit()
+    _pgc.commit()
     cursor.close()
     return ds
 
 
-def f2_init_and_seed():
-    """DBMS에 기본 테이블을 생성한다"""
+def _create_table(cursor):
+    """메타데이터, 센서테이터 테이블 추가"""
 
-    def create_hypertable(cursor):
-        """메타데이터, 센서테이터 테이블 추가"""
+    # 메타메이터 테이블은 별도 생성할것
 
-        # 농장, 센서 테이블
-        query_create_sensors_table = """
-        CREATE TABLE IF NOT EXISTS farms (
-            id SERIAL PRIMARY KEY, 
-            name VARCHAR(50));
-        CREATE TABLE IF NOT EXISTS sensors (
-            id SERIAL PRIMARY KEY, 
-            sn VARCHAR(50)            
-        );"""
+    # 센서데이터 테이블
+    create_sensordata_table = """
+    CREATE TABLE IF NOT EXISTS sensor_data (
+        id SERIAL, 
+        time TIMESTAMPTZ NOT NULL,
+        farm_id INTEGER,
+        sensor_id INTEGER,
+        air_temp DOUBLE PRECISION,
+        leaf_temp DOUBLE PRECISION,
+        humidity DOUBLE PRECISION,
+        light DOUBLE PRECISION,
+        co2 DOUBLE PRECISION,
+        dewpoint DOUBLE PRECISION,
+        evapotrans DOUBLE PRECISION,
+        hd DOUBLE PRECISION,
+        vpd DOUBLE PRECISION,
+        FOREIGN KEY (farm_id) REFERENCES farm (id),
+        FOREIGN KEY (sensor_id) REFERENCES sensor (id),
+        UNIQUE (time, sensor_id),
+        UNIQUE (id, time, sensor_id)
+    );
+    CREATE INDEX ON sensor_data (id);"""
 
-        # 센서데이터 테이블
-        query_create_sensordata_table = """
-        CREATE TABLE IF NOT EXISTS sensor_data (
-            id SERIAL, 
-            time TIMESTAMPTZ NOT NULL,
-            farm_id INTEGER,
-            sensor_id INTEGER,
-            air_temp DOUBLE PRECISION,
-            leaf_temp DOUBLE PRECISION,
-            humidity DOUBLE PRECISION,
-            light DOUBLE PRECISION,
-            co2 DOUBLE PRECISION,
-            dewpoint DOUBLE PRECISION,
-            evapotrans DOUBLE PRECISION,
-            hd DOUBLE PRECISION,
-            vpd DOUBLE PRECISION,
-            FOREIGN KEY (farm_id) REFERENCES farms (id),
-            FOREIGN KEY (sensor_id) REFERENCES sensors (id),
-            UNIQUE (time, sensor_id),
-            UNIQUE (id, time, sensor_id)
-        );
-        CREATE INDEX ON sensor_data (id);"""
+    # 센서테이터에 대한 하이퍼테이블 생성
+    create_sensordata_hypertable = """
+    SELECT create_hypertable('sensor_data', 'time', 
+        partitioning_column => 'sensor_id',
+        number_partitions => 100, 
+        if_not_exists => TRUE);
+    SELECT set_chunk_time_interval('sensor_data', INTERVAL '7 days');
+    """
+    cursor.execute(create_sensordata_table)
+    cursor.execute(create_sensordata_hypertable)
+    _pgc.commit()
 
-        # 센서테이터에 대한 하이퍼테이블 생성
-        query_create_sensordata_hypertable = """
-        SELECT create_hypertable('sensor_data', 'time', 
-            partitioning_column => 'sensor_id',
-			number_partitions => 100, 
-            if_not_exists => TRUE);
-        SELECT set_chunk_time_interval('sensor_data', INTERVAL '7 days');
-        """
-        cursor.execute(query_create_sensors_table)
-        cursor.execute(query_create_sensordata_table)
-        cursor.execute(query_create_sensordata_hypertable)
-        _pgClient.commit()
+    # 하이퍼테이블 정보 출력
+    query_table_info = """
+    SELECT h.table_name, c.interval_length FROM _timescaledb_catalog.dimension c
+        JOIN _timescaledb_catalog.hypertable h ON h.id = c.hypertable_id;"""
+    cursor.execute(query_table_info)
+    ti = cursor.fetchone()
+    debug(f"table info: {ti}")
 
-        # 하이퍼테이블 정보 출력
-        query_table_info = """
-        SELECT h.table_name, c.interval_length FROM _timescaledb_catalog.dimension c
-            JOIN _timescaledb_catalog.hypertable h ON h.id = c.hypertable_id;"""
-        cursor.execute(query_table_info)
-        ti = cursor.fetchone()
-        debug(f"table info: {ti}")
 
-    def seed(cursor):
-        """기본적인 메타데이터 추가"""
+def _seed(cursor):
+    """기본적인 메타데이터 및 랜덤 센서데이터 추가"""
 
-        # 1개의 농장 추가
-        cursor.execute("INSERT INTO farms (name) VALUES (%s)", ("Bit2Farm KIST",))
+    # 메타데이터는 별도 추가할 것
 
-        # 3개의 센서 추가
-        cursor.execute(
-            "INSERT INTO sensors (sn) VALUES (%s)", ("B2F_CAMs_1000000000001",)
-        )
-        cursor.execute(
-            "INSERT INTO sensors (sn) VALUES (%s)", ("B2F_CAMs_1000000000002",)
-        )
-        cursor.execute(
-            "INSERT INTO sensors (sn) VALUES (%s)", ("B2F_CAMs_1000000000003",)
-        )
-        _pgClient.commit()
+    # 농장 ID 추출
+    cursor.execute("SELECT id FROM farm ORDER BY id DESC LIMIT 1")
+    farmId = cursor.fetchone()["id"]  # 첫번째 농장 사용
 
-        # 농장 ID 추출
-        cursor.execute("SELECT id FROM farms ORDER BY id DESC LIMIT 1")
-        farmId = cursor.fetchone()["id"]
+    # 센서 ID 추출
+    cursor.execute("SELECT id, sn FROM sensor")
+    ids = {x["sn"]: x["id"] for x in cursor.fetchall()}
 
-        # 센서 ID 추출
-        cursor.execute("SELECT id, sn FROM sensors")
-        ids = {x["sn"]: x["id"] for x in cursor.fetchall()}
+    start = datetime.combine(datetime.now().date(), time())
+    dates = [start + timedelta(days=x) for x in range(-30, 30)]
 
-        # 각 센서에 대해 센서데이터 추가
-        for id in ids:
-            for x in range(0, 0):
+    sql = """INSERT INTO sensor_data 
+        (time, farm_id, sensor_id, air_temp, leaf_temp, humidity, 
+        light, co2, dewpoint, evapotrans, hd, vpd) 
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) 
+        ON CONFLICT DO NOTHING"""
+
+    # 각 센서에 대해 센서데이터 추가
+    for id in ids:
+        for d in dates:
+
+            debug(f"inserting... : {d}")
+
+            for x in range(2880):
                 cursor.execute(
-                    """
-                INSERT INTO sensor_data 
-                (time, farm_id, sensor_id, air_temp, leaf_temp, humidity, light, co2, dewpoint, evapotrans, hd, vpd) 
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                """,
+                    sql,
                     (
                         datetime.now() + timedelta(0, 0, x),
                         farmId,
-                        id,
+                        ids[id],
                         round(random.uniform(10, 30), 1),  # air temp
                         round(random.uniform(10, 30), 1),  # leaf
                         round(random.uniform(30, 90), 1),  # humidity
@@ -150,12 +135,16 @@ def f2_init_and_seed():
                         round(random.uniform(0, 10), 1),
                     ),
                 )
+                d = d + timedelta(seconds=30)
+            _pgc.commit()
 
-        _pgClient.commit()
 
-    cursor: pge.cursor = _pgClient.cursor(cursor_factory=pga.DictCursor)
-    create_hypertable(cursor)
-    seed(cursor)
+def f2_init_and_seed():
+    """DBMS에 기본 테이블을 생성한다"""
+
+    cursor: pge.cursor = _pgc.cursor(cursor_factory=pga.DictCursor)
+    #_create_table(cursor)
+    _seed(cursor)
     cursor.close()
 
 
@@ -163,7 +152,7 @@ def f2_init_and_seed():
 # endregion
 
 
-def f2_copy_mongo():
+def f3_copy_mongo():
     """MonogDB의 센서데이터를 PostgreSQL에 복사한다"""
 
     _db = getConfigSection("Mongo")
@@ -174,10 +163,10 @@ def f2_copy_mongo():
     _camsDb = _mongoClient[_db["Db"]]
     _sensors = _camsDb["sensors"]
 
-    cursor: pge.cursor = _pgClient.cursor(cursor_factory=pga.DictCursor)
-    cursor.execute("SELECT id FROM farms ORDER BY id DESC LIMIT 1")
+    cursor: pge.cursor = _pgc.cursor(cursor_factory=pga.DictCursor)
+    cursor.execute("SELECT id FROM farm ORDER BY id DESC LIMIT 1")
     farmId = cursor.fetchone()["id"]
-    cursor.execute("SELECT id, sn FROM sensors")
+    cursor.execute("SELECT id, sn FROM sensor")
     sensorIds = {x["sn"]: x["id"] for x in cursor.fetchall()}
     cursor.close()
 
@@ -222,10 +211,10 @@ def f2_copy_mongo():
         startTime = timer()
         src = _sensors.find({"Date": date}).sort([("_id", 1)])
 
-        cursor: pge.cursor = _pgClient.cursor()
+        cursor: pge.cursor = _pgc.cursor()
         for record in src:
             insert(cursor, farmId, record, sensorIds)
-        _pgClient.commit()
+        _pgc.commit()
         cursor.close()
 
         elapsedTime = round(timer() - startTime, 3)
@@ -234,7 +223,7 @@ def f2_copy_mongo():
     return
 
 
-#f2_copy_mongo()  # test
+# f2_copy_mongo()  # test
 
 
 # region ---- view ----
@@ -246,13 +235,13 @@ def load_data() -> Tuple[List[float], pd.DataFrame]:
     :return: 소요시간과 DataFrame의 튜플"""
 
     # 모든 센서의 ID 추출
-    cursor: pge.cursor = _pgClient.cursor(cursor_factory=pga.DictCursor)
-    cursor.execute("SELECT id, sn FROM sensors")
+    cursor: pge.cursor = _pgc.cursor(cursor_factory=pga.DictCursor)
+    cursor.execute("SELECT id, sn FROM sensor")
     sensorIds = [x["id"] for x in cursor.fetchall()]
     cursor.close()
 
     # 테이블의 필드 이름 추출
-    cursor: pge.cursor = _pgClient.cursor()
+    cursor: pge.cursor = _pgc.cursor()
     cursor.execute("select * from sensor_data where false;")
     cols = [x.name for x in cursor.description]
 
@@ -362,4 +351,5 @@ add_page(layout, "PostgreSQL", 30)
 # endregion
 
 if __name__ == "__main__":
-    f2_copy_mongo()
+    f2_init_and_seed()
+    # f3_copy_mongo()

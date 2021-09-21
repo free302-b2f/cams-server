@@ -53,7 +53,7 @@ def load_data(farmName, sn, date) -> Tuple[List[float], pd.DataFrame, List[str]]
         start = date
         sql = cursor.mogrify(
             """SELECT * FROM sensor_data 
-            WHERE (sensor_id = (SELECT id FROM sensors WHERE sn = %s)) 
+            WHERE (sensor_id = (SELECT id FROM sensor WHERE sn = %s)) 
             AND (date(time) = %s)
             ORDER BY time DESC LIMIT 10000""",
             (sn, start),
