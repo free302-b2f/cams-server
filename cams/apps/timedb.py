@@ -5,6 +5,12 @@
 
 # region ---- imports ----
 
+if __name__ == "__main__":
+    import sys, os.path as path
+
+    dir = path.join(path.dirname(__file__), "..")
+    sys.path.append(dir)
+
 from apps.imports import *
 
 # endregion
@@ -13,9 +19,9 @@ debug("loading...")
 
 # region ---- DB Server & Connection ----
 
-_db = getConfigSection("Postgres")
+_set = getConfigSection("Postgres")
 _pgClient = pg.connect(
-    f'postgres://{_db["User"]}:{_db["Pw"]}@{_db["Ip"]}:{_db["Port"]}/{_db["Db"]}'
+    f'postgres://{_set["User"]}:{_set["Pw"]}@{_set["Ip"]}:{_set["Port"]}/{_set["Db"]}'
 )
 
 # endregion
@@ -153,7 +159,7 @@ def f2_init_and_seed():
     cursor.close()
 
 
-#f2_init_and_seed()
+# f2_init_and_seed()
 # endregion
 
 
@@ -206,8 +212,8 @@ def f2_copy_mongo():
     first = _sensors.find().sort([("_id", 1), ("Date", 1)]).limit(1)[0]["Date"]
     last = _sensors.find().sort([("_id", -1), ("Date", -1)]).limit(1)[0]["Date"]
 
-    t1 = datetime(2020, 2, 10) #util.parseDate(first)
-    t2 = datetime(2020, 2, 20)#util.parseDate(last)
+    t1 = util.parseDate(first)
+    t2 = util.parseDate(last)
     numDays = (t2 - t1).days
     for d in range(0, numDays):
         date = (t1 + timedelta(days=d)).strftime("%Y%m%d")
@@ -228,13 +234,13 @@ def f2_copy_mongo():
     return
 
 
-#f2_copy_mongo() #test
+#f2_copy_mongo()  # test
 
 
 # region ---- view ----
 
 
-def f3_load_data() -> Tuple[List[float], pd.DataFrame]:
+def load_data() -> Tuple[List[float], pd.DataFrame]:
     """DB에서 하루동안의 데이터를 불러온다.
     쿼리 시간과 DataFrame 변환시간의 리스트를 생성
     :return: 소요시간과 DataFrame의 튜플"""
@@ -255,8 +261,9 @@ def f3_load_data() -> Tuple[List[float], pd.DataFrame]:
     startTime = timer()
 
     # 첫번째 센서의 2020-02-16 데이터 추출
-    start = datetime(2020, 2, 16).date()  # datetime.now().strftime('%Y-%m-%d')
-    #end = start + timedelta(hours=23, minutes=59, seconds=59, microseconds=999999)
+    start = datetime(2020, 2, 16).strftime("%Y-%m-%d")  # .date()
+    # datetime.now().strftime('%Y-%m-%d')
+    # end = start + timedelta(hours=23, minutes=59, seconds=59, microseconds=999999)
     sql = cursor.mogrify(
         """select * from sensor_data 
         WHERE (sensor_id = %s) AND (date(time) = %s)
@@ -324,7 +331,7 @@ def layout():
     debug(layout, f"entering...")
     app.title = "B2F - TimeDB Tester"
 
-    timing, df = f3_load_data()
+    timing, df = load_data()
     cbc.record_timing("Query", timing[0], "query DB")
     cbc.record_timing("DataFrame", timing[0], "pandas DataFrame")
 
@@ -339,7 +346,7 @@ def layout():
             html.Hr(),
             html.Listing(
                 util.formatTiming(
-                    request, [_db["Name"], _db["Ip"], _db["Port"]], timing, df.shape
+                    request, [_set["Name"], _set["Ip"], _set["Port"]], timing, df.shape
                 ),
                 className="log-listing",
             ),
@@ -349,7 +356,10 @@ def layout():
 
 
 # 이 페이지를 메인 메뉴바에 등록한다.
-# add_page(layout, "PostgreSQL", 30)
+add_page(layout, "PostgreSQL", 30)
 # layout();#test
 
 # endregion
+
+if __name__ == "__main__":
+    f2_copy_mongo()

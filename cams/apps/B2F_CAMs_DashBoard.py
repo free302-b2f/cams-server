@@ -2,93 +2,80 @@
 CAMs 센서데이터의 시각화
 """
 
-# region ---- import ----
+if __name__ == "__main__":
+    import sys, os.path as path
+
+    dir = path.join(path.dirname(__file__), "..")
+    sys.path.append(dir)
 
 from apps.imports import *
 
-# endregion
-
 debug("loading...")
 
-# region ---- DB Server & Connection ----
-
-_cams = getConfigSection("Cams")  # CAMs 설정
-
-if _cams["DbmsKey"] == "Mongo":
-    _setDb = getConfigSection("Mongo")  # CAMs DB 설정
-    _mongoClient = MongoClient(
-        f'mongodb://{_setDb["User"]}:{_setDb["Pw"]}@{_setDb["Ip"]}:{_setDb["Port"]}/{_setDb["Db"]}',
-        document_class=RawBSONDocument,
-    )
-    _camsDb = _mongoClient[_setDb["Db"]]
-
-else:
-    _setDb = getConfigSection("Postgres")
-    _connPg = pg.connect(
-        f'postgres://{_setDb["User"]}:{_setDb["Pw"]}@{_setDb["Ip"]}:{_setDb["Port"]}/{_setDb["Db"]}'
-    )
-
-# endregion
+_set = getConfigSection("Postgres")
+_pgc = pg.connect(
+    f'postgres://{_set["User"]}:{_set["Pw"]}@{_set["Ip"]}:{_set["Port"]}/{_set["Db"]}'
+)
 
 
-def load_data(farmName, sn, date) -> Tuple[List[float], pd.DataFrame, List[str]]:
+def load_data(sn: str, date) -> Tuple[pd.DataFrame, List[str]]:
     """DB에서 하루동안의 데이터를 불러온다.
-    쿼리 시간과 DataFrame 변환시간의 리스트를 생성
+    DataFrame 변환시간의 리스트를 생성
     테이블의 필드이름 목록을 생성
-    :return: 소요시간과 DataFrame, 필드이름 목록의 튜플"""
+    :return: DataFrame, 필드이름 목록의 튜플"""
 
-    def query_mongo() -> Tuple[Cursor, List[str]]:
-        sensors = _camsDb["sensors"]
-        ds = sensors.find({"SN": sn, "Date": date})
-        cols = _setDb["DataColumns"]
-        # data_types = {x:'float64' for x in cols}
-        # meta_columns = _setDb['MetaColumns']
-        # for x in meta_columns: data_types[x] = 'string'
-        return (ds, cols)
+    def query_postgres() -> Tuple[List, List[str]]:
 
-    def query_postgres(sn, cols, ds) -> Tuple[List, List[str]]:
-        cursor: pge.cursor = _connPg.cursor()
-        start = datetime(2021, 2, 16)  # datetime.now().strftime('%Y-%m-%d')
-        end = start + timedelta(hours=23, minutes=59, seconds=59, microseconds=999999)
+        cursor: pge.cursor = _pgc.cursor()  # cursor_factory=pga.DictCursor)
+        start = date
         sql = cursor.mogrify(
-            """SELECT * FROM sensor_data 
-            WHERE (sensor_id = (SELECT id FROM sensord WHERE sn = %s)) 
-            AND (time BETWEEN %s AND %s)
+            """SELECT time, air_temp, leaf_temp, humidity, light, co2, dewpoint, evapotrans, hd, vpd 
+            FROM sensor_data 
+            WHERE (sensor_id = (SELECT id FROM sensors WHERE sn = %s)) 
+            AND (date(time) = %s)
             ORDER BY time DESC LIMIT 10000""",
-            (sn, start, end),
+            (sn, start),
         )
+        debug(f"{sql}")
+
         cursor.execute(sql)
         cols = [x.name for x in cursor.description]
         ds = cursor.fetchall()
         cursor.close()
+
+        if not len(ds):
+            cols.clear()
+
         return ds, cols
 
-    timing = [0, 0]
-    startTime = timer()
-    ds, cols = query_mongo() if _cams["DbmsKey"] == "Mongo" else query_postgres()
-    timing[0] = round(timer() - startTime, 3)
-
-    startTime = timer()
+    ds, cols = query_postgres()
     df = pd.DataFrame(ds)  # .astype(data_types)
-    timing[1] = round(timer() - startTime, 3)
+    df.columns = cols
+    # df.pop('id')
+    # cols.remove('id')
+    debug(load_data, f"{date}: {df.shape = }, {cols= }")
 
-    debug(load_data, f"{date}: {df.shape = }")
-
-    return (timing, df, cols)
+    return (df, cols)
 
 
-# load_data("", "B2F_CAMs_1000000000001", "20210117")#test
+# load_data("B2F_CAMs_1000000000001", "20210216")  # test
 
 
 def plot(df: pd.DataFrame, cols: List[str] = [], title: str = "B2F CAMs") -> dict:
     """데이터의 Figure 생성"""
 
     if df is None or len(df) == 0:
-        return px.scatter(pd.DataFrame({x: [0] for x in cols}), y=cols, title=title)
+        return px.scatter(
+            pd.DataFrame({x: [0] for x in cols}),
+            y=cols,
+            title=f"{title}",
+        )
 
-    df.sort_values(by=["Time"], axis=0, inplace=True)
+    df.sort_values(by=["time"], axis=0, inplace=True)
+    cols.remove("time")
+
     return {
-        "data": [go.Scatter(x=df["Time"], y=df[i], mode="lines", name=i) for i in cols],
+        "data": [go.Scatter(x=df["time"], y=df[i], mode="lines", name=i) for i in cols],
         "layout": go.Layout(
             title=title,
             xaxis_title="Time",
@@ -102,51 +89,41 @@ def plot(df: pd.DataFrame, cols: List[str] = [], title: str = "B2F CAMs") -> dic
 
 
 @app.callback(
-    [Output("graph1", "figure"), Output("log-listing", "children")],
-    [Input("SN", "value"), Input("Date", "date"), Input("sampling-ratio", "value")],
+    Output("graph1", "figure"),
+    Input("SN", "value"),
+    Input("Date", "date"),
+    # Input("sampling-ratio", "value"),
 )
-def update_graph(SN, date, sampleRatio):  # Year, Month, Day):
+def update_graph(sensor_sn, date):  # , sampleRatio):
     """선택된 정보로 그래프를 업데이트 한다"""
 
-    debug(update_graph, f"{SN = }, {date = }, {sampleRatio = }")
+    debug(update_graph, f"{sensor_sn = }, {date = }")
+    # debug(update_graph, f"{SN = }, {date = }, {sampleRatio = }")
 
     # date == None
     if date is None:
-        listing = util.formatTiming(
-            request, [_setDb["Name"], _setDb["Ip"], _setDb["Port"]], [0, 0, 0], 0
-        )
-        return [plot(None), listing]
+        return plot(None)
 
-    dbSN = f"B2F_CAMs_100000000000{SN}"
+    dbSN = sensor_sn  # TODO: use sensor_id
     dbDate = datetime.fromisoformat(date).strftime("%Y%m%d")
+    df, cols = load_data(dbSN, dbDate)
 
-    timing, df, cols = load_data("B2F", dbSN, dbDate)
-
-    cbc.record_timing("Query", timing[0], "query DB")
-    cbc.record_timing("DataFrame", timing[0], "pandas DataFrame")
-    startTime = timer()
-
-    frac = (float(sampleRatio) if (sampleRatio is not None) else 100) / 100.0
-    if frac < 1:
-        df = df.sample(frac=frac)
+    # resampling pdands.Frame
+    # frac = (float(sampleRatio) if (sampleRatio is not None) else 100) / 100.0
+    # if frac < 1:
+    #     df = df.sample(frac=frac)
     fig = plot(df, cols, f"{dbSN} : {dbDate}")
 
-    timing.append(round(timer() - startTime, 3))
-    cbc.record_timing("DataTable", timing[2], "dash view")
-
-    listing = util.formatTiming(
-        request, [_setDb["Name"], _setDb["Ip"], _setDb["Port"]], timing, df.shape
-    )
-
-    return [fig, listing]
+    return fig
 
 
-@app.callback(Output("cams-sr-label", "children"), Input("sampling-ratio", "value"))
-def update_time(sampleRatio):
-    """샘플링 비율에 따른 샘플간격을 업데이트 한다"""
+# @app.callback(Output("cams-sr-label", "children"), Input("sampling-ratio", "value"))
+# def update_time(sampleRatio):
+#     """샘플링 비율에 따른 샘플간격을 업데이트 한다"""
 
-    frac = (float(sampleRatio) if (sampleRatio != None) else 0) / 100.0
-    return f"{0.5 / frac} minutes"
+#     frac = (float(sampleRatio) if (sampleRatio != None) else 0) / 100.0
+#     minuites =0.5 / frac
+#     return f"{0.5 / frac} minutes"
 
 
 def layout():
@@ -154,6 +131,12 @@ def layout():
 
     debug(layout, f"entering...")
     app.title = "B2F - CAMs Viewer"
+
+    # 센서 ID 추출
+    cursor: pg.cursor = _pgc.cursor(cursor_factory=pga.DictCursor)
+    cursor.execute("SELECT id, sn FROM sensors")
+    ids = {x["sn"]: x["id"] for x in cursor.fetchall()}
+    cursor.close()
 
     def tr(label: str, el, elId: str = None, merge: bool = False):
         """주어진 내용을 html TR에 출력한다"""
@@ -189,61 +172,67 @@ def layout():
             )
         return tr
 
-    dateValue = datetime(2021, 2, 16)  # datetime.now().date()
-    snOptions = [{"label": f"Sensor {x}", "value": x} for x in range(1, 4)]
+    dateValue = datetime.now().date()
 
-    return html.Div(
-        [
-            html.H3("B2F CAMs Viewer"),
-            html.Hr(),
-            html.Listing("", id="log-listing", className="log-listing"),
-            html.Table(
-                [
-                    tr("", "", merge=True),
-                    tr(
-                        "Sensor",
-                        dcc.Dropdown(
-                            id="SN", options=snOptions, value=snOptions[0]["value"]
-                        ),
-                        "SN",
-                    ),
-                    tr(
-                        "Date",
-                        dcc.DatePickerSingle(
-                            id="Date",
-                            display_format="YYYY-MM-DD",
-                            date=dateValue,
-                        ),
-                    ),
-                    tr(
-                        "Sample Ratio(%)",
-                        [
-                            dcc.Input(
-                                id="sampling-ratio",
-                                value="100",
-                                type="number",
-                                min=0,
-                                max=100,
-                                step=1,
-                                debounce=True,
-                            ),
-                            html.Span("100%", id="cams-sr-label"),
-                        ],
-                        "sampling-ratio",
-                    ),
-                    tr(
-                        "Graph",
-                        dcc.Graph(id="graph1", className="camsGraphBorder"),
-                        merge=True,
-                    ),
-                ],
-                className="cams_contents_table",
-            ),  # ~table
-        ]
+    snOptions = [{"label": sn, "value": sn} for sn in ids]
+
+    sensorTr = tr(
+        "Sensor",
+        dcc.Dropdown(id="SN", options=snOptions, value=snOptions[0]["value"]),
+        "SN",
     )
+    dateTr = tr(
+        "Date",
+        dcc.DatePickerSingle(
+            id="Date",
+            display_format="YYYY-MM-DD",
+            date=dateValue,
+        ),
+    )
+    fracTr = tr(
+        "Sample Ratio(%)",
+        [
+            dcc.Input(
+                id="sampling-ratio",
+                value="100",
+                type="number",
+                min=0,
+                max=100,
+                step=1,
+                debounce=True,
+            ),
+            html.Span("100%", id="cams-sr-label"),
+        ],
+        "sampling-ratio",
+    )
+    graphTr = tr(
+        "Graph",
+        dcc.Graph(id="graph1", className="camsGraphBorder"),
+        merge=True,
+    )
+
+    return [
+        html.H3("B2F CAMs Viewer"),
+        html.Hr(),
+        html.Table(
+            [
+                tr("", "", merge=True),
+                sensorTr,
+                dateTr,
+                # fracTr,
+                graphTr,
+            ],
+            className="cams_contents_table",
+        ),  # ~table
+    ]
 
 
 # layout()#test
 
 # 이 페이지를 메인 메뉴바에 등록한다.
 add_page(layout, "CAMs", 40)
+
+
+if __name__ == "__main__":
+    layout()
+    # load_data("B2F_CAMs_1000000000001", "20200216")  # test

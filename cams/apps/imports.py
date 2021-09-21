@@ -2,7 +2,7 @@
 
 from types import FunctionType, LambdaType, ModuleType
 from typing import Any, Callable, Tuple, List, Dict
-from datetime import timedelta, datetime, timezone
+from datetime import timedelta, datetime, timezone, time
 import random, sys
 from os import path, getcwd
 from timeit import default_timer as timer
