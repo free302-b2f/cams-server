@@ -158,6 +158,7 @@ class ModulePropertyBuilder:
         if propName in self._propDic:
             value = self._propDic[propName]()
             if value is None:
+                # 속성을 아직 초기화하지 않은 경우 == 코드 실행 순서에 문제가 있음!
                 raise ValueError(f"{self.name}.{propName} == None")
             return value
         raise AttributeError(f"package '{self.name}' has no attribute '{propName}'")

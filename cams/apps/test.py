@@ -74,7 +74,7 @@ def layout():
     app.title = "B2F - test sqlalchemy"
 
     df = load_data(db.user)
-    cols = db.user.User.__table__.columns.keys()
+    cols = db.user.AppUser.__table__.columns.keys()
     dtUser = build_data_table(cols, df, "test-dt-user")
 
     df = load_data(db.farm)

@@ -20,15 +20,8 @@ class Sensor(db.Model):
 
     # endregion
 
-
-    # 기존 DBMS에서 정보를 추출하여 생성
-    # __table__ = sc.Table(
-    #     "sensors",
-    #     db.Model.metadata,
-    #     autoload_with=db.engine,
-    # )
-    # _keys = __table__.columns.keys()
-
+    # 테이블 컬럼 정의
+    __tablename__ = "sensor"
     id = db.Column(db.Integer, primary_key=True)
     sn = db.Column(db.String(max_sn), nullable=False)
     farm_id = db.Column(db.Integer, db.ForeignKey("farm.id"), nullable=False)

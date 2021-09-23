@@ -6,7 +6,7 @@ import flask_login as fli
 import werkzeug.security as wsec
 
 
-class User(fli.UserMixin, db.Model):
+class AppUser(fli.UserMixin, db.Model):
     """로그인 사용자 DB모델"""
 
     # region ---- View에서 사용할 필드 정보 ----
@@ -22,16 +22,17 @@ class User(fli.UserMixin, db.Model):
         """각 필드의 최대길이를 리턴"""
 
         return {
-            "max_un": cls.max_username,
-            "max_pw": cls.max_password,
-            "max_em": cls.max_email,
-            "max_pwd": cls.max_password_hash,
-            "max_rn": cls.max_realname,
+            "max_username": cls.max_username,
+            "max_password": cls.max_password,
+            "max_email": cls.max_email,
+            "max_password_hash": cls.max_password_hash,
+            "max_realname": cls.max_realname,
         }
 
     # endregion
 
     # 테이블 컬럼 정의
+    __tablename__ = "app_user"
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(max_username), unique=True, nullable=False)
     email = db.Column(db.String(max_email), unique=True)
@@ -48,26 +49,3 @@ class User(fli.UserMixin, db.Model):
         dic = {key: self.__getattribute__(key) for key in keys}
         return dic
 
-
-# region ---- 테이블 조작 연산 추가 -----
-class _UserAction(ActionBuilder[User]):
-    """db.user 모듈 ActionBuilder에 의해 정의된 함수를 오버라이딩하는 클래스"""
-
-    # override insert()
-    def insert(self, **kwargs) -> User:
-        """오버라이드 - 패스워드 암호화 추가"""
-
-        # encrypt plain password
-        pw = wsec.generate_password_hash(kwargs["password"], method="sha256")
-        kwargs["password"] = pw
-
-        # 부모의 메소드 호출
-        return ActionBuilder.insert(self, **kwargs)
-
-    pass
-
-
-# 모듈 함수 추가
-_UserAction(sys.modules[__name__], User)
-
-# endregion

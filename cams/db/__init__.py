@@ -5,7 +5,7 @@
 
 # region ---- __all__ 정의 ----
 
-__all__ = []
+# __all__ = [ ]
 
 # endregion
 
@@ -52,21 +52,17 @@ def init_app(server: fl.Flask) -> fli.LoginManager:
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
     )
 
-    global _db, _load_user, _load_farm, _load_sensor, _seed_meta
+    global _db, _load_user, _seed_meta
 
     #! db.xxx 모듈을 실행하기 전에 _db 초기화 필요
     _db = SQLAlchemy(server)
-    _db.Model.metadata.reflect(bind=_db.engine, schema=_set["Db"])
+    # _db.Model.metadata.reflect(bind=_db.engine, schema=_set["Db"])
 
     #! import all models
-    from db.user import User
+    from db.user import AppUser
     from db.farm import Farm
     from db.sensor import Sensor
-
-    _load_user = User.query.get
-    # _load_farm = Farm.query.get
-    # _load_sensor = Sensor.query.get
-
+    
     # create all model tables & seed
     if _set["DropTables"]:
         _db.drop_all()
@@ -78,6 +74,11 @@ def init_app(server: fl.Flask) -> fli.LoginManager:
         _db.create_all()
         _seed_meta()
 
+    _load_user = AppUser.query.get
+    # _load_farm = Farm.query.get
+    # _load_sensor = Sensor.query.get
+
+
     pass  # init_app
 
 
@@ -85,22 +86,25 @@ def _seed_meta():
     import werkzeug.security as wsec
 
     #! import all models
-    from db.user import User
+    from db.user import AppUser
     from db.farm import Farm
     from db.sensor import Sensor
 
     pw = wsec.generate_password_hash("3569", method="sha256")
-    u = User(
+    
+    f1 = Farm(name="KIST Pheno Lab1")
+    f2 = Farm(name="KIST Pheno Lab2")
+    f1.sensors.append(Sensor(sn="B2F_CAMs_1000000000001"))
+    f1.sensors.append(Sensor(sn="B2F_CAMs_1000000000002"))
+    f2.sensors.append(Sensor(sn="B2F_CAMs_1000000000003"))
+    u = AppUser(
         username="drbae",
         password=pw,
         email="amadeus.bae@gmail.com",
-        realname="Dr BAE",
-    )
-    f = Farm(name="B2F-KIST1")
-    f.sensors.append(Sensor(sn="B2F_CAMs_1000000000001"))
-    f.sensors.append(Sensor(sn="B2F_CAMs_1000000000002"))
-    f.sensors.append(Sensor(sn="B2F_CAMs_1000000000003"))
-    u.farms.append(f)
+        realname="Samyong Bae",
+    )    
+    u.farms.append(f1)
+    u.farms.append(f2)
     _db.session.add(u)
     _db.session.commit()
 
@@ -110,11 +114,15 @@ def _seed_meta():
 
 # region ---- 모듈의 global property 정의 ----
 
-#flask-login 에서 사용
 mpb = util.ModulePropertyBuilder(sys.modules[__name__])
+
+# flask-login 에서 사용
+mpb.addProp("loadUser", lambda: _load_user) 
+
+# 다른 모듈에서 _db:SQLAlchemy 인스턴스를 접근하는데 사용
+# ex) from db import db as DB
+# 이 모듈 로딩시의 _db값(=None)이 아닌 import호출시 값을 리턴(C#의 property)
 mpb.addProp("db", lambda: _db)
-mpb.addProp("loadUser", lambda: _load_user)
-# mpb.addProp("loadFarm", lambda: _load_farm)
-# mpb.addProp("loadSensor", lambda: _load_sensor)
+
 
 # endregion

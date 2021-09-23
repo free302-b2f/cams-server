@@ -19,17 +19,13 @@ class Farm(db.Model):
         }
 
     # endregion
-
-    # 기존 DBMS에서 정보를 추출하여 생성
-    # __table__ = sc.Table(
-    #     "farms",
-    #     db.Model.metadata,
-    #     autoload_with=db.engine,
-    # )
+    
+    # 테이블 컬럼 정의
+    __tablename__ = "farm"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(max_name), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    user = db.relationship("User", backref=db.backref("farms", lazy=True))
+    user_id = db.Column(db.Integer, db.ForeignKey("app_user.id"), nullable=False)
+    user = db.relationship("AppUser", backref=db.backref("farms", lazy=True))
 
     def __repr__(self):
         return f"<Farm: {self.name}>"
@@ -41,6 +37,3 @@ class Farm(db.Model):
         dic = {key: self.__getattribute__(key) for key in keys}
         return dic
 
-
-# 모듈 함수 추가
-ActionBuilder[Farm](sys.modules[__name__], Farm)

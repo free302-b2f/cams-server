@@ -14,7 +14,7 @@
 {% endblock %}
 
 
-{% block card_body_1 %}
+{% block card_body %}
 <!-- password confirm -->
 <div class="input-group form-group">
     <div class="input-group-prepend">
@@ -22,20 +22,30 @@
     </div>
     <input name="lm-login-password-confirm" id="lm-login-password-confirm" class="form-control" 
         oninput="validatePassword('lm-login-password', 'lm-login-password-confirm')"
-        maxlength={{max_pw}} placeholder="password" required type="password">
+        maxlength={{max_password}} placeholder="password" required type="password">
 </div>
-{% endblock %}
 
-
-{% block card_body_2 %}
 <!-- email -->
 <div class="input-group form-group">
     <div class="input-group-prepend">
         <span class="input-group-text"><i class="fas fa-envelope"></i></span>
     </div>
     <input name="lm-login-email" id="lm-login-email" class="form-control" 
-        maxlength={{max_em}} placeholder="email address" required type="email">
+        maxlength={{max_email}} placeholder="email address" required type="email">
 </div>
+
+<!-- realname -->
+<div class="input-group form-group">
+    <div class="input-group-prepend">
+        <span class="input-group-text">
+            <!-- <i class="fas fa-envelope"></i> -->
+            <span class="material-icons-two-tone">badge</span>
+        </span>
+    </div>
+    <input name="lm-login-realname" id="lm-login-realname" class="form-control" 
+        maxlength={{max_realname}} placeholder="real name" required type="text">
+</div>
+
 {% endblock %}
 
 

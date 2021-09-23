@@ -6,11 +6,12 @@
 
 // ====[ 기본설정 - dash 설정 덮어쓰기 ]====
 // @app_back_color : #343a40;
-@app_back_color : #F0F0F0;
-@content_back_color : #FFFFFF;
+@app_back_color : #F0F1F2;
+@content_back_color : #F5F6F7;
 
 html{ font-size: 100%; }    // reset font size set by dash 'bWLwgP.css'
 body{ background-color: @app_back_color; }
+.font-sc { font-variant: small-caps; }
 
 .btn { display: flex; }
 .flex-h
@@ -19,8 +20,8 @@ body{ background-color: @app_back_color; }
     flex-direction: row;
     flex-wrap: nowrap;
     justify-content: flex-start;
-    align-content: center;
-    align-items: flex-start;
+    // align-content: center;
+    align-items: flex-end;
 }
 
 .flex-h-right {
@@ -32,10 +33,7 @@ body{ background-color: @app_back_color; }
     align-items: flex-end;
 }
 
-.mr1
-{
-    margin-right: 1rem;
-}
+.mr1 { margin-right: 1rem; }
 
 // .flex-h>*
 // {
@@ -300,39 +298,81 @@ body{ background-color: @app_back_color; }
     min-width: 600px;
     height: 100%;
     // margin-left: 1rem;
-    border: yellowgreen dashed 2px;
+    border: yellowgreen solid 1px;
     background-color: @content_back_color;
+    // background-color: rgba(0, 0, 0, 0.52);
+    // color:seashell;
 }
-#lm-profile-container header
+#lm-profile-header
 {
     // background: linear-gradient(135deg, gold 20%, skyblue 100%);
     display: flex;
     width: 100%;
-    margin-bottom: 1rem;
+    //margin-bottom: 1rem;
     // height: 4rem;    
     // align-items: center;
     // color: #fff;
     // text-shadow: #00F 0 0 .5em;
 }
+#lm-profile-menu  a:hover
+{
+    color:coral;
+}
 
 #lm-profile-container section
 {
-    margin-bottom: 1rem;
+    margin-bottom: 0.0rem;
 }
-
 #lm-profile-container section>h5~*
 {
-    margin-left: 1rem;
+    margin-left: 2.0rem;
+    width: 70%;
 }
 #lm-profile-container h5
 {
-    margin-top: 2rem;
+    margin-top: 1rem;
     margin-bottom: 1rem;
 }
+#lm-profile-container span.material-icons-outlined
+{
+    margin-left: 1rem;
+    color:rgba(sienna, 0.52);
+}
+#lm-profile-container span.material-icons-outlined:hover
+{
+    color:coral;
+    cursor: pointer;
+}
+
+// #lm-profile-personal>label
+#lm-profile-container section>label
+{
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+}
+#lm-profile-container label>span 
+{ 
+    width: 30%; 
+    display: flex;
+    justify-content: flex-end;
+    padding-right: 1rem;
+}
+#lm-profile-container label>input
+{ 
+    width: 60%; 
+}
+#lm-profile-container label>span.material-icons-outlined
+{ 
+    width: 2rem;
+    justify-content: flex-start; 
+    margin-left: 0rem;
+    padding-right: 0rem;
+}
+// #lm-profile-container label>button{ align-self: flex-end; }
 
 
-
-// ====[ 페이지: CMAs Viewer ]====
+// ====[ 페이지: CAMs Viewer ]====
 
 #app-cams-container
 {

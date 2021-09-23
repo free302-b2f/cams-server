@@ -4,7 +4,7 @@ from dash_html_components.A import A
 from dash_html_components.Div import Div
 from sqlalchemy.sql.expression import false
 from lm.imports import *
-from db.user import User
+from db.user import AppUser
 from app import app, add_page
 from dash import no_update
 

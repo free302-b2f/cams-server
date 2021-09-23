@@ -53,9 +53,15 @@ _element.href = "https://fonts.googleapis.com/icon?family=Material+Icons+Two+Ton
 document.getElementsByTagName('head')[0].appendChild(_element);
 
 //<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"></link>
+// _element = document.createElement('link');
+// _element.rel = "stylesheet";
+// _element.href = "https://fonts.googleapis.com/icon?family=Material+Icons&display=swap";
+// document.getElementsByTagName('head')[0].appendChild(_element);
+
+//<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"></link>
 _element = document.createElement('link');
 _element.rel = "stylesheet";
-_element.href = "https://fonts.googleapis.com/icon?family=Material+Icons&display=swap";
+_element.href = "https://fonts.googleapis.com/icon?family=Material+Icons+Outlined&display=swap";
 document.getElementsByTagName('head')[0].appendChild(_element);
 
 

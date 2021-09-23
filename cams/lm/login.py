@@ -1,9 +1,10 @@
 from lm.imports import *
-import db.user as db  # import User, getUserByName
+from db.user import AppUser
+
 from app import app, debug
 import json
 
-_ctx = db.User.max_len()
+_ctx = AppUser.max_len()
 
 
 @app.server.route("/login", methods=["GET", "POST"])
@@ -17,7 +18,10 @@ def login():
 
     response = {"isOK": False, "cause": "", "next": "/"}
 
-    user = db.firstBy(filterBy={"username": un})
+    # user = User.firstBy(filterBy={"username": un})
+    user = AppUser.query.filter_by(username=un).first()
+    
+
     if not user:
         response["cause"] = "lm-login-username"
     else:
