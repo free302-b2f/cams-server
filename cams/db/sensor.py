@@ -9,6 +9,7 @@ class Sensor(db.Model):
     # region ---- View에서 사용할 필드 정보 ----
     # 클래스 변수: 각 필드 최대 길이 등
     max_sn = 32
+    max_name = 64
 
     @classmethod
     def max_len(cls):
@@ -24,6 +25,7 @@ class Sensor(db.Model):
     __tablename__ = "sensor"
     id = db.Column(db.Integer, primary_key=True)
     sn = db.Column(db.String(max_sn), nullable=False)
+    name = db.Column(db.String(max_name), nullable=False)
     farm_id = db.Column(db.Integer, db.ForeignKey("farm.id"), nullable=False)
     farm = db.relationship("Farm", backref=db.backref("sensors", lazy=True))
 
@@ -39,5 +41,5 @@ class Sensor(db.Model):
         return dic
 
 
-# 모듈 함수 추가
-ActionBuilder[Sensor](sys.modules[__name__], Sensor)
+# # 모듈 함수 추가
+# ActionBuilder[Sensor](sys.modules[__name__], Sensor)

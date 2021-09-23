@@ -200,7 +200,7 @@ body{ background-color: @app_back_color; }
     max-width: 800px;
     height: 100%;  
     margin: 0;
-    border: yellowgreen dashed 2px;
+    border: yellowgreen solid 1px;
     background-color: rgba(@content_back_color, 0.9);
 }
 #apps-camera-img-container
@@ -219,14 +219,16 @@ body{ background-color: @app_back_color; }
     max-width:100%;
     max-height:100%;
     // aspect-ratio: 4/3;
+
     border: solid;
     border-color: cornflowerblue;
     background-color: transparent;
-    background-image: url(/assets/img/b2f.png);
+    background-image: url(/assets/img/b2f_640x480.png);
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
 }
+.visibily-hidden { visibility: hidden; }
 #apps-camera-info-box 
 {
     position: absolute; /* Position the background text */
@@ -248,7 +250,10 @@ body{ background-color: @app_back_color; }
 }
 #apps-camera-control-box
 {
+    // padding: 1rem;
+    width: 80%;
     padding: 1rem;
+    margin-left: 1rem;
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
@@ -256,19 +261,24 @@ body{ background-color: @app_back_color; }
     justify-content: flex-start;
     align-items: stretch;
 }
-#apps-camera-control-box label
+#apps-camera-control-box>label
 {
     display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    align-content: stretch;
+    align-items: center;
+    justify-content: space-between;
+}
+#apps-camera-control-box>label>*:nth-child(2n-1)
+{ 
+    width: 30%; 
+    display: flex;
     justify-content: flex-start;
-    align-items: stretch;
+    padding-right: 1rem;
 }
-#apps-camera-control-box label>span
-{
-    text-shadow: #FFFFFF 0px 0 10px;
+#apps-camera-control-box>label>*:nth-child(2n)
+{ 
+    width: 60%; 
 }
+
 
 
 // ====[ 페이지: Home ]====

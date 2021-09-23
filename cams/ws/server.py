@@ -39,29 +39,38 @@ async def _echo(ws):
 WsPool.setLogger(debug, info)
 
 
-async def _upload(ws, sensorId: int):
+async def _upload(ws, sensor):
     """웹소켓 수신 데이터를 파일/버퍼에 저장"""
 
-    info(_upload, f"uploader connected to <{sensorId}>")
-    pool = WsPool.getPool(sensorId)  # WsPool 인스턴스 생성
+    info(_upload, f"uploader connected to <{sensor}>")
+    pool = WsPool.getPool(sensor)  # WsPool 인스턴스 생성
 
     async for data in ws:
         # debug(f"received: {round(len(data)/1024)} KiB")  # test
         await pool.broadcast(data)  # TODO: wait until all download complete?
 
-    info(_upload, f"uploader disconnected from <{sensorId}>")
+    info(_upload, f"uploader disconnected from <{sensor}>")
 
 
-async def _download(ws, sensorId: int):
+async def _download(ws):#, sensorId: int):
     """파일/버퍼에서 웹소켓으로 데이터 전송"""
 
-    info(_download, f"downloader connected to <{sensorId}>")
-    pool = WsPool.getPool(sensorId)  # WsPool 인스턴스 생성
-    pool.add(ws)
-
+    info(_download, f"downloader connected.")# to <{sensorId}>")
+    lastSensor = ""
+    
     try:
-        async for data in ws:  # 연결유지
-            pass
+        async for newSensor in ws:  # 연결유지
+            if lastSensor != newSensor:
+                if lastSensor: 
+                    # WsPool.remove(lastSensor, ws)
+                    pool = WsPool.getPool(lastSensor)
+                    pool.remove(ws)
+
+                info(_download, f"downloader request: {newSensor}")
+                lastSensor = newSensor
+                # WsPool.add(newSensor, ws)
+                pool = WsPool.getPool(newSensor)
+                pool.add(ws)
 
     except ConnectionClosed as ex:
         debug(_download, f"ConnectionClosed: {ex}")
@@ -69,7 +78,9 @@ async def _download(ws, sensorId: int):
     except Exception as ex:
         debug(_download, f"Exception: {ex}")
 
-    info(_download, f"downloader disconnected from <{sensorId}>")
+    info(_download, f"downloader disconnected from <{lastSensor}>")
+    # WsPool.remove(lastSensor, ws)
+    pool = WsPool.getPool(lastSensor)
     pool.remove(ws)
 
 
@@ -91,7 +102,7 @@ async def _client_handler(ws, path: str):
         await _upload(ws, getSensorId(path))
 
     elif path.startswith("download"):
-        await _download(ws, getSensorId(path))
+        await _download(ws)#, getSensorId(path))
 
     else:
         await _echo(ws)

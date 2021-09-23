@@ -53,7 +53,7 @@ class WsPool(object):
 
         WsPool.info(f"removing: {ws}")
         with self._lock:
-            if ws not in self._pool:
+            if ws in self._pool:
                 self._pool.remove(ws)
 
     # class variables
@@ -81,10 +81,25 @@ class WsPool(object):
 
     @classmethod
     def getPool(cls, id: str) -> WsPool:
-        """주어진 아이디의 풀을 리턴, 없으면 생성"""
+        """주어진 센서 아이디의 풀을 리턴, 없으면 생성"""
 
         with cls._lock:
             if id not in cls._pools:
                 cls._pools[id] = WsPool()
             pool = cls._pools[id]
         return pool
+
+    # @classmethod
+    # def add(cls, id:str, ws):
+    #     """주어진 센서 아이디의 웹소켓을 추가한다"""
+
+    #     pool = cls.getPool(id)
+    #     pool.add(ws)
+
+    # @classmethod
+    # def remove(cls, id:str, ws):
+    #     """주어진 센서 아이디의 웹소켓을 제거한다"""
+        
+    #     pool = cls.getPool(id)
+    #     pool.remove(ws)
+

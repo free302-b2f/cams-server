@@ -94,9 +94,9 @@ def _seed_meta():
     
     f1 = Farm(name="KIST Pheno Lab1")
     f2 = Farm(name="KIST Pheno Lab2")
-    f1.sensors.append(Sensor(sn="B2F_CAMs_1000000000001"))
-    f1.sensors.append(Sensor(sn="B2F_CAMs_1000000000002"))
-    f2.sensors.append(Sensor(sn="B2F_CAMs_1000000000003"))
+    f1.sensors.append(Sensor(sn="B2F_CAMs_1000000000001", name="Lab1 Sensor1"))
+    f1.sensors.append(Sensor(sn="B2F_CAMs_1000000000002", name="Lab1 Sensor2"))
+    f2.sensors.append(Sensor(sn="B2F_CAMs_1000000000003", name="Test Sensor"))
     u = AppUser(
         username="drbae",
         password=pw,

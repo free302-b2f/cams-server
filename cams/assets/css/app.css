@@ -161,7 +161,7 @@ body {
   max-width: 800px;
   height: 100%;
   margin: 0;
-  border: yellowgreen dashed 2px;
+  border: yellowgreen solid 1px;
   background-color: rgba(245, 246, 247, 0.9);
 }
 #apps-camera-img-container {
@@ -178,10 +178,13 @@ body {
   border: solid;
   border-color: cornflowerblue;
   background-color: transparent;
-  background-image: url(/assets/img/b2f.png);
+  background-image: url(/assets/img/b2f_640x480.png);
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
+}
+.visibily-hidden {
+  visibility: hidden;
 }
 #apps-camera-info-box {
   position: absolute;
@@ -213,7 +216,9 @@ body {
   font-variant: small-caps;
 }
 #apps-camera-control-box {
+  width: 80%;
   padding: 1rem;
+  margin-left: 1rem;
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
@@ -221,16 +226,19 @@ body {
   justify-content: flex-start;
   align-items: stretch;
 }
-#apps-camera-control-box label {
+#apps-camera-control-box > label {
   display: flex;
-  flex-direction: column;
-  flex-wrap: nowrap;
-  align-content: stretch;
-  justify-content: flex-start;
-  align-items: stretch;
+  align-items: center;
+  justify-content: space-between;
 }
-#apps-camera-control-box label > span {
-  text-shadow: #FFFFFF 0px 0 10px;
+#apps-camera-control-box > label > *:nth-child(2n-1) {
+  width: 30%;
+  display: flex;
+  justify-content: flex-start;
+  padding-right: 1rem;
+}
+#apps-camera-control-box > label > *:nth-child(2n) {
+  width: 60%;
 }
 /* home contents */
 #app-home-container {

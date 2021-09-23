@@ -209,5 +209,5 @@ def f3_copy_mongo():
 
 
 if __name__ == "__main__":
-    # f2_init_and_seed()
-    f3_copy_mongo()
+    f2_init_and_seed()
+    # f3_copy_mongo()
