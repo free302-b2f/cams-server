@@ -132,11 +132,13 @@ def layout():
     debug(layout, f"entering...")
     app.title = "B2F - CAMs Viewer"
 
-    # 센서 ID 추출
-    cursor: pg.cursor = _pgc.cursor(cursor_factory=pga.DictCursor)
-    cursor.execute("SELECT id, sn FROM sensor")
-    ids = {x["sn"]: x["id"] for x in cursor.fetchall()}
-    cursor.close()
+    # 센서 ID 추출    
+    user = fli.current_user
+    farms = user.farms
+    sensors = []
+    for f in farms:
+        sensors.extend(f.sensors)
+    ids = {x.sn: x.id for x in sensors}
 
     def tr(label: str, el, elId: str = None, merge: bool = False):
         """주어진 내용을 html TR에 출력한다"""
@@ -175,10 +177,11 @@ def layout():
     dateValue = datetime.now().date()
 
     snOptions = [{"label": sn, "value": sn} for sn in ids]
+    snDefalut = snOptions[0]["value"] if len(snOptions) > 0 else ""
 
     sensorTr = tr(
         "Sensor",
-        dcc.Dropdown(id="SN", options=snOptions, value=snOptions[0]["value"]),
+        dcc.Dropdown(id="SN", options=snOptions, value=snDefalut),
         "SN",
     )
     dateTr = tr(
@@ -213,7 +216,7 @@ def layout():
 
     return html.Div(
         [
-            html.H3("B2F CAMs Viewer"),
+            html.H3("Bit2Farm CAMs Viewer"),
             html.Hr(),
             html.Table(
                 [
@@ -230,10 +233,8 @@ def layout():
     )
 
 
-# layout()#test
-
 # 이 페이지를 메인 메뉴바에 등록한다.
-add_page(layout, "CAMs", 40)
+add_page(layout, "CAMs Viewer", 40)
 
 
 if __name__ == "__main__":

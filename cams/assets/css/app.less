@@ -372,13 +372,14 @@ body{ background-color: @app_back_color; }
 // #lm-profile-container label>button{ align-self: flex-end; }
 
 
-// ====[ 페이지: CAMs Viewer ]====
+// ====[ 페이지: CAMs ]====
 
 #app-cams-container
 {
     width: 100%;
     min-width: 800px;
-    // flex: 1 1 auto
+    background-color: @app_back_color;
+    flex-grow: 1;
 }
 
 .camsGraphBorder{
@@ -396,15 +397,12 @@ body{ background-color: @app_back_color; }
     vertical-align: middle;
     font-family:Consolas;
 }
+
 #cams-sr-label{
     color:blue;
     padding-left:10px;
 }
-
-.DateInput_input
-{
-    font-weight: inherit;
-}
+.DateInput_input { font-weight: inherit; }
 
 
 

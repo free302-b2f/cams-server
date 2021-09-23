@@ -298,6 +298,8 @@ body {
 #app-cams-container {
   width: 100%;
   min-width: 800px;
+  background-color: #F0F1F2;
+  flex-grow: 1;
 }
 .camsGraphBorder {
   margin-top: 4px;

@@ -29,7 +29,7 @@ def login():
             fli.login_user(user)
             # fl.flash("Logged in successfully.")
             response["isOK"] = True
-            response["next"] = "/"
+            response["next"] = "/lm-profile"
             # return fl.redirect(fl.url_for("/"))
         else:
             response["cause"] = "lm-login-password"

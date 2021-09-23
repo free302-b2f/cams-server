@@ -126,4 +126,4 @@ app.clientside_callback(
 
 # endregion
 
-add_page(layout, "CamViewer")
+add_page(layout, "IR Cam")
