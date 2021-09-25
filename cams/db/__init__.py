@@ -116,7 +116,7 @@ def _seed_meta():
         password=pw,
         email="kist-pheno@gmail.com",
         realname="Pheno KIST",
-        level=0,  # administrator
+        level=0,
     )
     farm = Farm(name="KIST Pheno Farm")
     farm.sensors.append(Sensor(sn="B2F_CAMs_1000000000001", name="Lab Sensor 1"))

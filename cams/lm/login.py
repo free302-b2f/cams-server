@@ -25,9 +25,12 @@ def login():
     if not user:
         response["cause"] = "lm-login-username"
     else:
-        if wsec.check_password_hash(user.password, pw):
+        if user.level <= -2:
+            response["cause"] = f"account <{un}> is locked"
+
+        elif wsec.check_password_hash(user.password, pw):
             fli.login_user(user)
-            # fl.flash("Logged in successfully.")
+            
             response["isOK"] = True
             response["next"] = "/lm-profile"
         else:

@@ -67,7 +67,8 @@ function applyServerValidation(id) {
 
     if (!id) return;
     let el = document.getElementById(id);
-    if (!el) return;
+    if (!el) return id;
+
     let na = el.value;
 
     if (id != _id_pw && id != _id_pwc) {
@@ -80,7 +81,7 @@ function applyServerValidation(id) {
     }
 
     // pw
-    errorMsg = "패스워드가 유효하지 않습니다.";
+    let errorMsg = "패스워드가 유효하지 않습니다.";
     el.setCustomValidity(errorMsg);
     el.addEventListener("input", function (ev) {
         el.setCustomValidity(ev.target.value == na ? errorMsg : "");

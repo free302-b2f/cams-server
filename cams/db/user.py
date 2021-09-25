@@ -38,7 +38,7 @@ class AppUser(fli.UserMixin, dba.Model):
     email = dba.Column(dba.String(max_email), unique=True)
     password = dba.Column(dba.String(max_password_hash))
     realname = dba.Column(dba.String(max_password_hash))
-    level = dba.Column(dba.Integer, nullable=False, default=0) # 현재 일반유저 TODO: -1로 변경
+    level = dba.Column(dba.Integer, nullable=False, server_default="-2") # 현재 일반유저 TODO: -1로 변경
     # Column('version', Integer, server_default="SELECT MAX(1, MAX(old_versions)) FROM version_table")
     # -2=잠금, -1=게스트, 0=일반, +1=관리자
     # 관리자~아이디 승인/관리, 모든 팜/센서 접근()
