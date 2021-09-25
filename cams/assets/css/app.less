@@ -192,36 +192,51 @@ body{ background-color: @app_back_color; }
 #app-sidebar-github path:hover { fill:#539BF5; }
 
 
+//
 // ====[ 페이지: Camera Viewer ]====
+//
 #apps-camera-container
 {
-    position: relative;  
-    min-width: 600px;
-    max-width: 800px;
+    // position: relative;  
+    min-width: 640px;
+    max-width: 1380px;
     height: 100%;  
     margin: 0;
     border: yellowgreen solid 1px;
     background-color: rgba(@content_back_color, 0.9);
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: flex-start;
 }
-#apps-camera-img-container
+#apps-camera-container .apps-camera-img-container
 {
     position: relative;  
     // min-width: 600px;
     // max-width: 800px;
-    width: 100%;
+    width: 640px;
     aspect-ratio: 4/3; 
+    // margin-left: 10px;
+    // margin-right: 10px;
+
+    border: cornflowerblue solid 1px;
 }
-#apps-camera-img
+#apps-camera-container .apps-camera-img-container:nth-child(2n-1)
+{
+    margin-right: 10px;
+}
+#apps-camera-container .apps-camera-img
 {
     position: relative;
-    width: 100%;
+    width: 100%;    
     height: 100%;
+    // max-width:640px;
+    // min-width: 320px;
     max-width:100%;
-    max-height:100%;
-    // aspect-ratio: 4/3;
+    aspect-ratio: 4/3;
 
-    border: solid;
-    border-color: cornflowerblue;
+    // border: solid;
+    // border-color: cornflowerblue;
     background-color: transparent;
     background-image: url(/assets/img/b2f_640x480.png);
     background-position: center;
@@ -229,7 +244,7 @@ body{ background-color: @app_back_color; }
     background-size: cover;
 }
 .visibily-hidden { visibility: hidden; }
-#apps-camera-info-box 
+#apps-camera-container .apps-camera-info-box 
 {
     position: absolute; /* Position the background text */
     bottom: 0; /* At the bottom. Use top:0 to append it to the top */
@@ -238,7 +253,7 @@ body{ background-color: @app_back_color; }
     width: 100%; /* Full width */
     padding: 10px; /* Some padding */
 }
-#apps-camera-title
+#apps-camera-container .apps-camera-title
 {
     position: absolute; /* Position the background text */
     top: 0; /* At the bottom. Use top:0 to append it to the top */
@@ -248,7 +263,7 @@ body{ background-color: @app_back_color; }
     padding: 10px; /* Some padding */
     font-variant: small-caps;
 }
-#apps-camera-control-box
+#apps-camera-container .apps-camera-control-box
 {
     // padding: 1rem;
     width: 80%;

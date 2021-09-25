@@ -52,25 +52,32 @@ async def _upload(ws, sensor):
     info(_upload, f"uploader disconnected from <{sensor}>")
 
 
-async def _download(ws):#, sensorId: int):
+async def _download(ws, sensorId: int):
     """파일/버퍼에서 웹소켓으로 데이터 전송"""
 
-    info(_download, f"downloader connected.")# to <{sensorId}>")
+    info(_download, "downloader connected.")# to <{sensorId}>")
+
     lastSensor = ""
+
+    def connect(lastSensor:str, newSensor:str)-> str:
+        if lastSensor: 
+            # WsPool.remove(lastSensor, ws)
+            pool = WsPool.getPool(lastSensor)
+            pool.remove(ws)
+
+        if newSensor:
+            info(_download, f"downloader request: {newSensor}")
+            # lastSensor = newSensor
+            pool = WsPool.getPool(newSensor)
+            pool.add(ws)
+
+        return newSensor
     
     try:
-        async for newSensor in ws:  # 연결유지
-            if lastSensor != newSensor:
-                if lastSensor: 
-                    # WsPool.remove(lastSensor, ws)
-                    pool = WsPool.getPool(lastSensor)
-                    pool.remove(ws)
+        lastSensor = connect(lastSensor, sensorId)
 
-                info(_download, f"downloader request: {newSensor}")
-                lastSensor = newSensor
-                # WsPool.add(newSensor, ws)
-                pool = WsPool.getPool(newSensor)
-                pool.add(ws)
+        async for newSensor in ws:  # 연결유지
+            lastSensor = connect(lastSensor, newSensor)
 
     except ConnectionClosed as ex:
         debug(_download, f"ConnectionClosed: {ex}")
@@ -79,7 +86,6 @@ async def _download(ws):#, sensorId: int):
         debug(_download, f"Exception: {ex}")
 
     info(_download, f"downloader disconnected from <{lastSensor}>")
-    # WsPool.remove(lastSensor, ws)
     pool = WsPool.getPool(lastSensor)
     pool.remove(ws)
 
@@ -89,7 +95,7 @@ def getSensorId(path: str) -> int:
 
     words = path.split("/")
     if len(words) < 2:
-        return "_unknown_"
+        return ""
     else:
         return words[1].strip()
 
@@ -102,7 +108,7 @@ async def _client_handler(ws, path: str):
         await _upload(ws, getSensorId(path))
 
     elif path.startswith("download"):
-        await _download(ws)#, getSensorId(path))
+        await _download(ws, getSensorId(path))
 
     else:
         await _echo(ws)

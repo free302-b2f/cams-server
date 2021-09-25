@@ -73,8 +73,8 @@ def init(id: str):
     print(f"{__name__}.init(): {_camera = }")
 
     # 카메라 설정
-    _camera.set(cv.CAP_PROP_FRAME_WIDTH, 800)
-    _camera.set(cv.CAP_PROP_FRAME_HEIGHT, 600)
+    _camera.set(cv.CAP_PROP_FRAME_WIDTH, 640)
+    _camera.set(cv.CAP_PROP_FRAME_HEIGHT, 480)
     _camera.set(cv.CAP_PROP_BUFFERSIZE, 1)
     # _camera.set(cv.CAP_PROP_FPS, 2)
 

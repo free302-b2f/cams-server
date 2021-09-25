@@ -75,18 +75,93 @@ document.getElementsByTagName('head')[0].appendChild(_element);
 // Date 포맷 함수 : 로컬시간을 ISO 포맷의 문자열로 반환
 //
 function toLocalISOString(d) {
-    var z  = n =>  ('0' + n).slice(-2);
+    var z = n => ('0' + n).slice(-2);
     var zz = n => ('00' + n).slice(-3);
     var off = d.getTimezoneOffset();
-    var sign = off < 0? '+' : '-';
+    var sign = off < 0 ? '+' : '-';
     off = Math.abs(off);
-  
+
     return d.getFullYear() + '-'
-           + z(d.getMonth()+1) + '-' +
-           z(d.getDate()) + 'T' +
-           z(d.getHours()) + ':'  + 
-           z(d.getMinutes()) + ':' +
-           z(d.getSeconds()) + '.' +
-           zz(d.getMilliseconds()) +
-           sign + z(off/60|0) + ':' + z(off%60); 
+        + z(d.getMonth() + 1) + '-' +
+        z(d.getDate()) + 'T' +
+        z(d.getHours()) + ':' +
+        z(d.getMinutes()) + ':' +
+        z(d.getSeconds()) + '.' +
+        zz(d.getMilliseconds()) +
+        sign + z(off / 60 | 0) + ':' + z(off % 60);
 }
+
+
+//
+// websocket
+//
+function wsImg(wsUri, imgIndex) {
+
+    console.log(`wsImg(): wsUri=${wsUri}, imgIndex=${imgIndex}`);
+    const ws = new WebSocket(wsUri);
+
+    ws.onopen = function (event) {
+        console.log(`img${imgIndex}: ws connected: ${wsUri}`);
+    };
+
+    ws.onmessage = function (event) {
+
+        if (event === undefined) return;
+
+        event.data.slice(-4).arrayBuffer().then(header => {
+            var decoder = new TextDecoder();
+            var metaLen = parseInt(decoder.decode(header), 10);
+            //console.log("metaLen= " + metaLen);
+
+            event.data.slice(-metaLen).arrayBuffer().then(meta => {
+                const ts = decoder.decode(meta.slice(0, 32));
+                const dt = new Date(ts);
+                //console.log("ts=" + ts + "  dt=" + dt);
+
+                const sn = decoder.decode(meta.slice(32, - 4));
+                //console.log(sn);
+
+                const imgInfo = document.querySelector(`#apps-camera-info-${imgIndex}`);
+                imgInfo.textContent = sn + " @ " + toLocalISOString(dt); //dt.toString();
+
+                const jpg = event.data.slice(0, event.data.size, "image/jpeg");
+                const elImg = document.querySelector(`#apps-camera-img-${imgIndex}`);
+                elImg.src = URL.createObjectURL(jpg);
+            });
+        });
+    }
+}
+
+function sleep(ms) {
+    return new Promise((r) => setTimeout(r, ms));
+}
+
+//
+//
+//
+// console.log("adding load handler...");
+window.addEventListener("load", async (e) => {
+    
+    let camera_view = document.getElementById("apps-camera-container");
+    while (camera_view == undefined || camera_view == null) {
+        await sleep(100);
+        camera_view = document.getElementById("apps-camera-container");
+    }
+
+    if (camera_view !== undefined) {
+        console.log(`camera view found: ${camera_view}`);
+        for (var i = 0; i < 5; i++) {
+
+            const imgId = `#apps-camera-img-${i}`;
+            console.log(`finding img <${imgId}>`);
+
+            const img = document.querySelector(imgId);
+            if (img == undefined) continue;
+
+            console.log(`found: uri=${img.dataset.ws_uri}, id=${img.id}`);
+            wsImg(img.dataset.ws_uri, i);
+        }
+    }
+});
+
+
