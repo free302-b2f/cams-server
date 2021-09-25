@@ -418,16 +418,49 @@ body{ background-color: @app_back_color; }
     border: 1px solid lightgray;
 }
 
-.cams_contents_table{
+.cams_contents_table
+{
     border-collapse: separate;
     border-spacing: 0 0px;
     display: block !important;
     width: 100%;
 }
-.cams_table_td{   
+
+.cams_contents_table tr { width: 100%; }
+
+.cams_contents_table td
+{
     vertical-align: middle;
     font-family:Consolas;
+    padding: 0px;
+    border: none;
 }
+.apps-cams-table-tr td
+{
+    width: 50%;
+}
+
+.cams_contents_table label
+{
+    margin-left: 1.0rem;
+    width: 90%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+.cams_contents_table label>*:nth-child(2n -1)
+{
+    width: 7.5rem;
+}
+.cams_contents_table label>*:nth-child(2n)
+{
+    width: 16rem;
+}
+
+// .cams_table_td{   
+//     vertical-align: middle;
+//     font-family:Consolas;
+// }
 
 #cams-sr-label{
     color:blue;

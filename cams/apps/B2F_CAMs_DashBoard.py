@@ -8,6 +8,8 @@ if __name__ == "__main__":
     dir = path.join(path.dirname(__file__), "..")
     sys.path.append(dir)
 
+from dash_html_components.Label import Label
+from dash_html_components.Td import Td
 from apps.imports import *
 
 debug("loading...")
@@ -132,7 +134,7 @@ def layout():
     debug(layout, f"entering...")
     app.title = "B2F - CAMs Viewer"
 
-    # 센서 ID 추출    
+    # 센서 ID 추출
     user = fli.current_user
     farms = user.farms
     sensors = []
@@ -175,22 +177,34 @@ def layout():
         return tr
 
     dateValue = datetime.now().date()
-
     snOptions = [{"label": sn, "value": sn} for sn in ids]
     snDefalut = snOptions[0]["value"] if len(snOptions) > 0 else ""
 
-    sensorTr = tr(
-        "Sensor",
-        dcc.Dropdown(id="SN", options=snOptions, value=snDefalut),
-        "SN",
-    )
-    dateTr = tr(
-        "Date",
-        dcc.DatePickerSingle(
-            id="Date",
-            display_format="YYYY-MM-DD",
-            date=dateValue,
+    sensorTr = html.Tr(
+        html.Td(
+            html.Label(
+                [
+                    html.Span("Sensor"),
+                    dcc.Dropdown(id="SN", options=snOptions, value=snDefalut),
+                ]
+            ),
+            colSpan="10",
         ),
+    )
+    dateTr = html.Tr(
+        html.Td(
+            html.Label(
+                [
+                    html.Span("Date"),
+                    dcc.DatePickerSingle(
+                        id="Date",
+                        display_format="YYYY-MM-DD",
+                        date=dateValue,
+                    ),
+                ],
+            ),
+            colSpan="10",
+        )
     )
     fracTr = tr(
         "Sample Ratio(%)",
@@ -208,23 +222,44 @@ def layout():
         ],
         "sampling-ratio",
     )
-    graphTr = tr(
-        "Graph",
-        dcc.Graph(id="graph1", className="camsGraphBorder"),
-        merge=True,
-    )
+    graphTr = [
+        html.Tr(
+            [
+                html.Td(
+                    dcc.Graph(id="graph1", className="camsGraphBorder"),
+                ),
+                html.Td(
+                    dcc.Graph(id="graph2", className="camsGraphBorder"),
+                ),
+                html.Td(),
+            ],
+            className="apps-cams-table-tr",
+        ),
+        html.Tr(
+            [
+                html.Td(
+                    dcc.Graph(id="graph3", className="camsGraphBorder"),
+                ),
+                html.Td(
+                    dcc.Graph(id="graph4", className="camsGraphBorder"),
+                ),
+                html.Td(),
+            ],
+            className="apps-cams-table-tr",
+        ),
+    ]
 
     return html.Div(
         [
             html.H3("Bit2Farm CAMs Viewer"),
-            html.Hr(),
+            # html.Hr(),
             html.Table(
                 [
-                    tr("", "", merge=True),
+                    # tr("", "", merge=True),
                     sensorTr,
                     dateTr,
                     # fracTr,
-                    graphTr,
+                    *graphTr,
                 ],
                 className="cams_contents_table",
             ),  # ~table
