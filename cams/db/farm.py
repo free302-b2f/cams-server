@@ -1,9 +1,9 @@
 """농장 모델 정의 및 관련 로직"""
 
-from db.imports import *
+from db._imports import *
 
 
-class Farm(db.Model):
+class Farm(dba.Model):
     """농장 DB 모델"""
 
     # region ---- View에서 사용할 필드 정보 ----
@@ -19,13 +19,13 @@ class Farm(db.Model):
         }
 
     # endregion
-    
+
     # 테이블 컬럼 정의
     __tablename__ = "farm"
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(max_name), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey("app_user.id"), nullable=False)
-    user = db.relationship("AppUser", backref=db.backref("farms", lazy=True))
+    id = dba.Column(dba.Integer, primary_key=True)
+    name = dba.Column(dba.String(max_name), nullable=False)
+    user_id = dba.Column(dba.Integer, dba.ForeignKey("app_user.id"), nullable=False)
+    user = dba.relationship("AppUser", backref=dba.backref("farms", lazy=True))
 
     def __repr__(self):
         return f"<Farm: {self.name}>"
@@ -35,5 +35,10 @@ class Farm(db.Model):
 
         keys = self.__table__.columns.keys()
         dic = {key: self.__getattribute__(key) for key in keys}
-        return dic
+        return dic    
 
+
+if getattr(sys, "_test_", None):
+    farm = Farm()
+    print(f"{Farm.max_len()= }")
+    print(f"{farm.to_dict()= }")

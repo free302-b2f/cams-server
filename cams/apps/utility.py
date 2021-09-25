@@ -129,7 +129,13 @@ def loadSettings(filePath: str) -> Dict[str, Any]:
 
 
 class ModulePropertyBuilder:
-    """모듈 속성을 정의하는 도움함수 모음"""
+    """모듈 속성을 정의하고
+    - 속성값을 Callable로 저장하고 있다가
+    - 속성 접근시 호출해서 값을 리턴한다
+
+    + setattr() getattr()의 부족한 점을 보완
+     - callable을 호출없이 속성으로 사용
+    """
 
     def __init__(self, module: ModuleType) -> None:
         """인스턴스 객체 생성자
@@ -137,9 +143,13 @@ class ModulePropertyBuilder:
         :param module: 속성을 정의할 모듈  -> sys.modules[__name__]
         """
 
+        # 속성을 저장할 딕
         self._propDic = {}
+
+        # __getattr__ 오버라이딩
         module.__getattr__ = self.getProp
 
+        # 모듈/패키지 이름 :메시지 출력시 사용
         self.name = module.__name__
         if self.name == "__init__":
             self.name = module.__package__
@@ -156,8 +166,8 @@ class ModulePropertyBuilder:
         :param raiseIfNone: 참일경우 속성값이 None이면 ValueError 예외를 던진다"""
 
         if propName in self._propDic:
-            value = self._propDic[propName]()
-            if value is None:
+            value = self._propDic[propName]() # call getter
+            if raiseIfNone and value is None:
                 # 속성을 아직 초기화하지 않은 경우 == 코드 실행 순서에 문제가 있음!
                 raise ValueError(f"{self.name}.{propName} == None")
             return value

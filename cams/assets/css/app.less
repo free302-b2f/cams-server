@@ -300,6 +300,7 @@ body{ background-color: @app_back_color; }
 }
 
 
+
 // ====[ 페이지: Profile ]====
 
 #lm-profile-container
@@ -324,28 +325,23 @@ body{ background-color: @app_back_color; }
     // color: #fff;
     // text-shadow: #00F 0 0 .5em;
 }
-#lm-profile-menu  a:hover
-{
-    color:coral;
-}
+#lm-profile-menu a:hover { color:coral; }
 
-#lm-profile-container section
-{
-    margin-bottom: 0.0rem;
-}
-#lm-profile-container section>h5~*
-{
-    margin-left: 2.0rem;
-    width: 70%;
-}
+#lm-profile-container section { margin-bottom: 0.0rem; }
 #lm-profile-container h5
 {
     margin-top: 1rem;
     margin-bottom: 1rem;
 }
-#lm-profile-container span.material-icons-outlined
+#lm-profile-container h5>span.material-icons-outlined
 {
     margin-left: 1rem;
+}
+
+//icon : common
+#lm-profile-container span.material-icons-outlined
+{
+    // margin-left: 1rem;
     color:rgba(sienna, 0.52);
 }
 #lm-profile-container span.material-icons-outlined:hover
@@ -354,31 +350,41 @@ body{ background-color: @app_back_color; }
     cursor: pointer;
 }
 
-// #lm-profile-personal>label
+//label
 #lm-profile-container section>label
 {
+    margin-left: 1.0rem;
+    width: 90%;
     display: flex;
     align-items: center;
-    justify-content: space-evenly;
+    justify-content: flex-start;
 }
-#lm-profile-container label>span 
+#lm-profile-container label>span:nth-child(3n-2) 
 { 
-    width: 30%; 
+    width: 25%; 
     display: flex;
     justify-content: flex-end;
     padding-right: 1rem;
 }
 #lm-profile-container label>input
 { 
-    width: 60%; 
+    width: 50%; 
 }
-#lm-profile-container label>span.material-icons-outlined
+#lm-profile-container label>span:nth-child(3n) 
 { 
-    width: 2rem;
+    // width: 20%; 
+    display: flex;
+    justify-content: flex-start;
+    // padding-right: 0rem;
+}
+#lm-profile-container label span.material-icons-outlined
+{ 
+    width: 1.5rem;
+    margin-left: 0.5rem;
     justify-content: flex-start; 
-    margin-left: 0rem;
     padding-right: 0rem;
 }
+
 // #lm-profile-container label>button{ align-self: flex-end; }
 
 

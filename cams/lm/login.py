@@ -30,7 +30,6 @@ def login():
             # fl.flash("Logged in successfully.")
             response["isOK"] = True
             response["next"] = "/lm-profile"
-            # return fl.redirect(fl.url_for("/"))
         else:
             response["cause"] = "lm-login-password"
 

@@ -82,7 +82,6 @@ def init_app(
             return
 
         return fl.render_template("login.html")  # , next=fl.request.endpoint)
-        # return fl.redirect(_lm.login_view)
 
     # endregion
 

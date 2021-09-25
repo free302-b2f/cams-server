@@ -43,7 +43,7 @@ import main_layout
 # "complete" layout
 app.validation_layout = [app.layout, *router.values()]
 
-from test import *
+# from test import *
 
 
 # region ----[ NavBar Toggler Callback ]----
@@ -104,8 +104,9 @@ def display_page(appPath:str):
 # endregion
 
 
-# ----[ start websocket server ]----
+# region ----[ start websocket server ]----
 
 startWsServer()
 
-# ----
+# endregon
+

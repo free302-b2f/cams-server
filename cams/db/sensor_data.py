@@ -24,6 +24,16 @@ _pgc = pg.connect(
 # endregion
 
 
+def f0_drop_sensor_data():
+    """drop sensor_data table"""
+
+    cursor: pge.cursor = _pgc.cursor()
+    cursor.execute("DROP TABLE IF EXISTS sensor_data")
+    _pgc.commit()
+    cursor.close()
+    pass
+
+
 def f1_check_db_connection():
     cursor: pge.cursor = _pgc.cursor()
     cursor.execute("SELECT 'hello world'")
@@ -91,7 +101,7 @@ def _seed(cursor):
     ids = [x["id"] for x in cursor.fetchall()]
 
     start = datetime.combine(datetime.now().date(), datetime.min.time())
-    dates = [start + timedelta(days=x) for x in range(-30, 30)]
+    dates = [start + timedelta(days=x) for x in range(-7, 1)]
 
     sql = """INSERT INTO sensor_data 
         (time, sensor_id, air_temp, leaf_temp, humidity, 

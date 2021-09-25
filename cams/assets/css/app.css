@@ -267,16 +267,14 @@ body {
 #lm-profile-container section {
   margin-bottom: 0rem;
 }
-#lm-profile-container section > h5 ~ * {
-  margin-left: 2rem;
-  width: 70%;
-}
 #lm-profile-container h5 {
   margin-top: 1rem;
   margin-bottom: 1rem;
 }
-#lm-profile-container span.material-icons-outlined {
+#lm-profile-container h5 > span.material-icons-outlined {
   margin-left: 1rem;
+}
+#lm-profile-container span.material-icons-outlined {
   color: rgba(160, 82, 45, 0.52);
 }
 #lm-profile-container span.material-icons-outlined:hover {
@@ -284,23 +282,29 @@ body {
   cursor: pointer;
 }
 #lm-profile-container section > label {
+  margin-left: 1rem;
+  width: 90%;
   display: flex;
   align-items: center;
-  justify-content: space-evenly;
+  justify-content: flex-start;
 }
-#lm-profile-container label > span {
-  width: 30%;
+#lm-profile-container label > span:nth-child(3n-2) {
+  width: 25%;
   display: flex;
   justify-content: flex-end;
   padding-right: 1rem;
 }
 #lm-profile-container label > input {
-  width: 60%;
+  width: 50%;
 }
-#lm-profile-container label > span.material-icons-outlined {
-  width: 2rem;
+#lm-profile-container label > span:nth-child(3n) {
+  display: flex;
   justify-content: flex-start;
-  margin-left: 0rem;
+}
+#lm-profile-container label span.material-icons-outlined {
+  width: 1.5rem;
+  margin-left: 0.5rem;
+  justify-content: flex-start;
   padding-right: 0rem;
 }
 #app-cams-container {

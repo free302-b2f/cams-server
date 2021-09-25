@@ -1,34 +1,37 @@
 """센서 모델 정의 및 관련 로직"""
 
-from db.imports import *
+from db._imports import *
 
 
-class Sensor(db.Model):
+class Sensor(dba.Model):
     """센서 DB 모델"""
 
     # region ---- View에서 사용할 필드 정보 ----
     # 클래스 변수: 각 필드 최대 길이 등
     max_sn = 32
     max_name = 64
+    max_desc = 128
 
     @classmethod
     def max_len(cls):
         """각 필드의 최대길이를 리턴"""
 
         return {
+            "max_sn": cls.max_sn,
             "max_name": cls.max_name,
+            "max_desc": cls.max_desc,
         }
 
     # endregion
 
     # 테이블 컬럼 정의
     __tablename__ = "sensor"
-    id = db.Column(db.Integer, primary_key=True)
-    sn = db.Column(db.String(max_sn), nullable=False)
-    name = db.Column(db.String(max_name), nullable=False)
-    farm_id = db.Column(db.Integer, db.ForeignKey("farm.id"), nullable=False)
-    farm = db.relationship("Farm", backref=db.backref("sensors", lazy=True))
-
+    id = dba.Column(dba.Integer, primary_key=True)
+    sn = dba.Column(dba.String(max_sn), nullable=False)
+    name = dba.Column(dba.String(max_name), nullable=False)
+    desc = dba.Column(dba.String(max_desc), nullable=True)
+    farm_id = dba.Column(dba.Integer, dba.ForeignKey("farm.id"), nullable=False)
+    farm = dba.relationship("Farm", backref=dba.backref("sensors", lazy=True))
 
     def __repr__(self):
         return f"<Sensor: {self.sn}>"
@@ -41,5 +44,8 @@ class Sensor(db.Model):
         return dic
 
 
-# # 모듈 함수 추가
-# ActionBuilder[Sensor](sys.modules[__name__], Sensor)
+if getattr(sys, "_test_", None):
+    sensor = Sensor()
+    print(f"{Sensor.max_len()= }")
+    print(f"{sensor.max_len()= }")
+    print(f"{sensor.to_dict()= }")

@@ -5,15 +5,15 @@
 
 # region ---- __all__ 정의 ----
 
-# __all__ = [ ]
+__all__ = ["user", "farm", "sensor", "sensor_data", "admin", "init"]
 
 # endregion
 
 
 # region ---- imports ----
 
-from os import name
-import sys
+import sys, json
+from datetime import timedelta, datetime, timezone, time
 from types import FunctionType
 
 import flask as fl
@@ -32,7 +32,7 @@ _dbUri = (
 )
 
 # module global variables
-_db: SQLAlchemy = None
+_dba: SQLAlchemy = None
 _load_user: FunctionType = None
 # _load_farm: FunctionType = None
 # _load_sensor: FunctionType = None
@@ -52,77 +52,100 @@ def init_app(server: fl.Flask) -> fli.LoginManager:
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
     )
 
-    global _db, _load_user, _seed_meta
+    global _dba, _load_user, _seed_meta
 
-    #! db.xxx 모듈을 실행하기 전에 _db 초기화 필요
-    _db = SQLAlchemy(server)
-    # _db.Model.metadata.reflect(bind=_db.engine, schema=_set["Db"])
+    #! db.xxx 모듈을 실행하기 전에 _dba 초기화 필요
+    _dba = SQLAlchemy(server)
+    # _dba.Model.metadata.reflect(bind=_dba.engine, schema=_set["Db"])
 
     #! import all models
     from db.user import AppUser
     from db.farm import Farm
     from db.sensor import Sensor
-    
+    from db.admin import Cams
+
     # create all model tables & seed
     if _set["DropTables"]:
-        _db.drop_all()
+        from db.sensor_data import f0_drop_sensor_data
+
+        f0_drop_sensor_data()
+        _dba.drop_all()
         # _db.Model.metadata.bind = _db.engine # drop_all()시 불필요
         # Sensor.__table__.drop(checkfirst=True)
         # Farm.__table__.drop(checkfirst=True)
         # User.__table__.drop(checkfirst=True)
 
-        _db.create_all()
+        _dba.create_all()
         _seed_meta()
 
     _load_user = AppUser.query.get
     # _load_farm = Farm.query.get
     # _load_sensor = Sensor.query.get
 
-
     pass  # init_app
 
 
 def _seed_meta():
     import werkzeug.security as wsec
+    from db.sensor_data import f2_init_and_seed
 
     #! import all models
     from db.user import AppUser
     from db.farm import Farm
     from db.sensor import Sensor
+    from db.admin import Cams
 
+    # drbae + test farm + test sensor
     pw = wsec.generate_password_hash("3569", method="sha256")
-    
-    f1 = Farm(name="KIST Pheno Lab1")
-    f2 = Farm(name="KIST Pheno Lab2")
-    f1.sensors.append(Sensor(sn="B2F_CAMs_1000000000001", name="Lab1 Sensor1"))
-    f1.sensors.append(Sensor(sn="B2F_CAMs_1000000000002", name="Lab1 Sensor2"))
-    f2.sensors.append(Sensor(sn="B2F_CAMs_1000000000003", name="Test Sensor"))
-    u = AppUser(
+    user = AppUser(
         username="drbae",
         password=pw,
         email="amadeus.bae@gmail.com",
         realname="Samyong Bae",
-    )    
-    u.farms.append(f1)
-    u.farms.append(f2)
-    _db.session.add(u)
-    _db.session.commit()
+        level=1,  # administrator
+    )
+    farm = Farm(name="B2F Test Farm")
+    farm.sensors.append(Sensor(sn="B2F_CAMs_1000000000003", name="Test Sensor"))
+    user.farms.append(farm)
+    _dba.session.add(user)
 
+    # KIST Pheno
+    pw = wsec.generate_password_hash("kist1966!!!", method="sha256")
+    user = AppUser(
+        username="pheno",
+        password=pw,
+        email="kist-pheno@gmail.com",
+        realname="Pheno KIST",
+        level=0,  # administrator
+    )
+    farm = Farm(name="KIST Pheno Farm")
+    farm.sensors.append(Sensor(sn="B2F_CAMs_1000000000001", name="Lab Sensor 1"))
+    farm.sensors.append(Sensor(sn="B2F_CAMs_1000000000002", name="Lab Sensor 2"))
+    user.farms.append(farm)
+    _dba.session.add(user)
+
+    # 관리 정보 추가
+    _dba.session.add(Cams("cams_setup_date", datetime.utcnow().isoformat()))
+    _dba.session.add(Cams("cams_start_date", datetime.utcnow().isoformat()))
+
+    _dba.session.commit()
+
+    f2_init_and_seed()
 
 # endregion
 
 
 # region ---- 모듈의 global property 정의 ----
 
-mpb = util.ModulePropertyBuilder(sys.modules[__name__])
+_mpb = util.ModulePropertyBuilder(sys.modules[__name__])
 
 # flask-login 에서 사용
-mpb.addProp("loadUser", lambda: _load_user) 
+_mpb.addProp("loadUser", lambda: _load_user)
 
-# 다른 모듈에서 _db:SQLAlchemy 인스턴스를 접근하는데 사용
-# ex) from db import db as DB
-# 이 모듈 로딩시의 _db값(=None)이 아닌 import호출시 값을 리턴(C#의 property)
-mpb.addProp("db", lambda: _db)
+# 다른 모듈에서 _dba:SQLAlchemy 인스턴스를 접근하는데 사용
+# ex) from db import dba as DB
+# 이 모듈 로딩시의 _dba값(=None)이 아닌 import호출시 값을 리턴(C#의 property)
+_mpb.addProp("dba", lambda: _dba)
 
 
 # endregion

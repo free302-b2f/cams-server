@@ -4,10 +4,10 @@
 
 from types import ModuleType
 from typing import Any, Dict, List, Generic, TypeVar
-from db import db
+from db import dba
 
 # 제너릭 타입변수 선언
-M = TypeVar("M", db.Model, db.Model)
+M = TypeVar("M", dba.Model, dba.Model)
 
 # 제너릭 베이스 클래스
 class ActionBuilder(Generic[M]):
@@ -50,8 +50,8 @@ class ActionBuilder(Generic[M]):
         """모델 M의 새 레코드 추가"""
 
         model = self.m(**kwargs)
-        db.session.add(model)
-        db.session.commit()
+        dba.session.add(model)
+        dba.session.commit()
         return model
 
     def all(self) -> List[M]:

@@ -1,5 +1,5 @@
 from lm.imports import *
-from db import db as db
+from db import dba
 from db.user import AppUser
 from app import app, debug
 import json
@@ -37,8 +37,8 @@ def signup():
             try:
                 pwHash = wsec.generate_password_hash(pw, method="sha256")
                 newUser = AppUser(username=un, password=pwHash, email=em, realname=rn)
-                db.session.add(newUser)
-                db.session.commit()
+                dba.session.add(newUser)
+                dba.session.commit()
                 response["isOK"] = True
             except:
                 response["cause"] = "unknown"

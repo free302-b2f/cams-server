@@ -14,9 +14,9 @@ from flask_caching import Cache
 from dash import Dash
 from dash_extensions.enrich import (
     DashProxy,
-    # Trigger,
-    # TriggerTransform,
-    # MultiplexerTransform,
+    Trigger,
+    TriggerTransform,
+    MultiplexerTransform,
     # ServersideOutputTransform,
     NoOutputTransform,
 )
@@ -41,7 +41,11 @@ ext_css = [
 ]
 
 # app = Dash(__name__, url_base_pathname="/")
-app = DashProxy(__name__, url_base_pathname="/", transforms=[NoOutputTransform()])
+app = DashProxy(
+    __name__,
+    url_base_pathname="/",
+    transforms=[NoOutputTransform(), TriggerTransform(), MultiplexerTransform()],
+)
 app.config["suppress_callback_exceptions"] = True
 app.config["prevent_initial_callbacks"] = False
 app.config["external_stylesheets"] = ext_css
