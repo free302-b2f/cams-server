@@ -14,10 +14,12 @@ from apps.imports import *
 
 debug("loading...")
 
-_set = getConfigSection("Postgres")
-_pgc = pg.connect(
-    f'postgres://{_set["User"]}:{_set["Pw"]}@{_set["Ip"]}:{_set["Port"]}/{_set["Db"]}'
+_setDb = getConfigSection("Mongo")  # CAMs DB 설정
+_mongoClient = MongoClient(
+    f'mongodb://{_setDb["User"]}:{_setDb["Pw"]}@{_setDb["Ip"]}:{_setDb["Port"]}/{_setDb["Db"]}',
+    document_class=RawBSONDocument,
 )
+_camsDb = _mongoClient[_setDb["Db"]]
 
 
 def load_data(sn: str, date) -> Tuple[pd.DataFrame, List[str]]:
@@ -26,33 +28,19 @@ def load_data(sn: str, date) -> Tuple[pd.DataFrame, List[str]]:
     테이블의 필드이름 목록을 생성
     :return: DataFrame, 필드이름 목록의 튜플"""
 
-    def query_postgres() -> Tuple[List, List[str]]:
+    def query_mongo() -> Tuple[Cursor, List[str]]:
+        sensors = _camsDb["sensors"]
+        ds = sensors.find({"SN": sn, "Date": date})
+        cols = _setDb["DataColumns"]
+        # data_types = {x:'float64' for x in cols}
+        # meta_columns = _setDb['MetaColumns']
+        # for x in meta_columns: data_types[x] = 'string'
+        return (ds, cols)
 
-        cursor: pge.cursor = _pgc.cursor()  # cursor_factory=pga.DictCursor)
-        start = date
-        sql = cursor.mogrify(
-            """SELECT time, air_temp, leaf_temp, humidity, light, co2, dewpoint, evapotrans, hd, vpd 
-            FROM sensor_data 
-            WHERE (sensor_id = (SELECT id FROM sensor WHERE sn = %s)) 
-            AND (date(time) = %s)
-            ORDER BY time DESC LIMIT 10000""",
-            (sn, start),
-        )
-        debug(f"{sql}")
-
-        cursor.execute(sql)
-        cols = [x.name for x in cursor.description]
-        ds = cursor.fetchall()
-        cursor.close()
-
-        if not len(ds):
-            cols.clear()
-
-        return ds, cols
-
-    ds, cols = query_postgres()
+    ds, cols = query_mongo()
     df = pd.DataFrame(ds)  # .astype(data_types)
-    df.columns = cols
+    # if df.shape[0] and df.shape[1]:
+    #     df.columns = cols
     # df.pop('id')
     # cols.remove('id')
     debug(load_data, f"{date}: {df.shape = }, {cols= }")
@@ -73,11 +61,11 @@ def plot(df: pd.DataFrame, cols: List[str] = [], title: str = "B2F CAMs") -> dic
             title=f"{title}",
         )
 
-    df.sort_values(by=["time"], axis=0, inplace=True)
-    cols.remove("time")
+    df.sort_values(by=["Time"], axis=0, inplace=True)
+    # cols.remove("Time")
 
     return {
-        "data": [go.Scatter(x=df["time"], y=df[i], mode="lines", name=i) for i in cols],
+        "data": [go.Scatter(x=df["Time"], y=df[i], mode="lines", name=i) for i in cols],
         "layout": go.Layout(
             title=title,
             xaxis_title="Time",
@@ -85,9 +73,6 @@ def plot(df: pd.DataFrame, cols: List[str] = [], title: str = "B2F CAMs") -> dic
             # legend ={'itemwidth':30}
         ),
     }
-
-
-# plot(query_sensors("", "B2F_CAMs_1000000000001", "20210117"), 'test plot') #test
 
 
 @app.callback(
@@ -100,32 +85,16 @@ def update_graph(sensor_sn, date):  # , sampleRatio):
     """선택된 정보로 그래프를 업데이트 한다"""
 
     debug(update_graph, f"{sensor_sn = }, {date = }")
-    # debug(update_graph, f"{SN = }, {date = }, {sampleRatio = }")
 
-    # date == None
     if date is None:
         return plot(None)
 
     dbSN = sensor_sn  # TODO: use sensor_id
     dbDate = datetime.fromisoformat(date).strftime("%Y%m%d")
-    df, cols = load_data(dbSN, dbDate)
-
-    # resampling pdands.Frame
-    # frac = (float(sampleRatio) if (sampleRatio is not None) else 100) / 100.0
-    # if frac < 1:
-    #     df = df.sample(frac=frac)
+    df, cols = load_data(dbSN, dbDate)    
     fig = plot(df, cols, f"{dbSN} : {dbDate}")
 
     return fig
-
-
-# @app.callback(Output("cams-sr-label", "children"), Input("sampling-ratio", "value"))
-# def update_time(sampleRatio):
-#     """샘플링 비율에 따른 샘플간격을 업데이트 한다"""
-
-#     frac = (float(sampleRatio) if (sampleRatio != None) else 0) / 100.0
-#     minuites =0.5 / frac
-#     return f"{0.5 / frac} minutes"
 
 
 def layout():
@@ -141,40 +110,6 @@ def layout():
     for f in farms:
         sensors.extend(f.sensors)
     ids = {x.sn: x.id for x in sensors}
-
-    def tr(label: str, el, elId: str = None, merge: bool = False):
-        """주어진 내용을 html TR에 출력한다"""
-
-        if merge:
-            tr = html.Tr(
-                html.Td(
-                    el,
-                    style={"width": "100%", "padding": "2px 5px"},
-                    colSpan="10",
-                    className="cams_table_td",
-                )
-            )
-        else:
-            tr = html.Tr(
-                [
-                    html.Td(
-                        html.Label(label, htmlFor=elId if (elId != None) else label),
-                        style={"width": "20%", "padding": "2px 5px"},
-                        className="cams_table_td",
-                    ),
-                    html.Td(
-                        el,
-                        style={"width": "50%", "padding": "2px 5px"},
-                        className="cams_table_td",
-                    ),
-                    html.Td(
-                        "",
-                        style={"width": "100%", "padding": "2px 5px"},
-                        className="cams_table_td",
-                    ),
-                ]
-            )
-        return tr
 
     dateValue = datetime.now().date()
     snOptions = [{"label": sn, "value": sn} for sn in ids]
@@ -205,22 +140,6 @@ def layout():
             ),
             colSpan="10",
         )
-    )
-    fracTr = tr(
-        "Sample Ratio(%)",
-        [
-            dcc.Input(
-                id="sampling-ratio",
-                value="100",
-                type="number",
-                min=0,
-                max=100,
-                step=1,
-                debounce=True,
-            ),
-            html.Span("100%", id="cams-sr-label"),
-        ],
-        "sampling-ratio",
     )
     graphTr = [
         html.Tr(
@@ -255,10 +174,8 @@ def layout():
             # html.Hr(),
             html.Table(
                 [
-                    # tr("", "", merge=True),
                     sensorTr,
                     dateTr,
-                    # fracTr,
                     *graphTr,
                 ],
                 className="cams_contents_table",
@@ -275,3 +192,4 @@ add_page(layout, "CAMs Viewer", 40)
 if __name__ == "__main__":
     layout()
     # load_data("B2F_CAMs_1000000000001", "20200216")  # test
+    # plot(query_sensors("", "B2F_CAMs_1000000000001", "20210117"), 'test plot') #test
