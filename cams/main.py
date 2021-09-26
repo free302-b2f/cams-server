@@ -78,6 +78,7 @@ def display_page(appPath:str):
 
     # TEST: Dash/Flask 경로 테스트 - 로그인, 사인업 페이지
     if appPath.startswith(lm.login_view) or appPath.startswith(lm.signup_view):
+        # TODO: 여기는 도달 안함
         debug(display_page, "*** flask route in dash? ***")
     
     # 사용자 인증 상태 체크
@@ -89,10 +90,10 @@ def display_page(appPath:str):
     # 경로의 레이아웃 얻기
     v = router.get(appPath, None)
 
-    # 레이아웃이 없는 경우 Flask 경로로 보고 refresh 
+    # 레이아웃이 없는 경우 프로필/대시보드로 이동 
     if v is None:
         error(f"Layout of {appPath=} is 'None'")
-        return no_update, appPath
+        return no_update, lm.profile_view
 
     # 함수형 레아아웃에 대하여 함수 출력 얻기
     if callable(v):

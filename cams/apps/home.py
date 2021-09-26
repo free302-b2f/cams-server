@@ -42,8 +42,8 @@ def layout():
     )
 
 
-add_page(layout, "Home", 10)
-add_page(layout, addPath="/")
+# add_page(layout, "Home", 10)
+# add_page(layout, addPath="/")
 
 # testing
 # layout()

@@ -234,7 +234,7 @@ def layout():
                     ),
                     tr(
                         "Graph",
-                        dcc.Graph(id="graph1", className="camsGraphBorder"),
+                        dcc.Graph(id="graph1", className="apps-cams-graph"),
                         merge=True,
                     ),
                 ],

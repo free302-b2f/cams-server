@@ -403,26 +403,26 @@ body{ background-color: @app_back_color; }
 // #lm-profile-container label>button{ align-self: flex-end; }
 
 
+//
 // ====[ 페이지: CAMs ]====
+//
 
 #app-cams-container
 {
+    flex-grow: 1;
+    align-self: flex-start;
     width: 100%;
     min-width: 800px;
+    max-width: 100%;
+    padding: 1rem 1rem 0rem 1rem;
     background-color: @app_back_color;
-    flex-grow: 1;
-}
-
-.camsGraphBorder{
-    margin-top: 4px;
-    border: 1px solid lightgray;
 }
 
 .cams_contents_table
 {
     border-collapse: separate;
-    border-spacing: 0 0px;
-    display: block !important;
+    // border-spacing: 0 0px;
+    // display: block !important;
     width: 100%;
 }
 
@@ -435,32 +435,58 @@ body{ background-color: @app_back_color; }
     padding: 0px;
     border: none;
 }
-.apps-cams-table-tr td
+.apps-cams-table-tr td { width: 50%; }
+.apps-cams-table-tr td:nth-child(2n-1) { padding-right: 0.5rem; }
+.apps-cams-table-tr td:nth-child(2n) { padding-left: 0.5rem; }
+
+// #apps-cams-sensor { value
+
+.apps-cams-graph-container
 {
-    width: 50%;
+    min-width: 300px;
+    max-width: 900px;
+    // aspect-ratio: 4/3;
+    margin-bottom: 1rem;
+}
+.apps-cams-graph{
+    margin-top: 4px;
+    border: 1px solid lightgray;
+    aspect-ratio: 5/3;
+}
+.apps-cams-graph-info
+{
+    border: rgba(yellowgreen, 0.52) dashed 1px;
+    padding: 0.2rem 0.5rem 0.5rem 1rem;
+    background-color: ivory;
+    color:rgba(#000, 0.64);
+    font-style: italic;
+}
+
+.apps-cams-graph-container .legend > rect
+{
+    fill-opacity: 0.5;
+    border: gray solid 2px;
 }
 
 .cams_contents_table label
 {
     margin-left: 1.0rem;
-    width: 90%;
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: flex-start;
+    cursor: pointer;
 }
+.cams_contents_table label *{ cursor: pointer; }
 .cams_contents_table label>*:nth-child(2n -1)
 {
-    width: 7.5rem;
+    width: 5rem;
 }
 .cams_contents_table label>*:nth-child(2n)
 {
     width: 16rem;
 }
 
-// .cams_table_td{   
-//     vertical-align: middle;
-//     font-family:Consolas;
-// }
 
 #cams-sr-label{
     color:blue;

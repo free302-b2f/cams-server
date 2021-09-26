@@ -21,9 +21,9 @@ import camera # 카메라 모듈 필요
 # region ----[ 모듈 설정 변수 ]----
 
 # TODO: load from config file
-SENSOR_ID = "B2F_CAMs_1000000000001"
-WS_HOST = "localhost"
-# WS_HOST = "bit2farm.iptime.org"
+SENSOR_ID = "B2F_CAMs_1000000000002"
+# WS_HOST = "localhost"
+WS_HOST = "bit2farm.iptime.org"
 WS_PORT = 28765
 WS_RATE = 1
 
