@@ -123,20 +123,22 @@ def update_graph(sensor_id, date):
     fig1.update_yaxes(title_text="Light", secondary_y=False)
     fig1.update_yaxes(title_text="Temperature [ºC]", secondary_y=True)
 
-    # figure 2 :
-    fig2 = plotAll(df, ["Light"], "Light vs Humidity", ["Humidity"])
-    fig2.update_yaxes(title_text="Light", secondary_y=False)
-    fig2.update_yaxes(title_text="Humiidty[%]", secondary_y=True)
+    # figure 2 : temp~hum
+    fig2 = plotAll(df, ["Air_Temp", "Leaf_Temp"], "Temperature vs Humidity", ["Humidity"])
+    fig2.update_yaxes(title_text="Temperature(ºC)", secondary_y=False)
+    fig2.update_yaxes(title_text="Humiidty(%)", secondary_y=True)
 
-    # /CO₂
+    # figure 3 : light~evatr
     fig3 = plotAll(df, ["Light"], "Light vs EvapoTranspiration", ["EvapoTranspiration"])
     fig3.update_yaxes(title_text="Light", secondary_y=False)
     fig3.update_yaxes(title_text="EvapoTrans", secondary_y=True)
 
-    # /CO₂
-    fig4 = plotAll(df, ["Air_Temp"], "Temperautre vs VPD/HD", ["HD", "VPD"])
-    fig4.update_yaxes(title_text="Temperature(ºC)", secondary_y=False)
-    fig4.update_yaxes(title_text="VPD(kPa) / HD", secondary_y=True)
+    # figure 4 : ALL
+    fig4 = plotAll(df, cols, "Time vs Various")
+    fig4.update_yaxes(title_text="Quantities", secondary_y=False)
+    fig4.update_xaxes(rangeslider_visible=True)
+    fig4.update_layout(legend=dict(yanchor="top", y=1.15, xanchor="left", x=0.95))
+    fig4.update_traces(name="EvaTrans", selector=dict(name="EvapoTranspiration"))
 
     return fig1, fig2, fig3, fig4
 
@@ -153,7 +155,6 @@ def layout():
     _sensors = {}
     for f in _farms:
         _sensors.update({s.id: s for s in f.sensors})
-    # ids = {x.sn: x.id for x in _sensors}
 
     dateValue = datetime.now().date()
     snOptions = [{"label": _sensors[s].name, "value": s} for s in _sensors]
@@ -229,7 +230,7 @@ def layout():
     return html.Div(
         [
             html.H4(
-                f"{fli.current_user.realname.upper()}'s CAMs",
+                f"{fli.current_user.realname}'s CAMs",
                 className="font-sc",
             ),
             # html.Hr(),

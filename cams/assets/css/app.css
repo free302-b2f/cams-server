@@ -169,7 +169,8 @@ body {
 }
 #apps-camera-container .apps-camera-img-container {
   position: relative;
-  width: 640px;
+  min-width: 480px;
+  max-width: 640px;
   aspect-ratio: 4/3;
   border: cornflowerblue solid 1px;
 }
@@ -344,14 +345,13 @@ body {
   padding-left: 0.5rem;
 }
 .apps-cams-graph-container {
-  min-width: 300px;
-  max-width: 900px;
+  min-width: 480px;
+  max-width: 920px;
   margin-bottom: 1rem;
 }
 .apps-cams-graph {
-  margin-top: 4px;
   border: 1px solid lightgray;
-  aspect-ratio: 5/3;
+  aspect-ratio: 1.618;
 }
 .apps-cams-graph-info {
   border: rgba(154, 205, 50, 0.52) dashed 1px;
@@ -363,6 +363,9 @@ body {
 .apps-cams-graph-container .legend > rect {
   fill-opacity: 0.5;
   border: gray solid 2px;
+}
+.apps-cams-graph-container text.gtitle {
+  font-variant: small-caps;
 }
 .cams_contents_table label {
   margin-left: 1rem;
