@@ -12,6 +12,8 @@ __all__.remove('utility')
 __all__.remove( "B2F_CAMs_DashBoard_timing")
 __all__.remove( "B2F_CAMs_DashBoard_Expert")
 __all__.remove( "camera_viewer_old")
+__all__.remove( "camera_viewer")
+__all__.remove( "ws_tester")
 # __all__.remove( "B2F_CAMs_DashBoard")
 
 #__all__ = ['home', 'mongo', 'timedb', 'B2F_CAMs_DashBoard']

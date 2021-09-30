@@ -5,7 +5,7 @@
     },
     "Mongo": {
         "Name": "MongoDB",
-        "Ip": "192.168.0.46",
+        "Ip": "bit2farm.iptime.org",
         "Port": 27111,
         "Db": "DB_CAMs",
         "User": "CAMs",

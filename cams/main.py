@@ -31,7 +31,7 @@ lm.init_app(app.server, "/login", "/signup", "/lm-profile")
 from db import *
 from lm import *
 from apps import *
-from ws.server import run as startWsServer
+# from ws.server import run as startWsServer
 
 #! main_layout을 임포트 하기전에 메뉴등록하는 페이지를 전부 임포트해야한다.
 import apps.home
@@ -71,7 +71,7 @@ def toggle_navbar_collapse(n, is_open):
     Output("app-url-refresh", "pathname"),
     Input("app-url", "pathname"),
 )
-def display_page(appPath:str):
+def display_page(appPath: str):
     """주어진 경로에 해당하는 레이아웃을 리턴한다."""
 
     debug(display_page, f"{appPath = }")
@@ -80,7 +80,7 @@ def display_page(appPath:str):
     if appPath.startswith(lm.login_view) or appPath.startswith(lm.signup_view):
         # TODO: 여기는 도달 안함
         debug(display_page, "*** flask route in dash? ***")
-    
+
     # 사용자 인증 상태 체크
     else:
         if not fli.current_user or not fli.current_user.is_authenticated:
@@ -90,7 +90,7 @@ def display_page(appPath:str):
     # 경로의 레이아웃 얻기
     v = router.get(appPath, None)
 
-    # 레이아웃이 없는 경우 프로필/대시보드로 이동 
+    # 레이아웃이 없는 경우 프로필/대시보드로 이동
     if v is None:
         error(f"Layout of {appPath=} is 'None'")
         return no_update, lm.profile_view
@@ -98,7 +98,7 @@ def display_page(appPath:str):
     # 함수형 레아아웃에 대하여 함수 출력 얻기
     if callable(v):
         v = v()
-    
+
     return v, no_update
 
 
@@ -107,7 +107,9 @@ def display_page(appPath:str):
 
 # region ----[ start websocket server ]----
 
-startWsServer()
+# import os
+
+# dir = os.path.join(app.server.root_path, "static", "ircam")
+# startWsServer(dir)
 
 # endregon
-

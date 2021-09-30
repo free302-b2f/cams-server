@@ -16,20 +16,22 @@ import websockets  # pip install websockets
 from websockets.exceptions import ConnectionClosed
 
 import camera # 카메라 모듈 필요
+import server
 
 
 # region ----[ 모듈 설정 변수 ]----
 
 # TODO: load from config file
-SENSOR_ID = "B2F_CAMs_1000000000002"
-# WS_HOST = "localhost"
-WS_HOST = "bit2farm.iptime.org"
-WS_PORT = 28765
-WS_RATE = 1
+_SENSOR_SN = "B2F_CAMs_1000000000001"
+_WS_HOST = "localhost"
+# _WS_HOST = "bit2farm.iptime.org"
+_WS_PORT = 28765
+_WS_BASE_URL = f"ws://{_WS_HOST}:{_WS_PORT}"
+_WS_RATE = 1/1
 
 # 웹소켓 서버 주소
-_ws_url = f"ws://{WS_HOST}:{WS_PORT}/upload/{SENSOR_ID}"
-_T = 1 / WS_RATE
+_ws_url = f"ws://{_WS_HOST}:{_WS_PORT}/upload/{_SENSOR_SN}"
+_T = 1 / _WS_RATE
 
 # endregion
 
@@ -58,7 +60,7 @@ async def _runAsync():
 
     print(f"{__name__}._runAsync(): entering...")
 
-    camera.init(SENSOR_ID)
+    camera.init(_SENSOR_SN)
     async with websockets.connect(_ws_url, ping_interval=120, ping_timeout=120) as ws:
         print(f"{ws = }")
 

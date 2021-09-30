@@ -1,4 +1,6 @@
 """PostgreSQL + TimescaleDB를 테스트하기 위한 페이지
++ sensor_data 테이블을 생성하고 hypertable을 구축한다.
++ mongodb의 데이터를 postgresql에 복제해 넣는다.
 + DB에서 하루치의 데이터를 불러와 dash.DataTable 로 출력한다.
 + Db 쿼리 시간과 주요 계산의 소요시간을 측정하여 출력한다.
 """

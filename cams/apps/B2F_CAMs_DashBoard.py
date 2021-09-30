@@ -42,7 +42,9 @@ def load_data(sn: str, date) -> Tuple[pd.DataFrame, List[str]]:
     meta_columns = _set["MetaColumns"]
     for x in meta_columns:
         data_types[x] = "string"
-    df = pd.DataFrame(ds).astype(data_types)
+    df = pd.DataFrame(ds)
+    if df.shape[0] and df.shape[1]:
+        df.astype(data_types)
     debug(load_data, f"{date}: {df.shape = }")
     # debug(load_data, f"{date}: {df.shape = }, {cols= }")
 
