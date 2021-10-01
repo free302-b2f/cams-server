@@ -2,6 +2,7 @@
 CAMs 센서데이터의 시각화
 """
 
+from re import IGNORECASE
 from plotly.subplots import make_subplots
 from dash_extensions.enrich import Trigger
 from apps.imports import *
@@ -23,6 +24,23 @@ _cams = _mongo[_set["Db"]]
 _farms: List[Farm] = []  # fli.current_useruser.farms
 _sensors: Dict[int, Sensor] = {}
 
+# build data types of columns
+_cols = [
+    "Light",
+    "Air_Temp",
+    "Leaf_Temp",
+    "Humidity",
+    "CO2",
+    "Dewpoint",
+    "EvapoTranspiration",
+    "HD",
+    "VPD",
+]
+# metas = _set["MetaColumns"]
+_data_types = {x: "float64" for x in _cols}
+# for x in metas:
+#     data_types[x] = "string"
+
 
 def load_data(sn: str, date) -> Tuple[pd.DataFrame, List[str]]:
     """DB에서 하루동안의 데이터를 불러온다.
@@ -30,20 +48,16 @@ def load_data(sn: str, date) -> Tuple[pd.DataFrame, List[str]]:
     그래프에 들어갈 데이터 필드 목록을 생성
     :return: DataFrame, 필드이름 목록의 튜플"""
 
+    # load dataset from DB
     sensors = _cams["sensors"]
     ds = sensors.find({"SN": sn, "Date": date})
-    cols = _set["DataColumns"]
-    data_types = {x: "float64" for x in cols}
-    meta_columns = _set["MetaColumns"]
-    for x in meta_columns:
-        data_types[x] = "string"
+
     df = pd.DataFrame(ds)
     if df.shape[0] and df.shape[1]:
-        df.astype(data_types)
+        df = df.astype(_data_types, copy=False)  # , errors="ignore")
     debug(load_data, f"{date}: {df.shape = }")
-    # debug(load_data, f"{date}: {df.shape = }, {cols= }")
 
-    return (df, cols)
+    return df
 
 
 def plotAll(
@@ -87,7 +101,9 @@ def plotAll(
     )
     fig.update_layout(legend=dict(yanchor="bottom", y=1.05, xanchor="right", x=1.15))
 
-    fig.update_xaxes(tickmode="auto", title="Time [hh:mm:ss]")#, rangeslider_visible=True)
+    fig.update_xaxes(
+        tickmode="auto", title="Time [hh:mm:ss]"
+    )  # , rangeslider_visible=True)
     fig.update_yaxes(tickmode="auto", tickformat=".3n", secondary_y=False)
     fig.update_yaxes(tickmode="auto", tickformat=".3n", secondary_y=True)
     return fig
@@ -113,7 +129,7 @@ def update_graph(sensor_id, date):
     sensor = _sensors[sensor_id]
     dbSN = sensor.sn  # TODO: use sensor_id (pg)
     dbDate = datetime.fromisoformat(date).strftime("%Y%m%d")
-    df, cols = load_data(dbSN, dbDate)
+    df = load_data(dbSN, dbDate)
 
     # "Light","Air_Temp","Leaf_Temp","Humidity","CO2","Dewpoint","EvapoTranspiration","HD","VPD"
     # figure 1 : temperature vs light
@@ -122,7 +138,9 @@ def update_graph(sensor_id, date):
     fig1.update_yaxes(title_text="Temperature [ºC]", secondary_y=True)
 
     # figure 2 : temp~hum
-    fig2 = plotAll(df, ["Air_Temp", "Leaf_Temp"], "Temperature vs Humidity", ["Humidity"])
+    fig2 = plotAll(
+        df, ["Air_Temp", "Leaf_Temp"], "Temperature vs Humidity", ["Humidity"]
+    )
     fig2.update_yaxes(title_text="Temperature(ºC)", secondary_y=False)
     fig2.update_yaxes(title_text="Humiidty(%)", secondary_y=True)
 
@@ -132,7 +150,7 @@ def update_graph(sensor_id, date):
     fig3.update_yaxes(title_text="EvapoTrans", secondary_y=True)
 
     # figure 4 : ALL
-    fig4 = plotAll(df, cols, "Time vs Various")
+    fig4 = plotAll(df, _cols, "Time vs Various")
     fig4.update_yaxes(title_text="Quantities", secondary_y=False)
     fig4.update_xaxes(rangeslider_visible=True)
     fig4.update_layout(legend=dict(yanchor="top", y=1.15, xanchor="left", x=0.95))

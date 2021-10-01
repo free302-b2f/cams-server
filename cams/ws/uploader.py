@@ -23,8 +23,8 @@ import server
 
 # TODO: load from config file
 _SENSOR_SN = "B2F_CAMs_1000000000002"
-_WS_HOST = "localhost"
-# _WS_HOST = "bit2farm.iptime.org"
+# _WS_HOST = "localhost"
+_WS_HOST = "bit2farm.iptime.org"
 _WS_PORT = 28765
 _WS_BASE_URL = f"ws://{_WS_HOST}:{_WS_PORT}"
 _WS_RATE = 1 / 30

@@ -39,6 +39,10 @@ def decodeJpeg():
                 _imgInfos.append(f"{sn} @ {tsLocal}")
         except:
             pass
+    if len(_imgInfos) != len(_sensors):
+        rng = range(len(_sensors) - len(_imgInfos))
+        for i in rng:
+            _imgInfos.append("-none-")
 
 
 def init():
@@ -47,6 +51,7 @@ def init():
     _user = fli.current_user
     if not _user:
         return
+        
     _farms = _user.farms
     _sensors = []
     for f in _farms:
