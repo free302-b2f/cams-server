@@ -156,15 +156,15 @@ body {
   fill: #539BF5;
 }
 #apps-camera-container {
-  min-width: 640px;
-  max-width: 1380px;
+  min-width: 650px;
+  max-width: 100%;
   height: 100%;
   margin: 0;
   border: yellowgreen solid 1px;
   background-color: rgba(245, 246, 247, 0.9);
   display: flex;
   flex-direction: row;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   align-items: flex-start;
 }
 #apps-camera-container .apps-camera-img-container {

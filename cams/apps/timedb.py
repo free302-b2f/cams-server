@@ -157,12 +157,12 @@ def f2_init_and_seed():
 def f3_copy_mongo():
     """MonogDB의 센서데이터를 PostgreSQL에 복사한다"""
 
-    _db = getConfigSection("Mongo")
+    _setMongo = getConfigSection("Mongo")
     _mongoClient = MongoClient(
-        f'mongodb://{_db["User"]}:{_db["Pw"]}@{_db["Ip"]}:{_db["Port"]}/{_db["Db"]}',
+        f'mongodb://{_setMongo["User"]}:{_setMongo["Pw"]}@{_setMongo["Ip"]}:{_setMongo["Port"]}/{_setMongo["Db"]}',
         document_class=RawBSONDocument,
     )
-    _camsDb = _mongoClient[_db["Db"]]
+    _camsDb = _mongoClient[_setMongo["Db"]]
     _sensors = _camsDb["sensors"]
 
     cursor: pge.cursor = _pgc.cursor(cursor_factory=pga.DictCursor)

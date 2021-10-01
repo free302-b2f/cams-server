@@ -10,24 +10,24 @@
   - 백그라운드로 쓰레드로 실행: run()
 """
 
-import asyncio, time, threading
+import asyncio, time, threading, datetime
 from asyncio.tasks import sleep
 import websockets  # pip install websockets
 from websockets.exceptions import ConnectionClosed
 
-import camera # 카메라 모듈 필요
+import camera  # 카메라 모듈 필요
 import server
 
 
 # region ----[ 모듈 설정 변수 ]----
 
 # TODO: load from config file
-_SENSOR_SN = "B2F_CAMs_1000000000001"
+_SENSOR_SN = "B2F_CAMs_1000000000002"
 _WS_HOST = "localhost"
 # _WS_HOST = "bit2farm.iptime.org"
 _WS_PORT = 28765
 _WS_BASE_URL = f"ws://{_WS_HOST}:{_WS_PORT}"
-_WS_RATE = 1/1
+_WS_RATE = 1 / 30
 
 # 웹소켓 서버 주소
 _ws_url = f"ws://{_WS_HOST}:{_WS_PORT}/upload/{_SENSOR_SN}"
@@ -55,6 +55,9 @@ def _saveFile():
             file.write(bytes)
 
 
+_sleep = 0.5
+
+
 async def _runAsync():
     """웹소켓 서버와 접속하고 카메라 이미지를 계속 업로드한다"""
 
@@ -65,6 +68,12 @@ async def _runAsync():
         print(f"{ws = }")
 
         while True:
+            sec = time.localtime().tm_sec % _T
+            print(f"{sec= }")
+            if sec : 
+                time.sleep(_T - sec - 0.5)
+                continue
+
             try:
                 nextT = time.time() + _T
                 await _sendFile(ws)
@@ -76,7 +85,7 @@ async def _runAsync():
             except Exception as ex:
                 print(f"{__name__}._runAsync():\n{ex}")
 
-            # 
+            #
             sleepT = nextT - time.time()
             if sleepT > 0.015:
                 await sleep(sleepT)

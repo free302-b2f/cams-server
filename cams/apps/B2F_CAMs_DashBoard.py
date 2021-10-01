@@ -2,13 +2,8 @@
 CAMs 센서데이터의 시각화
 """
 
-if __name__ == "__main__":
-    import sys, os.path as path
-
-    dir = path.join(path.dirname(__file__), "..")
-    sys.path.append(dir)
-
 from plotly.subplots import make_subplots
+from dash_extensions.enrich import Trigger
 from apps.imports import *
 
 # import db
@@ -56,7 +51,7 @@ def plotAll(
 ) -> dict:
     """데이터의 Figure 생성"""
 
-    if df is None or len(df) == 0:
+    if df is None or not df.shape[0] or not df.shape[1]:
         return px.scatter(
             pd.DataFrame({x: [0] for x in cols}),
             y=cols,
@@ -105,6 +100,7 @@ def plotAll(
     Output("apps-cams-graph4", "figure"),
     Input("apps-cams-sensor", "value"),
     Input("apps-cams-date", "date"),
+    Trigger("apps-cams-interval", "n_intervals"),
 )
 def update_graph(sensor_id, date):
     """선택된 정보로 그래프를 업데이트 한다"""
@@ -244,6 +240,11 @@ def layout():
                 ],
                 className="cams_contents_table",
             ),  # ~table
+            dcc.Interval(
+                id="apps-cams-interval",
+                interval=30_000,  # in milliseconds
+                n_intervals=0,
+            ),
         ],
         id="app-cams-container",
     )
