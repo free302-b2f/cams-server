@@ -19,10 +19,22 @@ _imgInfos: List[str] = []
 _outputs: List[Output] = []
 
 
+def getFileTime(jpg: str):
+    try:
+        if os.path.isfile(jpg):
+            ts = os.path.getmtime(jpg)
+            ts = datetime.fromtimestamp(ts).astimezone().isoformat()
+            return ts
+        else:
+            return "-none-"
+    except:
+        return "-none-"
+
+
 def decodeJpeg():
     global _imgInfos
     paths = [os.path.join(app.server.root_path, *u.split("/")) for u in _uris]
-    _imgInfos = ["-none-" for j in paths]
+    _imgInfos = ["-none-" for s in _sensors]
     rng = range(len(paths))
 
     for j in range(len(paths)):
@@ -39,6 +51,7 @@ def decodeJpeg():
             tsLocal = datetime.fromisoformat(ts).astimezone().isoformat()
             _imgInfos[j] = f"{sn} @ {tsLocal}"
         except:
+            _imgInfos[j] = f"{_sensors[j].sn} @ {getFileTime(paths[j])}"
             pass
 
 
@@ -48,7 +61,7 @@ def init():
     _user = fli.current_user
     if not _user:
         return
-        
+
     _farms = _user.farms
     _sensors = []
     for f in _farms:
