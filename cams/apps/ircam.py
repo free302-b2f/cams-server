@@ -22,27 +22,24 @@ _outputs: List[Output] = []
 def decodeJpeg():
     global _imgInfos
     paths = [os.path.join(app.server.root_path, *u.split("/")) for u in _uris]
-    _imgInfos = []
+    _imgInfos = ["-none-" for j in paths]
+    rng = range(len(paths))
 
-    for jpg in paths:
+    for j in range(len(paths)):
         try:
+            jpg = paths[j]
             with open(jpg, "rb") as f:
                 buf = f.read()
-                metaLen = int(buf[-4:].decode("utf-8"))
-                meta = buf[-metaLen:]
-                ts = meta[0:32].decode("utf-8")
-                sn = meta[32:-4].decode("utf-8")
-                info(decodeJpeg, f"ts={ts}, sn={sn}")
+            metaLen = int(buf[-4:].decode("utf-8"))
+            meta = buf[-metaLen:]
+            ts = meta[0:32].decode("utf-8")
+            sn = meta[32:-4].decode("utf-8")
+            info(decodeJpeg, f"ts={ts}, sn={sn}")
 
-                tsLocal = datetime.fromisoformat(ts).astimezone().isoformat()
-
-                _imgInfos.append(f"{sn} @ {tsLocal}")
+            tsLocal = datetime.fromisoformat(ts).astimezone().isoformat()
+            _imgInfos[j] = f"{sn} @ {tsLocal}"
         except:
             pass
-    if len(_imgInfos) != len(_sensors):
-        rng = range(len(_sensors) - len(_imgInfos))
-        for i in rng:
-            _imgInfos.append("-none-")
 
 
 def init():
