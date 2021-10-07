@@ -19,10 +19,12 @@ _imgInfos: List[str] = []
 _outputs: List[Output] = []
 
 
-def getFileTime(jpg: str):
+def getFileTime(filePath: str):
+    """주어진 경로의 OS 파일시스템에 저장된 수정시각을 리턴한다"""
+
     try:
-        if os.path.isfile(jpg):
-            ts = os.path.getmtime(jpg)
+        if os.path.isfile(filePath):
+            ts = os.path.getmtime(filePath)
             ts = datetime.fromtimestamp(ts).astimezone().isoformat()
             return ts
         else:
@@ -32,6 +34,8 @@ def getFileTime(jpg: str):
 
 
 def decodeJpeg():
+    """_uris 목록의 파일들에 대하여 메타데이터를 추출하여 _imgInfos에 저장한다"""
+
     global _imgInfos
     paths = [os.path.join(app.server.root_path, *u.split("/")) for u in _uris]
     _imgInfos = ["-none-" for s in _sensors]
@@ -56,6 +60,8 @@ def decodeJpeg():
 
 
 def init():
+    """글로벌 변수 - 센서목록, IR이미지 경로 등 - 를 초기화 한다"""
+
     global _sensors, _uris, _imgs, _outputs
 
     _user = fli.current_user
