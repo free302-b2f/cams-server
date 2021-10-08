@@ -1,0 +1,111 @@
+/*-----------------------------------------------------
+    + apps.export 뷰의 스타일
+    + 2021.10.08 by DrBAE : amadeus.bae@gmail.com
+-----------------------------------------------------*/
+
+@import "app-base.less";
+
+//
+// ====[ 페이지: export ]====
+//
+
+#app-export-container
+{
+    // width:100%;
+    min-width: 800px;
+    max-width: 1900px;
+    height: 100%;
+    border: yellowgreen solid 1px;
+    background-color: @content_back_color;
+}
+#app-export-container>header
+{
+    display: flex;
+    width: 100%;
+}
+#app-export-container>section
+{
+    display: flex;
+    width: 100%;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+//label
+#app-export-container label
+{
+    width: 80%;
+    // width:max-content;
+    // margin-left: 1.0rem;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+#app-export-container label>*:nth-child(3n-2) 
+{ 
+    width: 16%; 
+    display: flex;
+    justify-content: flex-start;
+    // padding-right: 1rem;
+}
+#app-export-container label>*:nth-child(3n-1)
+{ 
+    width:auto;
+}
+#app-export-container label>*:nth-child(3n) 
+{ 
+    width: 17.8rem; 
+}
+#app-export-container label>button:hover
+{
+    border: yellowgreen dashed 1px;
+}
+#app-export-container label>button:focus, #app-export-container label>button:focus-visible
+{
+    border: yellowgreen solid 1px;
+    outline: none;
+}
+
+//icon : common
+#app-export-container label span.material-icons-outlined
+{ 
+    width: 1.5rem;
+    margin-left: 0.5rem;
+    justify-content: flex-start; 
+    padding-right: 0rem;
+}
+#app-export-container .material-icons-outlined
+{
+    // margin-left: 1rem;
+    color:rgba(sienna, 0.52);
+}
+#app-export-container .material-icons-outlined:hover
+{
+    color:coral;
+    cursor: pointer;
+}
+
+//data table
+#apps-export-dt-table
+{
+    width: 100%;
+    font-family: Consolas;
+}
+#app-export-container th
+{
+    background-color: rgba(yellowgreen, 0.52);
+    // background: linear-gradient(135deg, orange 60%, cyan);
+    // background-attachment:scroll;
+}
+
+
+.DateRangePickerInput__withBorder 
+{
+    border:none;
+}
+.DateRangePickerInput 
+{
+    background-color:inherit;
+}
+
+

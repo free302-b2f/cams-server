@@ -2,7 +2,6 @@
 CAMs 센서데이터의 시각화
 """
 
-from re import IGNORECASE
 from plotly.subplots import make_subplots
 from dash_extensions.enrich import Trigger
 from apps.imports import *
@@ -46,7 +45,7 @@ def load_data(sn: str, date) -> Tuple[pd.DataFrame, List[str]]:
     """DB에서 하루동안의 데이터를 불러온다.
     DataFrame 변환시간의 리스트를 생성
     그래프에 들어갈 데이터 필드 목록을 생성
-    :return: DataFrame, 필드이름 목록의 튜플"""
+    :return: DataFrame"""
 
     # load dataset from DB
     sensors = _cams["sensors"]
@@ -256,7 +255,7 @@ def layout():
                     dateTr,
                     *graphTr,
                 ],
-                className="cams_contents_table",
+                className="app-cams-table",
             ),  # ~table
             dcc.Interval(
                 id="apps-cams-interval",
@@ -269,7 +268,7 @@ def layout():
 
 
 # 이 페이지를 메인 메뉴바에 등록한다.
-add_page(layout, "CAMs Viewer", 40)
+add_page(layout, "CAMs Viewer", 20)
 
 
 if __name__ == "__main__":

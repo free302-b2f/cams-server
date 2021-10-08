@@ -28,13 +28,10 @@ lm.init_app(app.server, "/login", "/signup", "/lm-profile")
 # endregion
 
 # load modules & add pages
+#! main_layout을 임포트 하기전에 메뉴등록하는 페이지를 전부 임포트해야한다.
 from db import *
 from lm import *
 from apps import *
-# from ws.server import run as startWsServer
-
-#! main_layout을 임포트 하기전에 메뉴등록하는 페이지를 전부 임포트해야한다.
-import apps.home
 import main_layout
 
 # endregion

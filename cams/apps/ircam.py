@@ -155,4 +155,4 @@ def pull():
         return no_update
 
 
-add_page(layout, "IR-CAM")
+add_page(layout, "IR-CAM", 30)

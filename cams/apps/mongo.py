@@ -93,7 +93,7 @@ def load_data() -> Tuple[List[float], pd.DataFrame]:
 
     sensors = _camsDb["sensors"]
 
-    today = "20210216"  # datetime.now().strftime('%Y%m%d')
+    today = "20211003"  # datetime.now().strftime('%Y%m%d')
     cursor = sensors.find(
         {"SN": "B2F_CAMs_1000000000001", "Date": today},
         # projection={'_id': False, 'FarmName':False, 'SN':False}
@@ -171,4 +171,4 @@ def layout():
 
 
 # 이 페이지를 메인 메뉴바에 등록한다.
-# add_page(layout, "MongoDB", 20)
+add_page(layout, "MongoDB", 60)

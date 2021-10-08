@@ -1,7 +1,12 @@
 /*-----------------------------------------------------
     + v0.1
     + 웹사이트 전체적인 테마를 설정
-    + 2021.09.09 by DrBAE : amadeus.bae@gmai.com
+    + 2021.09.09 by DrBAE : amadeus.bae@gmail.com
+-----------------------------------------------------*/
+/*-----------------------------------------------------
+    + v1
+    + less 공통 변수 정의
+    + 2021.10.08 by DrBAE : amadeus.bae@gmail.com
 -----------------------------------------------------*/
 html {
   font-size: 100%;
@@ -247,17 +252,6 @@ body {
 #apps-camera-control-box > label > *:nth-child(2n) {
   width: 60%;
 }
-/* home contents */
-#app-home-container {
-  font-size: inherit;
-  height: 100%;
-  min-width: 600px;
-  border: yellowgreen dashed 2px;
-  background-color: #F5F6F7;
-}
-#app-home-container pre {
-  font-size: inherit;
-}
 #lm-profile-container {
   min-width: 600px;
   height: 100%;
@@ -323,14 +317,14 @@ body {
   padding: 1rem 1rem 0rem 1rem;
   background-color: #F0F1F2;
 }
-.cams_contents_table {
+.app-cams-table {
   border-collapse: separate;
   width: 100%;
 }
-.cams_contents_table tr {
+.app-cams-table tr {
   width: 100%;
 }
-.cams_contents_table td {
+.app-cams-table td {
   vertical-align: middle;
   font-family: Consolas;
   padding: 0px;
@@ -368,7 +362,7 @@ body {
 .apps-cams-graph-container text.gtitle {
   font-variant: small-caps;
 }
-.cams_contents_table label {
+.app-cams-table label {
   margin-left: 1rem;
   width: 100%;
   display: flex;
@@ -376,18 +370,14 @@ body {
   justify-content: flex-start;
   cursor: pointer;
 }
-.cams_contents_table label * {
+.app-cams-table label * {
   cursor: pointer;
 }
-.cams_contents_table label > *:nth-child(2n -1) {
+.app-cams-table label > *:nth-child(2n -1) {
   width: 5rem;
 }
-.cams_contents_table label > *:nth-child(2n) {
+.app-cams-table label > *:nth-child(2n) {
   width: 16rem;
-}
-#cams-sr-label {
-  color: blue;
-  padding-left: 10px;
 }
 .DateInput_input {
   font-weight: inherit;

@@ -238,7 +238,7 @@ def layout():
                         merge=True,
                     ),
                 ],
-                className="cams_contents_table",
+                className="app-cams-table",
             ),  # ~table
         ]
     )
