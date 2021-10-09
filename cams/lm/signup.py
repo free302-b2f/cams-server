@@ -1,5 +1,5 @@
 from lm.imports import *
-from db import dba
+from db import get_dba #db sql alchemy
 from db.user import AppUser
 from app import app, debug
 import json
@@ -35,6 +35,7 @@ def signup():
             response["cause"] = "lm-login-email"
         else:
             try:
+                dba = get_dba()
                 pwHash = wsec.generate_password_hash(pw, method="sha256")
                 newUser = AppUser(username=un, password=pwHash, email=em, realname=rn)
                 dba.session.add(newUser)

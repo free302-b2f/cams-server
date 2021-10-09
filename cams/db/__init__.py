@@ -33,10 +33,6 @@ _dbUri = (
 
 # module global variables
 _dba: SQLAlchemy = None
-_load_user: FunctionType = None
-# _load_farm: FunctionType = None
-# _load_sensor: FunctionType = None
-# _seed_meta: FunctionType = None
 
 # endregion
 
@@ -52,7 +48,7 @@ def init_app(server: fl.Flask) -> fli.LoginManager:
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
     )
 
-    global _dba, _load_user, _seed_meta
+    global _dba, _seed_meta
 
     #! db.xxx 모듈을 실행하기 전에 _dba 초기화 필요
     _dba = SQLAlchemy(server)
@@ -77,10 +73,6 @@ def init_app(server: fl.Flask) -> fli.LoginManager:
 
         _dba.create_all()
         _seed_meta()
-
-    _load_user = AppUser.query.get
-    # _load_farm = Farm.query.get
-    # _load_sensor = Sensor.query.get
 
     pass  # init_app
 
@@ -134,18 +126,7 @@ def _seed_meta():
 
 # endregion
 
-
-# region ---- 모듈의 global property 정의 ----
-
-_mpb = util.ModulePropertyBuilder(sys.modules[__name__])
-
-# flask-login 에서 사용
-_mpb.addProp("loadUser", lambda: _load_user)
-
-# 다른 모듈에서 _dba:SQLAlchemy 인스턴스를 접근하는데 사용
-# ex) from db import dba as DB
-# 이 모듈 로딩시의 _dba값(=None)이 아닌 import호출시 값을 리턴(C#의 property)
-_mpb.addProp("dba", lambda: _dba)
-
-
-# endregion
+def get_dba():
+    if not _dba:
+        raise ValueError(f"{__name__}._dba == None")
+    return _dba

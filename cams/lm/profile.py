@@ -1,12 +1,13 @@
 """로그인한 사용자의 프로파일 뷰 및 콜백"""
 
 from lm.imports import *
+import lm.logout
+
 from db.user import AppUser
 from db.farm import Farm
 from db.sensor import Sensor
 
 from app import app, add_page
-import lm.logout
 from dash import no_update
 from dash_extensions.enrich import Trigger
 from apps.imports import *
@@ -269,7 +270,8 @@ def addFarm(n: int):
     user = fli.current_user
     farm = Farm(name="--new farm--")
     user.farms.append(farm)
-    from db import dba
+    from db import get_dba
+    dba = get_dba()
 
     local_object = dba.session.merge(farm)
     dba.session.add(local_object)

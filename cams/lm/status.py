@@ -24,12 +24,12 @@ def login_status(appPath):
     """메인 메뉴바에 로그인 상태를 표시하는 콜백"""
 
     username, userId = "Login", "0"
-    pathname, refresh = lm.login_view, True
+    pathname, refresh = lm.login_view(), True
     icon, iconClass = "account_circle", "material-icons-two-tone md-light"
 
     if fli.current_user.is_authenticated:
         username, userId = fli.current_user.realname, fli.current_user.get_id()
-        pathname, refresh = lm.profile_view, False
+        pathname, refresh = lm.profile_view(), False
         icon, iconClass = "manage_accounts", "material-icons-outlined md-light"
 
     # <span class="material-icons-two-tone">account_circle</span>

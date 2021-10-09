@@ -28,12 +28,3 @@ _set = util.loadSettings("app_settings.json")["Postgres"]
 
 
 # endregion
-
-
-# region ---- 모듈의 global property 정의 ----
-
-mpb = util.ModulePropertyBuilder(sys.modules[__name__])
-#mpb.addProp("db", lambda: _db)
-
-# endregion
-

@@ -1,8 +1,7 @@
 """CAMs 데이터를 다운로드 하는 페이지"""
 
-from dash_html_components.Header import Header
-from dash_html_components.Section import Section
 from apps.imports import *
+from db import sensor
 
 debug("loading...")
 from db.user import AppUser
@@ -68,6 +67,8 @@ _dt_columns = [
     for h, c in zip(_headers, _meta_cols + _cols)
 ]
 
+_df: pd.DataFrame = None
+
 
 def layout():
     """Dash의 layout을 설정한다"""
@@ -88,7 +89,7 @@ def layout():
     headerRow = html.H4(
         [
             html.Span("cloud_download", className="material-icons-two-tone"),
-            html.Span("Exporting CAMs Data", className="font-sc"),
+            html.Span("Export CAMs Data", className="font-sc"),
         ],
         className="flex-h",
     )
@@ -101,8 +102,10 @@ def layout():
                 options=snOptions,
                 value=snDefalut,
                 clearable=False,
+                searchable=False,
             ),
-        ]
+        ],
+        className="apps-export-label",
     )
     dateRow = html.Label(
         [
@@ -115,14 +118,24 @@ def layout():
                 end_date=dateValue,
             ),
         ],
+        className="apps-export-label",
     )
 
-    buttonRow = html.Label(
+    buttonRow = html.Div(
         [
-            html.Span("", className="material-icons-two-tone"),
+            html.Span(id="apps-export-rows"),#[html.Span(id="apps-export-rows"), " rows"]),
             html.Span("_", className="material-icons-two-tone"),
-            html.Button("download", className="material-icons-outlined"),
-        ]
+            html.Button(
+                [
+                    html.Span("download", className="material-icons-outlined"),
+                    html.Span("Export as CSV", className="font-sc"),
+                ],
+                id="apps-export-button",
+                n_clicks=0,
+            ),
+            dcc.Download(id="apps-export-download"),
+        ],
+        className="apps-export-label",
     )
 
     return html.Div(
@@ -140,16 +153,6 @@ def layout():
 def build_data_table(df: pd.DataFrame) -> DataTable:
     """pandas.DataFrame을 dash.DataTable로 변환한다."""
 
-    # columns = [
-    #     {
-    #         "name": h,
-    #         "id": c,
-    #         "type": "numeric",
-    #         "format": Format(precision=3, scheme=Scheme.decimal_si_prefix),  # fixed)
-    #     }
-    #     for h, c in zip(_headers, _meta_cols + _cols)
-    # ]
-
     data = df.to_dict("records") if df is not None else []
 
     table = DataTable(
@@ -158,6 +161,9 @@ def build_data_table(df: pd.DataFrame) -> DataTable:
         data=data,
         style_cell=dict(textAlign="right", paddingRight="5px"),
         style_header=dict(textAlign="center"),
+        cell_selectable=False,
+        page_size=15,
+        row_selectable="multi",
     )
     return table
 
@@ -166,26 +172,28 @@ def load_data(sn, start, end) -> pd.DataFrame:
     """DB에서 주어진 기간동안의 데이터를 불러온다"""
 
     sensors = _cams["sensors"]
-
     cursor = sensors.find(
-        {"SN": sn, "Date": start},
+        {"SN": sn, "Date": {"$gte": start, "$lte": end}},
         projection={"_id": False, "FarmName": False, "SN": False},
-    ).sort([("Time", 1)])
+    ).sort([("Date", 1), ("Time", 1)])
 
-    # ds = list(cursor)
-    df = pd.DataFrame(cursor)
-    debug(load_data, f"{start}: {df.shape = }")
+    global _df
+    _df = pd.DataFrame(cursor)
+    debug(load_data, f"{start}~{end}: {_df.shape = }")
 
-    if df.shape[0] and df.shape[1]:
-        df = df.astype(_types, copy=False)  # , errors="ignore")
-        df["time_key"] = [util.parseDate(d, t) for d, t in zip(df["Date"], df["Time"])]
-        df.set_index("time_key", inplace=True)
+    if _df.shape[0] and _df.shape[1]:
+        _df = _df.astype(_types, copy=False)  # , errors="ignore")
+        _df["time_key"] = [
+            util.parseDate(d, t) for d, t in zip(_df["Date"], _df["Time"])
+        ]
+        _df.set_index("time_key", inplace=True)
 
-    return df
+    return _df
 
 
 @app.callback(
     Output("apps-export-dt-section", "children"),
+    Output("apps-export-rows", "children"),
     Input("apps-export-sensor", "value"),
     Input("apps-export-date", "start_date"),
     Input("apps-export-date", "end_date"),
@@ -202,7 +210,37 @@ def update_graph(sensor_id, start_date, end_date):
     df = load_data(sn, start, end)
     dt = build_data_table(df)
 
-    return dt
+    return dt, f"{df.shape[0]}"
+
+
+@app.callback(
+    Output("apps-export-download", "data"),
+    Input("apps-export-button", "n_clicks"),
+    State("apps-export-sensor", "value"),
+    State("apps-export-date", "start_date"),
+    State("apps-export-date", "end_date"),
+    prevent_initial_call=True,
+)
+def exportAsCsv(n, sensor_id, start, end):
+    """export data as csv"""
+
+    if _df is None:
+        return no_update
+
+    if not _df.shape[0] or not _df.shape[1]:
+        return no_update
+
+    sn = _sensors[sensor_id].name.replace(" ", "-")
+    fn = f"{sn}_{start}~{end}.csv"
+    cols = _meta_cols + _cols
+    return dcc.send_data_frame(
+        _df.to_csv,
+        fn,
+        # sep="\t",
+        float_format="%.2f",
+        columns=cols,
+        index=False,
+    )
 
 
 # 이 페이지를 메인 메뉴바에 등록한다.
