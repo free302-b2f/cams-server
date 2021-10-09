@@ -25,8 +25,9 @@ def getFileTime(filePath: str):
     try:
         if os.path.isfile(filePath):
             ts = os.path.getmtime(filePath)
-            ts = datetime.fromtimestamp(ts).astimezone().isoformat()
-            return ts
+            ts = datetime.fromtimestamp(ts).astimezone()
+            ts = ts.replace(microsecond=0)
+            return ts.isoformat()
         else:
             return "-none-"
     except:
@@ -52,8 +53,9 @@ def decodeJpeg():
             sn = meta[32:-4].decode("utf-8")
             info(decodeJpeg, f"ts={ts}, sn={sn}")
 
-            tsLocal = datetime.fromisoformat(ts).astimezone().isoformat()
-            _imgInfos[j] = f"{sn} @ {tsLocal}"
+            ts = datetime.fromisoformat(ts).astimezone()
+            ts = ts.replace(microsecond=0)
+            _imgInfos[j] = f"{sn} @ {ts.isoformat()}"
         except:
             _imgInfos[j] = f"{_sensors[j].sn} @ {getFileTime(paths[j])}"
             pass
