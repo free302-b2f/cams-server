@@ -116,6 +116,8 @@ def layout():
                 display_format="YYYY-MM-DD",
                 start_date=dateValue,
                 end_date=dateValue,
+                updatemode="bothdates",
+                minimum_nights=0,
             ),
         ],
         className="apps-export-label",
