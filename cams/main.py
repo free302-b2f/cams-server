@@ -32,6 +32,7 @@ lm.init_app(app.server, "/login", "/signup", "/lm-profile")
 from db import *
 from lm import *
 from apps import *
+from admin import *
 import main_layout
 
 # endregion

@@ -1,0 +1,84 @@
+/*-----------------------------------------------------
+    + apps.export 뷰의 스타일
+    + 2021.10.08 by DrBAE : amadeus.bae@gmail.com
+-----------------------------------------------------*/
+/*-----------------------------------------------------
+    + v1
+    + less 공통 변수 정의
+    + 2021.10.08 by DrBAE : amadeus.bae@gmail.com
+-----------------------------------------------------*/
+#admin-farm-container {
+  min-width: 800px;
+  max-width: 1900px;
+  height: 100%;
+  border: yellowgreen solid 1px;
+  background-color: #F5F6F7;
+}
+#admin-farm-container > header {
+  display: flex;
+  width: 100%;
+}
+#admin-farm-container > section {
+  display: flex;
+  width: 100%;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+#admin-farm-container > section:last-child {
+  margin-top: 2rem;
+}
+#admin-farm-add-section {
+  flex-direction: column;
+}
+#admin-farm-add-section.hidden {
+  display: none;
+}
+#admin-farm-container .admin-farm-label {
+  width: 30rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+#admin-farm-container .admin-farm-label > *:nth-child(4n-3) {
+  width: 7rem;
+  display: flex;
+  justify-content: flex-start;
+}
+#admin-farm-container .admin-farm-label > *:nth-child(4n-2) {
+  width: auto;
+}
+#admin-farm-container .admin-farm-label > *:nth-child(4n-1) {
+  width: 17.8rem;
+}
+#admin-farm-container .admin-farm-label > *:nth-child(4n) {
+  width: auto;
+}
+.admin-farm-add-label {
+  width: 30rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+#admin-farm-container .admin-farm-label > button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#admin-farm-container .admin-farm-label > button:hover {
+  border: yellowgreen dashed 1px;
+  color: coral;
+  cursor: pointer;
+}
+#admin-farm-container .admin-farm-label > button:focus,
+#admin-farm-container .admin-farm-label > button:focus-visible {
+  border: yellowgreen solid 1px;
+  outline: none;
+}
+#admin-farm-container .material-icons-outlined {
+  margin-left: 0.5rem;
+  color: rgba(160, 82, 45, 0.52);
+}
+#admin-farm-container .material-icons-outlined:hover {
+  color: coral;
+  cursor: pointer;
+}

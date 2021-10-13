@@ -280,11 +280,11 @@ def addFarm(n: int):
     return 0
 
 # Farm : delete
-@app.callback(
-    Output({"model": "delete-farm", "id": MATCH}, "n_clicks"),  # 더미
-    Trigger({"model": "delete-farm", "id": MATCH}, "n_clicks"),  # 이벤트 발생
-    State({"model": "delete-farm", "id": MATCH}, "data-farm_id"),  # 이벤트 소스의 팜 아이디
-)
+# @app.callback(
+#     Output({"model": "delete-farm", "id": MATCH}, "n_clicks"),  # 더미
+#     Trigger({"model": "delete-farm", "id": MATCH}, "n_clicks"),  # 이벤트 발생
+#     State({"model": "delete-farm", "id": MATCH}, "data-farm_id"),  # 이벤트 소스의 팜 아이디
+# )
 def deleteFarm(fid):
 
     if not cbc.triggered[0]["value"]:
@@ -303,12 +303,12 @@ def deleteFarm(fid):
     return 1
 
 # Farm : enter edit mode
-@app.callback(
-    Output({"model": "farm", "id": MATCH}, "readonly"),  # farm_name input
-    # Output({"model": "save-farm", "id": MATCH}, "n_clicks"),  # 더미
-    Trigger({"model": "edit-farm", "id": MATCH}, "n_clicks"),  # 이벤트 발생
-    State({"model": "edit-farm", "id": MATCH}, "data-farm_id"),  # 이벤트 소스의 팜 아이디
-)
+# @app.callback(
+#     Output({"model": "farm", "id": MATCH}, "readonly"),  # farm_name input
+#     # Output({"model": "save-farm", "id": MATCH}, "n_clicks"),  # 더미
+#     Trigger({"model": "edit-farm", "id": MATCH}, "n_clicks"),  # 이벤트 발생
+#     State({"model": "edit-farm", "id": MATCH}, "data-farm_id"),  # 이벤트 소스의 팜 아이디
+# )
 def editFarm(fid: int):
     """변경된 Farm 이름을 DB에 저장한다"""
 
@@ -319,12 +319,12 @@ def editFarm(fid: int):
 
 
 # Farm : save
-@app.callback(
-    Output({"model": "save-farm", "id": MATCH}, "n_clicks"),  # 더미
-    Trigger({"model": "save-farm", "id": MATCH}, "n_clicks"),  # 이벤트 발생
-    State({"model": "save-farm", "id": MATCH}, "data-farm_id"),  # 이벤트 소스의 팜 아이디
-    State({"model": "farm", "id": MATCH}, "value"),  # farm_name input
-)
+# @app.callback(
+#     Output({"model": "save-farm", "id": MATCH}, "n_clicks"),  # 더미
+#     Trigger({"model": "save-farm", "id": MATCH}, "n_clicks"),  # 이벤트 발생
+#     State({"model": "save-farm", "id": MATCH}, "data-farm_id"),  # 이벤트 소스의 팜 아이디
+#     State({"model": "farm", "id": MATCH}, "value"),  # farm_name input
+# )
 def saveFarm(fid, newName: str):
     """변경된 Farm 이름을 DB에 저장한다"""
 
@@ -356,11 +356,11 @@ function(n, n2)
         }
     }
 }"""
-app.clientside_callback(
-    _receive_func,
-    Input("lm-profile-farms-add", "n_clicks"),
-    Input({"model": "delete-farm", "id": ALL}, "n_clicks"),  # 이벤트 발생
-)
+# app.clientside_callback(
+#     _receive_func,
+#     Input("lm-profile-farms-add", "n_clicks"),
+#     Input({"model": "delete-farm", "id": ALL}, "n_clicks"),  # 이벤트 발생
+# )
 
 
 # 이 페이지를 메인 라우터에 등록한다.

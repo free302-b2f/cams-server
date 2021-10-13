@@ -22,7 +22,7 @@ import server
 # region ----[ 모듈 설정 변수 ]----
 
 # TODO: load from config file
-_SENSOR_SN = "B2F_CAMs_1000000000002"
+_SENSOR_SN = "B2F_CAMs_1000000000005"
 _WS_HOST = "localhost"
 # _WS_HOST = "bit2farm.iptime.org"
 _WS_PORT = 28765
