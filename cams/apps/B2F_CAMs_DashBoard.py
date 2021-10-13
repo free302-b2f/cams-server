@@ -186,6 +186,7 @@ def layout():
                             options=snOptions,
                             value=snDefalut,
                             clearable=False,
+                            searchable=False,
                         ),
                     ]
                 ),
