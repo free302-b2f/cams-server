@@ -97,7 +97,7 @@ def _seed_meta():
         level=1,  # administrator
     )
     farm = Farm(name="B2F Test Farm")
-    farm.sensors.append(Sensor(sn="B2F_CAMs_1000000000003", name="Test Sensor"))
+    farm.sensors.append(Sensor(sn="B2F_CAMs_2000000000003", name="Test Sensor", desc="DrBAE's Test CAMs"))
     user.farms.append(farm)
     _dba.session.add(user)
 
@@ -111,8 +111,12 @@ def _seed_meta():
         level=0,
     )
     farm = Farm(name="KIST Pheno Farm")
-    farm.sensors.append(Sensor(sn="B2F_CAMs_1000000000001", name="Lab Sensor 1"))
-    farm.sensors.append(Sensor(sn="B2F_CAMs_1000000000002", name="Lab Sensor 2"))
+    farm.sensors.append(Sensor(sn="B2F_CAMs_1000000000001", name="Lab Sensor 1", desc="KIST CAMs #1"))
+    farm.sensors.append(Sensor(sn="B2F_CAMs_1000000000002", name="Lab Sensor 2", desc="KIST CAMs #2"))
+    farm.sensors.append(Sensor(sn="B2F_CAMs_1000000000003", name="Lab Sensor 3", desc="KIST CAMs #3"))
+    farm.sensors.append(Sensor(sn="B2F_CAMs_1000000000004", name="Lab Sensor 4", desc="KIST CAMs #4"))
+    farm.sensors.append(Sensor(sn="B2F_CAMs_1000000000005", name="Lab Sensor 5", desc="KIST CAMs #5"))
+    farm.sensors.append(Sensor(sn="B2F_CAMs_1000000000006", name="Lab Sensor 6", desc="KIST CAMs #6"))
     user.farms.append(farm)
     _dba.session.add(user)
 
