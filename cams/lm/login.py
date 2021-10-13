@@ -1,4 +1,4 @@
-from lm.imports import *
+from lm._imports import *
 from db.user import AppUser
 
 from app import app, debug

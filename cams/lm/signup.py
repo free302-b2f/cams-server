@@ -1,4 +1,4 @@
-from lm.imports import *
+from lm._imports import *
 from db import get_dba #db sql alchemy
 from db.user import AppUser
 from app import app, debug

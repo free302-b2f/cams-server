@@ -4,7 +4,7 @@
 + 링크 주소에 따라 페이지 갱신여부 결정하며 갱신시 flask page로 이동한다.
 """
 
-from lm.imports import *
+from lm._imports import *
 from db.user import AppUser
 from app import app, add_page, debug
 

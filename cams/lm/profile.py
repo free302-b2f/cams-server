@@ -1,6 +1,6 @@
 """로그인한 사용자의 프로파일 뷰 및 콜백"""
 
-from lm.imports import *
+from lm._imports import *
 import lm.logout
 
 from db.user import AppUser
