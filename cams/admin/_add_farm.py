@@ -2,14 +2,14 @@
 
 from admin._imports import *
 from admin._common import *
-import visdcc
+# import visdcc
 
 _farmName = html.Label(
     [
         html.Span("Farm Name"),
         html.Span("_", className="material-icons-two-tone"),
         dcc.Input(
-            id="admin-manage-farm-add-name",
+            id="admin-manage-farm-name",
             type="text",
             maxLength=Farm.max_name,
             required=True,
@@ -24,7 +24,7 @@ addFarmSection = html.Section(
         html.Hr(),
         _farmName,
         buildButtonRow("Add Farm", "farm"),
-        visdcc.Run_js('admin-manage-farm-add-js'),
+        # visdcc.Run_js('admin-manage-farm-add-js'),
     ],
     className="admin-manage-add-section",
 )
@@ -35,7 +35,7 @@ addFarmSection = html.Section(
     Output("admin-manage-farm", "value"),
     Input("admin-manage-button-farm", "n_clicks"),
     State("admin-manage-user", "value"),
-    State("admin-manage-farm-add-name", "value"),
+    State("admin-manage-farm-name", "value"),
     prevent_initial_call=True,
 )
 def onButtonClick(n, uid, farmName):
@@ -49,7 +49,6 @@ def onButtonClick(n, uid, farmName):
     user.farms.append(farm)
 
     dba = db.get_dba()
-    # dba.session.add(user)
     dba.session.commit()
 
     # trigger user change

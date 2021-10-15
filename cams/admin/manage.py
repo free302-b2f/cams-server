@@ -11,11 +11,6 @@ def layout():
 
     debug(layout, f"entering...")
 
-    global g_users, g_farms, g_sensors
-
-    userOptions = [{"label": u.username, "value": u.id} for u in g_users]
-    userDefalut = userOptions[0]["value"] if len(userOptions) > 0 else ""
-
     headerRow = html.H4(
         [
             html.Span("settings", className="material-icons-two-tone"),
@@ -24,14 +19,15 @@ def layout():
         className="flex-h",
     )
 
+    userOpt = buildUserOptions()
     userRow = html.Label(
         [
             html.Span("User"),
             html.Span("badge", className="material-icons-two-tone"),
             dcc.Dropdown(
                 id="admin-manage-user",
-                options=userOptions,
-                value=userDefalut,
+                options=userOpt[0],
+                value=userOpt[1],
                 clearable=False,
                 searchable=False,
             ),
@@ -101,32 +97,42 @@ def onUser(uid):
     if not uid:
         return no_update
 
-    user = AppUser.query.get(uid)
-    farms = user.farms
-    farmOptions = [{"label": f.name, "value": f.id} for f in farms]
-    farmDefalut = farmOptions[0]["value"] if len(farmOptions) > 0 else ""
-
-    return farmOptions, farmDefalut
+    return buildFarmOptions(uid)
 
 
 @app.callback(
     Output("admin-manage-sensor", "options"),
     Output("admin-manage-sensor", "value"),
+    Output("admin-manage-farm-name", "value"),
     Input("admin-manage-farm", "value"),
 )
 def onFarm(fid):
     """Farm 선택시 sensor목록 업데이트"""
 
     if not fid:
-        return no_update
-
+        return no_update, no_update, ""
+    
     farm = Farm.query.get(fid)
-    sensors = farm.sensors
-    sensorOptions = [{"label": s.name, "value": s.id} for s in sensors]
-    sensorDefalut = sensorOptions[0]["value"] if len(sensorOptions) > 0 else ""
 
-    return sensorOptions, sensorDefalut
+    return *buildSensorOptions(fid), farm.name
 
+
+
+@app.callback(
+    Output("admin-manage-sensor-name", "value"),
+    Output("admin-manage-sensor-sn", "value"),
+    Output("admin-manage-sensor-desc", "value"),
+    Input("admin-manage-sensor", "value"),
+)
+def onSensor(sid):
+    """Sensor 선택시 업데이트"""
+
+    if not sid:
+        return "", "", ""
+
+    sensor = Sensor.query.get(sid)
+    
+    return sensor.name, sensor.sn, sensor.desc
 
 
 add_page(layout, "Add-Farm")

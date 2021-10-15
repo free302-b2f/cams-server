@@ -2,12 +2,10 @@
 
 from admin._imports import *
 
-g_users: List[AppUser] = AppUser.query.all()
-g_farms: List[Farm] = None
-g_sensors: List[Sensor] = None
-
 
 def buildButtonRow(buttonText, modelName):
+    """추가 항목에 사용할 버튼 생성"""
+
     return html.Div(
         [
             html.Span("_", className="material-icons-two-tone"),
@@ -28,14 +26,11 @@ def buildButtonRow(buttonText, modelName):
     )
 
 
-
 def buildUserOptions():
     """AppUser dropdown에 사용할 목록"""
 
-    global g_users, g_farms, g_sensors
-
-    g_users = AppUser.query.all()
-    options = [{"label": u.username, "value": u.id} for u in g_users]
+    users = AppUser.query.all()
+    options = [{"label": u.username, "value": u.id} for u in users]
     default = options[0]["value"] if len(options) > 0 else ""
     return options, default
 
@@ -43,29 +38,22 @@ def buildUserOptions():
 def buildFarmOptions(uid, selected=None):
     """Farm dropdown에 사용할 목록"""
 
-    global g_users, g_farms, g_sensors
-
     user = AppUser.query.get(uid)
-    g_farms = user.farms
-    options = [{"label": f.name, "value": f.id} for f in g_farms]
+    farms = user.farms
+    options = [{"label": f.name, "value": f.id} for f in farms]
     default = options[0]["value"] if len(options) > 0 else ""
     if selected:
         default = selected
     return options, default
 
 
-
-def buildSensorOptions(fid):
+def buildSensorOptions(fid, selected=None):
     """Sensor dropdown에 사용할 목록"""
 
-    global g_users, g_farms, g_sensors
-
     farm = Farm.query.get(fid)
-    g_sensors = farm.sensors
-    options = [{"label": s.name, "value": s.id} for s in g_sensors]
+    sensors = farm.sensors
+    options = [{"label": s.name, "value": s.id} for s in sensors]
     default = options[0]["value"] if len(options) > 0 else ""
+    if selected:
+        default = selected
     return options, default
-
-
-
-

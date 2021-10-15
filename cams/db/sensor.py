@@ -1,5 +1,6 @@
 """센서 모델 정의 및 관련 로직"""
 
+from enum import unique
 from db._imports import *
 
 
@@ -27,7 +28,7 @@ class Sensor(dba.Model):
     # 테이블 컬럼 정의
     __tablename__ = "sensor"
     id = dba.Column(dba.Integer, primary_key=True)
-    sn = dba.Column(dba.String(max_sn), nullable=False)
+    sn = dba.Column(dba.String(max_sn), nullable=False, unique=True)
     name = dba.Column(dba.String(max_name), nullable=False)
     desc = dba.Column(dba.String(max_desc), nullable=True)
     farm_id = dba.Column(dba.Integer, dba.ForeignKey("farm.id"), nullable=False)
