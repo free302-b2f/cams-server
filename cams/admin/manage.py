@@ -47,7 +47,13 @@ def layout():
             html.Span(
                 "clear",
                 className="material-icons-outlined",
-                id="admin-manage-farm-add",
+                id="admin-manage-farm-clear",
+                n_clicks=0,
+            ),
+            html.Span(
+                "delete",
+                className="material-icons-outlined",
+                id="admin-manage-farm-delete",
                 n_clicks=0,
             ),
         ],
@@ -64,9 +70,15 @@ def layout():
                 searchable=False,
             ),
             html.Span(
-                "delete_forever",
+                "clear",
                 className="material-icons-outlined",
-                id="admin-manage-sensor-add",
+                id="admin-manage-sensor-clear",
+                n_clicks=0,
+            ),
+            html.Span(
+                "delete",
+                className="material-icons-outlined",
+                id="admin-manage-sensor-delete",
                 n_clicks=0,
             ),
         ],
@@ -131,7 +143,7 @@ def onSensor(sid):
         return "", "", ""
 
     sensor = Sensor.query.get(sid)
-    
+
     return sensor.name, sensor.sn, sensor.desc
 
 

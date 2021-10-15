@@ -2,6 +2,7 @@
 
 from admin._imports import *
 from admin._common import *
+
 # import visdcc
 
 _farmName = html.Label(
@@ -23,7 +24,7 @@ addFarmSection = html.Section(
     [
         html.Hr(),
         _farmName,
-        buildButtonRow("Add Farm", "farm"),
+        buildButtonRow("Add New Farm", "farm"),
         # visdcc.Run_js('admin-manage-farm-add-js'),
     ],
     className="admin-manage-add-section",
@@ -38,8 +39,8 @@ addFarmSection = html.Section(
     State("admin-manage-farm-name", "value"),
     prevent_initial_call=True,
 )
-def onButtonClick(n, uid, farmName):
-    """<Add Fram> 버튼 클릭시 db작업 및 farm 목록 업데이트"""
+def onNewClick(n, uid, farmName):
+    """<Add New Fram> 버튼 클릭시 db작업 및 farm 목록 업데이트"""
 
     if not n:
         return no_update
@@ -49,7 +50,63 @@ def onButtonClick(n, uid, farmName):
     user.farms.append(farm)
 
     dba = db.get_dba()
-    dba.session.commit()
+    try:
+        dba.session.commit()
+    except:
+        return no_update
 
     # trigger user change
     return buildFarmOptions(uid, farm.id)
+
+
+@app.callback(
+    Output("admin-manage-farm", "options"),
+    Output("admin-manage-farm", "value"),
+    Input("admin-manage-save-farm", "n_clicks"),
+    State("admin-manage-user", "value"),
+    State("admin-manage-farm", "value"),
+    State("admin-manage-farm-name", "value"),
+    prevent_initial_call=True,
+)
+def onSaveClick(n, uid, fid, farmName):
+    """<Save Fram> 버튼 클릭시 db작업 및 목록 업데이트"""
+
+    if not n:
+        return no_update
+
+    dba = db.get_dba()
+    try:
+        farm = Farm.query.get(fid)
+        farm.name = farmName
+        dba.session.commit()
+    except:
+        return no_update
+
+    # trigger user change
+    return buildFarmOptions(uid, fid)
+
+
+# admin-manage-sensor-clear
+@app.callback(
+    Output("admin-manage-farm", "options"),
+    Output("admin-manage-farm", "value"),
+    Input("admin-manage-farm-clear", "n_clicks"),
+    State("admin-manage-user", "value"),
+    State("admin-manage-farm", "value"),
+    prevent_initial_call=True,
+)
+def onClearClick(n, uid, fid):
+    """<Clear> 버튼 작업 - 팜 삭제, 소유 센서가 있으면 삭제 안함"""
+
+    if not n:
+        return no_update
+
+    dba = db.get_dba()
+    try:
+        farm = Farm.query.get(fid)
+        dba.session.delete(farm)
+        dba.session.commit()
+    except:
+        return no_update
+
+    return buildFarmOptions(uid)

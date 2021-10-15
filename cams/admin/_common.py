@@ -21,6 +21,13 @@ def buildButtonRow(buttonText, modelName):
                 n_clicks=0,
                 **{f"data-model": modelName},
             ),
+            html.Span(
+                "save",
+                className="material-icons-outlined",
+                id=f"admin-manage-save-{modelName}",
+                n_clicks=0,
+            ),
+
         ],
         className="admin-manage-label",
     )

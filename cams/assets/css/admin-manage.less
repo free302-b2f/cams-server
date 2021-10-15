@@ -5,6 +5,10 @@
 
 @import "app-base.less";
 
+@buttonBorder : yellowgreen solid 1px;
+@buttonBorderHover : yellowgreen dashed 1px;
+@iconColor: rgba(sienna, 0.52);
+@iconColorHover : coral;
 
 #admin-manage-container
 {
@@ -12,7 +16,7 @@
     min-width: 800px;
     max-width: 1900px;
     height: 100%;
-    border: yellowgreen solid 1px;
+    border: @buttonBorder;
     background-color: @content_back_color;
 }
 #admin-manage-container>header
@@ -45,29 +49,29 @@
 //label
 .admin-manage-label
 {
-    width: 30rem;
-    // width:max-content;
+    // width: 32rem;
+    width:max-content;
     // margin-left: 1.0rem;
     display: flex;
     align-items: center;
     justify-content: flex-start;
 }
-.admin-manage-label>*:nth-child(4n-3) 
+.admin-manage-label>*:nth-child(5n-4) 
 { 
     width: 7rem; 
     display: flex;
     justify-content: flex-start;
     // padding-right: 1rem;
 }
-.admin-manage-label>*:nth-child(4n-2)
+.admin-manage-label>*:nth-child(5n-3)
 { 
     width:auto;
 }
-.admin-manage-label>*:nth-child(4n-1) 
+.admin-manage-label>*:nth-child(5n-2) 
 { 
     width: 17.8rem; 
 }
-.admin-manage-label>*:nth-child(4n) 
+.admin-manage-label>*:nth-child(5n -1) , .admin-manage-label>*:nth-child(5n) 
 { 
     width: auto; 
 }
@@ -92,30 +96,34 @@
 }
 .admin-manage-label>button:hover
 {
-    border: yellowgreen dashed 1px;
-    color:coral;
+    border: @buttonBorderHover;
+    color:@iconColorHover;
     cursor: pointer;
 }
 .admin-manage-label>button:focus, 
 .admin-manage-label>button:focus-visible
 {
-    border: yellowgreen solid 1px;
+    border: @buttonBorder;
     outline: none;
 }
-// .admin-manage-label>button>span:last-child
-// {
-//     margin-left: 0.5rem;
-// }
+
 
 //icon
-.material-icons-outlined
+//#admin-manage-container
+.admin-manage-label .material-icons-outlined
 {
     margin-left: 0.5rem;
-    margin-right: 0.5rem;
-    color:rgba(sienna, 0.52);
+    // margin-right: 0.5rem;
+    color: @iconColor;
 }
-.material-icons-outlined:hover
+.admin-manage-label .material-icons-outlined:hover
 {
-    color:coral;
+    color: @iconColorHover;
     cursor: pointer;
 }
+.admin-manage-label>button .material-icons-outlined
+{
+    margin-left: 0rem;
+    margin-right: 0.5rem;
+}
+

@@ -145,7 +145,7 @@ def layout():
             html.Header(headerRow, id="app-export-header"),
             html.Section(sensorRow),
             html.Section(dateRow),
-            html.Section(buttonRow),
+            html.Section(buttonRow, id="apps-export-button-section"),
             html.Section("-- data table --", id="apps-export-dt-section"),
         ],
         id="app-export-container",

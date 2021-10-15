@@ -24,8 +24,11 @@
   padding-left: 1rem;
   padding-right: 1rem;
 }
+#app-export-container > section#apps-export-button-section {
+  margin-top: 1rem;
+}
 #app-export-container > section:last-child {
-  margin-top: 0.5rem;
+  margin-top: 1rem;
   padding: 0rem;
 }
 #app-export-container .apps-export-label {
