@@ -1,0 +1,299 @@
+/*-----------------------------------------------------
+    + v0.1
+    + 웹사이트 전체적인 테마를 설정
+    + 2021.09.09 by DrBAE : amadeus.bae@gmail.com
+-----------------------------------------------------*/
+/*-----------------------------------------------------
+    + v1
+    + less 공통 변수 정의
+    + 2021.10.08 by DrBAE : amadeus.bae@gmail.com
+-----------------------------------------------------*/
+html {
+  font-size: 100%;
+}
+body {
+  background-color: #F0F1F2;
+}
+.font-sc {
+  font-variant: small-caps;
+}
+.btn {
+  display: flex;
+}
+.flex-h {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: flex-end;
+}
+.flex-h-right {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  align-content: center;
+  align-items: flex-end;
+}
+.mr1 {
+  margin-right: 1rem;
+}
+.flex-v {
+  display: flex!important;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-content: flex-start;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+.flex-v-center {
+  display: flex!important;
+  flex-direction: column;
+  align-content: center;
+  justify-content: flex-start;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+/* ----[ app-container ]---- */
+#app-container {
+  position: absolute;
+  width: 100%;
+  top: 0px;
+  bottom: 0px;
+  display: flex;
+  flex-direction: column;
+  background-color: #F0F1F2;
+}
+/* ----[ app-content ]---- */
+#app-content {
+  align-self: center;
+  width: 100%;
+  flex-grow: 1;
+  background-color: #F5F6F7;
+  background-blend-mode: darken;
+  background-image: url('http://getwallpapers.com/wallpaper/full/a/5/d/544750.jpg');
+  background-repeat: no-repeat;
+}
+.content-pad {
+  padding: 1rem 0 0 1rem;
+}
+/* ----[ app-sidebar ]---- */
+#app-sidebar {
+  background-color: transparent;
+  font-size: 1.1rem;
+}
+#app-sidebar.li {
+  margin-bottom: 0rem;
+}
+#app-sidebar ul.nav.nav-pills {
+  flex-grow: 1;
+  align-items: center;
+}
+#app-sidebar .nav-link {
+  padding: 0.5rem 0.5rem;
+}
+/* ----[ app-sidebar: brand ]---- */
+#app-sidebar-brand img {
+  height: 32px;
+  /* margin-right: 5px; */
+}
+/* ----[ app-sidebar: login ]---- */
+#app-sidebar-login {
+  display: flex;
+  flex-grow: 1;
+  justify-content: flex-end;
+  align-items: center;
+}
+.material-icons-two-tone {
+  align-items: center;
+  padding-right: 0.3rem;
+  padding-left: 0.3rem;
+}
+.material-icons-two-tone.md-dark {
+  filter: contrast(4) invert(0.5);
+}
+.material-icons-two-tone.md-light {
+  filter: contrast(4) invert(0.8);
+}
+.material-icons-two-tone.md-color {
+  color: #539BF5;
+}
+.material-icons.md-dark {
+  color: rgba(0, 0, 0, 0.54);
+}
+.material-icons.md-dark.md-inactive {
+  color: rgba(0, 0, 0, 0.26);
+}
+.material-icons.md-light {
+  color: #ffffff;
+}
+.material-icons.md-light.md-inactive {
+  color: rgba(255, 255, 255, 0.3);
+}
+#app-sidebar-login a {
+  display: flex;
+  align-items: center;
+  align-content: center;
+}
+/* ----[ app-sidebar: GitHub ]---- */
+#app-sidebar-github {
+  display: flex;
+  flex-grow: 0;
+  justify-content: flex-end;
+}
+#app-sidebar-github div,
+#app-sidebar-github div:hover {
+  width: 24px;
+  height: 24px;
+  background-image: url(/assets/img/github.svg);
+}
+#app-sidebar-github div {
+  background-image: url(/assets/img/github.svg);
+}
+#app-sidebar-github div:hover {
+  background-image: url(/assets/img/github_dark.svg);
+}
+/*  SVG fill color: not applied to svg wrapped by <img> */
+#app-sidebar-github path {
+  fill: #444C56;
+}
+#app-sidebar-github path:hover {
+  fill: #539BF5;
+}
+#lm-profile-container {
+  min-width: 600px;
+  height: 100%;
+  border: yellowgreen solid 1px;
+  background-color: #F5F6F7;
+}
+#lm-profile-header {
+  display: flex;
+  width: 100%;
+}
+#lm-profile-menu a:hover {
+  color: coral;
+}
+#lm-profile-container section {
+  margin-bottom: 0rem;
+}
+#lm-profile-container h5 {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+#lm-profile-container h5 > span.material-icons-outlined {
+  margin-left: 1rem;
+}
+#lm-profile-container span.material-icons-outlined {
+  color: rgba(160, 82, 45, 0.52);
+}
+#lm-profile-container span.material-icons-outlined:hover {
+  color: coral;
+  cursor: pointer;
+}
+#lm-profile-container section > label {
+  margin-left: 1rem;
+  width: 90%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+#lm-profile-container label > span:nth-child(3n-2) {
+  width: 25%;
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 1rem;
+}
+#lm-profile-container label > input {
+  width: 50%;
+}
+#lm-profile-container label > span:nth-child(3n) {
+  display: flex;
+  justify-content: flex-start;
+}
+#lm-profile-container label span.material-icons-outlined {
+  width: 1.5rem;
+  margin-left: 0.5rem;
+  justify-content: flex-start;
+  padding-right: 0rem;
+}
+#app-cams-container {
+  flex-grow: 1;
+  align-self: flex-start;
+  width: 100%;
+  min-width: 800px;
+  max-width: 100%;
+  padding: 1rem 1rem 0rem 1rem;
+  background-color: #F0F1F2;
+}
+.app-cams-table {
+  border-collapse: separate;
+  width: 100%;
+}
+.app-cams-table tr {
+  width: 100%;
+}
+.app-cams-table td {
+  vertical-align: middle;
+  font-family: Consolas;
+  padding: 0px;
+  border: none;
+}
+.apps-cams-table-tr td {
+  width: 50%;
+}
+.apps-cams-table-tr td:nth-child(2n-1) {
+  padding-right: 0.5rem;
+}
+.apps-cams-table-tr td:nth-child(2n) {
+  padding-left: 0.5rem;
+}
+.apps-cams-graph-container {
+  min-width: 480px;
+  max-width: 920px;
+  margin-bottom: 1rem;
+}
+.apps-cams-graph {
+  border: 1px solid lightgray;
+  aspect-ratio: 1.618;
+}
+.apps-cams-graph-info {
+  border: rgba(154, 205, 50, 0.52) dashed 1px;
+  padding: 0.2rem 0.5rem 0.5rem 1rem;
+  background-color: ivory;
+  color: rgba(0, 0, 0, 0.64);
+  font-style: italic;
+}
+.apps-cams-graph-container .legend > rect {
+  fill-opacity: 0.5;
+  border: gray solid 2px;
+}
+.apps-cams-graph-container text.gtitle {
+  font-variant: small-caps;
+}
+.app-cams-table label {
+  margin-left: 1rem;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  cursor: pointer;
+}
+.app-cams-table label * {
+  cursor: pointer;
+}
+.app-cams-table label > *:nth-child(2n -1) {
+  width: 5rem;
+}
+.app-cams-table label > *:nth-child(2n) {
+  width: 16rem;
+}
+.DateInput_input {
+  font-weight: inherit;
+}
+/* log message */
+.log-listing {
+  width: 100%;
+  color: darkblue;
+  font-size: 1em;
+  font-family: Consolas;
+}

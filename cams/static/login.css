@@ -1,0 +1,115 @@
+/* Made with love by Mutiullah Samim*/
+@import "/assets/css/font.css";
+@font-face {
+  font-family: 'Varela Round';
+  font-style: normal;
+  font-weight: 400;
+  src: url(https://fonts.gstatic.com/s/varelaround/v13/w8gdH283Tvk__Lua32TysjIfp8uK.ttf) format('truetype');
+}
+#app-loginpage.app-signup {
+  background-image: url('https://getwallpapers.com/wallpaper/full/a/9/b/34510.jpg');
+}
+#app-loginpage {
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  width: 100% !important;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  background-color: rgba(0, 0, 0, 0.6);
+  background-blend-mode: darken;
+  background-image: url('http://getwallpapers.com/wallpaper/full/a/5/d/544750.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  font-family: Varela Round, sans-serif;
+  font-weight: normal;
+}
+#app-loginpage .card {
+  width: 400px;
+  height: 370px;
+  margin-top: auto;
+  margin-bottom: auto;
+  background-color: rgba(0, 0, 0, 0.5) !important;
+}
+#app-loginpage .card.card-height-auto {
+  height: auto;
+}
+#app-loginpage .card-header h3 {
+  color: white;
+}
+#app-loginpage .card-footer div {
+  line-height: 200%;
+}
+#app-loginpage .social_icon {
+  position: absolute;
+  right: 20px;
+  top: -45px;
+  line-height: 100%;
+}
+#app-loginpage .social_icon span {
+  font-size: 60px;
+  margin-left: 10px;
+  color: #FFC312;
+  fill: #FFC312;
+}
+#app-loginpage .social_icon span:hover {
+  color: #FFFFFF;
+  fill: #FFFFFF;
+  cursor: pointer;
+}
+#app-loginpage #lm-login-kakao {
+  display: inline-block;
+  height: 60px;
+  aspect-ratio: 1;
+}
+#app-loginpage .input-group-prepend span {
+  width: 50px;
+  background-color: #FFC312;
+  color: black;
+  border: 0 !important;
+}
+#app-loginpage span.input-group-text {
+  justify-content: center;
+}
+#app-loginpage input.form-control {
+  font-family: Consolas, Courier, monospace;
+}
+#app-loginpage input:focus {
+  outline: 0 0 0 0  !important;
+  box-shadow: 0 0 0 0 !important;
+}
+#app-loginpage .remember {
+  color: white;
+}
+#app-loginpage .remember input {
+  width: 20px;
+  height: 20px;
+  margin-left: 15px;
+  margin-right: 5px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center!important;
+}
+#app-loginpage .remember label {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center!important;
+}
+#app-loginpage .login_btn {
+  color: black;
+  background-color: #FFC312;
+  width: 100px;
+}
+#app-loginpage .login_btn:hover {
+  color: black;
+  background-color: white;
+}
+#app-loginpage .links {
+  color: white;
+}
+#app-loginpage .links a {
+  margin-left: 4px;
+}

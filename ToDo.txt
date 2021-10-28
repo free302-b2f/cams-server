@@ -1,0 +1,29 @@
+====[ 진행중 ]====
+
++ 사용자 인증
++ 디비설계: 농장 센서 데이터 설정
+
++ 사용자 선택사항을 cookies? db? 에 저장
+ - 선택창: dash popup/modal 만들기
+
++ column name UI상 텍스트 조정
+ - talbe: 가능
+ - graph: ?
+
++ index.py.display_page()
+  - router에 없는 pahtname에대해 서버에 redicrect() 처리
+
+
+
+====[ 완료 ]====
+
+
++ mongodb
+ - cursor -> dash.DataTable 변환 : 실패
+
++ loading timing
+ - dash 기능 이용: custom timing event
+ - 모든 app .py 로딩시... 아무 코드도 실행되지 않게?
+
++ menubar 
+ - logo ~ NavBarSimple -> navBar 변경 필요

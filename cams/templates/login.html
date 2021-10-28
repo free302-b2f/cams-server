@@ -1,0 +1,32 @@
+{#<!----------------------------------------------------- 
+    + v0.1
+    + 로그인 뷰의 템플릿
+    + 2021-09-09 by DrBAE : amadeus.bae@gmail.com
+ ----------------------------------------------------->#}
+
+{% extends 'login_base.html' %}
+
+{% block card_header_text %}
+{% block title %}Sign In{% endblock %}
+{% endblock %}
+
+
+{% block card_body %}
+<!-- remember me -->
+<div class="row align-items-center remember">
+    <label><input type="checkbox">Remember Me</label>
+</div>
+{% endblock %}
+
+
+{% block form_action_path %}"/login"{% endblock %}
+
+{% block form_button_text %}Sign In{% endblock %}
+
+{% block card_footer_1 %}
+<!-- Link to Sign Up -->
+<div class="d-flex justify-content-center links">Don't have an account?
+    <a href="/signup">Sign Up!</a>
+</div>
+{% endblock %}
+

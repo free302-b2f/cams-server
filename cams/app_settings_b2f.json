@@ -1,0 +1,37 @@
+{
+    "logging": {
+        "Level": "DEBUG",
+        "DevUi": true
+    },
+    "Mongo": {
+        "Name": "MongoDB",
+        "Ip": "bit2farm.iptime.org",
+        "Port": 27111,
+        "Db": "DB_CAMs",
+        "User": "CAMs",
+        "Pw": "best"
+    },
+    "Postgres": {
+        "Name": "PostgreSQL",
+        "Ip": "bit2farm.iptime.org",
+        "Port": 25432,
+        "Db": "db_cams",
+        "User": "cams",
+        "Pw": "best",
+        "DropTables": false
+    },
+    "Cams": {
+        "DbmsKey": "Mongo"        
+    },
+    "LoginManager": {
+        "SECRET_KEY": "605feac2f60784caf7126e08f69932b4915b4fc3bf590881"
+    },
+    "WebSocket": {
+        "HostName": "local",
+        "host": "bit2farm.iptime.org",
+        "local": "localhost",
+        "port": 28765,
+        "API_KEY": "605FEAC2F60784CAF7126E08F69932B4915B4FC3BF590881",
+        "rate": 1
+    }
+}

@@ -1,0 +1,10 @@
+{
+    "WebSocket": {
+        "HostName": "local",
+        "host": "bit2farm.iptime.org",
+        "local": "localhost",
+        "port": 28765,
+        "API_KEY": "605FEAC2F60784CAF7126E08F69932B4915B4FC3BF590881",
+        "rate": 1
+    }
+}

@@ -1,0 +1,145 @@
+/* Made with love by Mutiullah Samim*/
+
+// @import url('https://fonts.googleapis.com/css?family=Numans');
+@import url('https://fonts.googleapis.com/css?family=Varela%20Round');
+// @import url('https://fonts.googleapis.com/css?family=Tangerine');
+@import "/assets/css/font.css";
+@icon_color : #FFC312;
+@icon_hover : #FFFFFF;
+@icon_height : 60px;
+@font_page : Varela Round;//Myriad Semibold;
+@font_input : Consolas;
+
+// singup page
+#app-loginpage.app-signup
+{
+    background-image: url('https://getwallpapers.com/wallpaper/full/a/9/b/34510.jpg');
+}
+
+// login page
+#app-loginpage
+{
+    //위치와 크기
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    width: 100% !important;
+    height: 100%;
+
+    //내용배치
+    display: flex;
+    flex-direction: column;//주축: 상하
+    align-content: center;//크로스축: 가로 중앙
+
+    //색깔 배경 등
+    background-color: rgba(0, 0, 0, 0.6);
+    background-blend-mode: darken;
+    background-image: url('http://getwallpapers.com/wallpaper/full/a/5/d/544750.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+
+    //글꼴
+    font-family: @font_page, sans-serif;
+    font-weight: normal;
+    //font-size: 1.5rem;
+    //line-height: 2.0;
+    
+    .card
+    {
+        width: 400px;
+        height: 370px;
+        margin-top: auto;
+        margin-bottom: auto;
+        background-color: rgba(0,0,0,0.5) !important;
+    }
+    .card.card-height-auto { height: auto; }
+    .card-header h3 { color: white; }
+    .card-footer div { line-height: 200%; }
+
+    .social_icon
+    {
+        position: absolute;
+        right: 20px;
+        top: -45px;
+        line-height: 100%;
+    }
+    .social_icon span //, #lm-login-kakao
+    {
+        font-size: @icon_height;
+        margin-left: 10px;
+        color: @icon_color;
+        fill: @icon_color;
+    }
+    .social_icon span:hover //, #lm-login-kakao:hover
+    {
+        color: @icon_hover;
+        fill: @icon_hover;
+        cursor: pointer;
+    }
+
+    #lm-login-kakao
+    {
+        display: inline-block;
+        height: @icon_height;
+        aspect-ratio: 1;
+        // margin-top: 10px;
+        // padding-top: 0px;
+        // margin-left: 10px;
+        // fill: #FFC312;
+        // content: url(/assets/img/kakao.svg);
+    }
+    
+    .input-group-prepend span
+    {
+        width: 50px;
+        background-color: #FFC312;
+        color: black;
+        border:0 !important;
+    }
+    
+    span.input-group-text{ justify-content: center; }
+    input.form-control{ font-family: @font_input, Courier, monospace; }
+
+    input:focus
+    {
+        outline: 0 0 0 0  !important;
+        box-shadow: 0 0 0 0 !important;
+    }
+    
+    .remember{ color: white; }
+    
+    .remember input
+    {
+        width: 20px;
+        height: 20px;
+        margin-left: 15px;
+        margin-right: 5px;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center!important;
+    }
+    .remember label
+    {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center!important;
+    }
+    
+    .login_btn{
+        color: black;
+        background-color: #FFC312;
+        width: 100px;
+    }
+    
+    .login_btn:hover
+    {
+        color: black;
+        background-color: white;
+    }
+    
+    .links{ color: white; }
+    
+    .links a{ margin-left: 4px; }
+
+}

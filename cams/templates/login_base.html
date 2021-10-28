@@ -1,0 +1,98 @@
+{#<!----------------------------------------------------- 
+    + v0.1
+    + 로그인 뷰의 베이스 템플릿
+    + 2021-09-09 by DrBAE : amadeus.bae@gmail.com
+    ***extends 이후 block 밖이 있는 것은 무시된다***
+ ----------------------------------------------------->#}
+
+<!doctype html>
+<title>{% block title %}{% endblock %} - Bit2Farm</title>
+
+<link rel="icon" type="image/x-icon" href="/assets/img/favicon.ico">
+
+<!-- bootstrap  -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+    integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+<!-- fontawesome -->
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css"
+    integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+
+<!-- google font -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Icons+Two+Tone" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
+
+<div id="app-loginpage" {% block page_container_class %}{% endblock %}>
+    <div class="d-flex justify-content-center h-100">
+
+        <!-- card -->
+        <div class="card card-height-auto">
+
+            <!-- card header -->
+            <div class="card-header">
+                <h3 class="font-small-caps">{% block card_header_text %}{% endblock %}</h3>
+                <div class="d-flex justify-content-end social_icon">
+                    <span><i class="fab fa-facebook-square"></i></span>
+                    <span><i class="fab fa-google-plus-square"></i></span>
+                    <span><i class="fab fa-twitter-square"></i></span>
+                    <span>
+                        <svg id="lm-login-kakao"><use xlink:href="/assets/img/kakao.svg#icon"></use></svg>
+                    </span>
+                </div>
+            </div>
+
+            <!-- card body -->
+            <div class="card-body">
+                <form id="lm-form" enctype="multipart/form-data" method="POST"
+                    action={% block form_action_path %}{% endblock %}
+                    onsubmit="lmSubmit(event)">
+
+                <!-- username -->
+                <div class="input-group form-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                    </div>
+                    <input name="lm-login-username" id="lm-login-username" class="form-control" 
+                        maxlength={{max_username}} placeholder="login id" required type="text">
+                </div>
+
+                <!-- password -->
+                <div class="input-group form-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-key"></i></span>
+                    </div>
+                    <input name="lm-login-password" id="lm-login-password" class="form-control" 
+                        maxlength={{max_password}} placeholder="password" required type="password">
+                </div>
+                
+                {% block card_body %}{% endblock %}                
+
+                <!-- status: server side validation result -->
+                <div id="lm-login-status" class="d-flex justify-content-center text-danger"></div>
+
+                <!-- submit -->
+                <div class="form-group">
+                    <button name="lm-login-button" 
+                    type="submit"
+                    class="btn float-right login_btn btn btn-secondary"
+                    >{% block form_button_text %}{% endblock %}</button>
+                </div>                
+            </form></div>
+            <!-- end of card body -->
+
+            <!-- card footer -->
+            <div class="card-footer">
+                {% block card_footer_1 %}{% endblock %}                
+                <div class="d-flex justify-content-center">
+                    <a href="#">Forgot your password?</a>
+                </div>
+            </div>
+
+        </div>
+        <!-- end of card -->
+
+    </div>    
+</div>
+
+<script src="{{url_for('static', filename='login.js')}}"></script>
+

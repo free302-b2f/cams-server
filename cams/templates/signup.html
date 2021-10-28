@@ -1,0 +1,65 @@
+{#<!----------------------------------------------------- 
+    + v0.1
+    + 사인업 뷰의 템플릿2
+    + 2021-09-09 by DrBAE : amadeus.bae@gmail.com
+ ----------------------------------------------------->#}
+
+{% extends 'login_base.html' %}
+<!-- extends 이후 block 밖이 있는 것은 무시된다 -->
+
+{% block page_container_class %}class="app-signup"{% endblock %}
+
+{% block card_header_text %}
+{% block title %}Sign Up{% endblock %}
+{% endblock %}
+
+
+{% block card_body %}
+<!-- password confirm -->
+<div class="input-group form-group">
+    <div class="input-group-prepend">
+        <span class="input-group-text"><i class="fas fa-key"></i></span>
+    </div>
+    <input name="lm-login-password-confirm" id="lm-login-password-confirm" class="form-control" 
+        oninput="validatePassword('lm-login-password', 'lm-login-password-confirm')"
+        maxlength={{max_password}} placeholder="password" required type="password">
+</div>
+
+<!-- email -->
+<div class="input-group form-group">
+    <div class="input-group-prepend">
+        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+    </div>
+    <input name="lm-login-email" id="lm-login-email" class="form-control" 
+        maxlength={{max_email}} placeholder="email address" required type="email">
+</div>
+
+<!-- realname -->
+<div class="input-group form-group">
+    <div class="input-group-prepend">
+        <span class="input-group-text">
+            <!-- <i class="fas fa-envelope"></i> -->
+            <span class="material-icons-two-tone">badge</span>
+        </span>
+    </div>
+    <input name="lm-login-realname" id="lm-login-realname" class="form-control" 
+        maxlength={{max_realname}} placeholder="real name" required type="text">
+</div>
+
+{% endblock %}
+
+
+{% block form_action_path %}"/signup"{% endblock %}
+{% block form_button_text %}Sign Up{% endblock %}
+
+
+{% block card_footer_1 %}
+<!-- Link to Sign Up -->
+<div class="d-flex justify-content-center links">Already have an account?
+    <a href="/login">Sign In!</a>
+</div>
+{% endblock %}
+
+
+{% block page_footer %}
+{% endblock %}   

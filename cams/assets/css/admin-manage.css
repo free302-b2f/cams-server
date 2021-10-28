@@ -1,0 +1,89 @@
+/*-----------------------------------------------------
+    + admin.manage 뷰의 스타일
+    + 2021.10.08 by DrBAE : amadeus.bae@gmail.com
+-----------------------------------------------------*/
+/*-----------------------------------------------------
+    + v1
+    + less 공통 변수 정의
+    + 2021.10.08 by DrBAE : amadeus.bae@gmail.com
+-----------------------------------------------------*/
+#admin-manage-container {
+  min-width: 800px;
+  max-width: 1900px;
+  height: 100%;
+  border: yellowgreen solid 1px;
+  background-color: #F5F6F7;
+}
+#admin-manage-container > header {
+  display: flex;
+  width: 100%;
+}
+#admin-manage-container > section {
+  display: flex;
+  width: 100%;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+#admin-manage-container > section:last-child {
+  margin-top: 2rem;
+}
+.admin-manage-add-section {
+  flex-direction: column;
+}
+.admin-manage-add-section > hr {
+  width: 100%;
+}
+.admin-manage-label {
+  width: max-content;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+.admin-manage-label > *:nth-child(5n-4) {
+  width: 7rem;
+  display: flex;
+  justify-content: flex-start;
+}
+.admin-manage-label > *:nth-child(5n-3) {
+  width: auto;
+}
+.admin-manage-label > *:nth-child(5n-2) {
+  width: 17.8rem;
+}
+.admin-manage-label > *:nth-child(5n -1),
+.admin-manage-label > *:nth-child(5n) {
+  width: auto;
+}
+.admin-manage-add-label {
+  width: 30rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+.admin-manage-label > button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.admin-manage-label > button:hover {
+  border: yellowgreen dashed 1px;
+  color: coral;
+  cursor: pointer;
+}
+.admin-manage-label > button:focus,
+.admin-manage-label > button:focus-visible {
+  border: yellowgreen solid 1px;
+  outline: none;
+}
+.admin-manage-label .material-icons-outlined {
+  margin-left: 0.5rem;
+  color: rgba(160, 82, 45, 0.52);
+}
+.admin-manage-label .material-icons-outlined:hover {
+  color: coral;
+  cursor: pointer;
+}
+.admin-manage-label > button .material-icons-outlined {
+  margin-left: 0rem;
+  margin-right: 0.5rem;
+}

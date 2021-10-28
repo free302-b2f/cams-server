@@ -1,0 +1,97 @@
+/*-----------------------------------------------------
+    + apps.export 뷰의 스타일
+    + 2021.10.08 by DrBAE : amadeus.bae@gmail.com
+-----------------------------------------------------*/
+/*-----------------------------------------------------
+    + v1
+    + less 공통 변수 정의
+    + 2021.10.08 by DrBAE : amadeus.bae@gmail.com
+-----------------------------------------------------*/
+#app-export-container {
+  min-width: 800px;
+  max-width: 1900px;
+  height: 100%;
+  border: yellowgreen solid 1px;
+  background-color: #F5F6F7;
+}
+#app-export-container > header {
+  display: flex;
+  width: 100%;
+}
+#app-export-container > section {
+  display: flex;
+  width: 100%;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+#app-export-container > section#apps-export-button-section {
+  margin-top: 1rem;
+}
+#app-export-container > section:last-child {
+  margin-top: 1rem;
+  padding: 0rem;
+}
+#app-export-container .apps-export-label {
+  width: 27rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+#app-export-container .apps-export-label > *:nth-child(3n-2) {
+  width: 7rem;
+  display: flex;
+  justify-content: flex-start;
+}
+#app-export-container .apps-export-label > *:nth-child(3n-1) {
+  width: auto;
+}
+#app-export-container .apps-export-label > *:nth-child(3n) {
+  width: 17.8rem;
+}
+#app-export-container .apps-export-label > button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#app-export-container .apps-export-label > button:hover {
+  border: yellowgreen dashed 1px;
+  color: coral;
+  cursor: pointer;
+}
+#app-export-container .apps-export-label > button:focus,
+#app-export-container .apps-export-label > button:focus-visible {
+  border: yellowgreen solid 1px;
+  outline: none;
+}
+#apps-export-rows {
+  font-family: Consolas;
+  font-style: oblique;
+  justify-content: flex-end !important;
+  padding-right: 1rem;
+  color: #1100fb;
+}
+#apps-export-dt-table {
+  width: 100%;
+}
+#apps-export-dt-table th {
+  background: linear-gradient(0deg, #a6b9d1, rgba(166, 185, 209, 0.2));
+  font-family: Arial, Helvetica, sans-serif;
+}
+#apps-export-dt-table td {
+  font-family: Consolas;
+}
+#apps-export-dt-table tr:nth-child(odd) {
+  background-color: rgba(0, 127, 251, 0.1) !important;
+}
+#apps-export-dt-table tr > * {
+  background-color: transparent!important;
+}
+#apps-export-dt-table tr:hover {
+  background-color: rgba(255, 192, 203, 0.5) !important;
+}
+.DateRangePickerInput__withBorder {
+  border: none;
+}
+.DateRangePickerInput {
+  background-color: inherit;
+}
