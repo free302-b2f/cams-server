@@ -23,6 +23,8 @@
   width: 100%;
   padding-left: 1rem;
   padding-right: 1rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 #app-export-container > section#apps-export-button-section {
   margin-top: 1rem;

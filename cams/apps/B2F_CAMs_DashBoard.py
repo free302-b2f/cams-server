@@ -8,8 +8,8 @@ from datetime import timedelta, datetime, timezone, time, date
 
 import flask_login as fli
 from plotly.subplots import make_subplots
-import dash_html_components as html
-import dash_core_components as dcc
+from dash import html
+from dash import dcc
 from dash.dependencies import Input, Output, State, MATCH, ALL
 from dash_extensions.enrich import Trigger
 import plotly.express as px

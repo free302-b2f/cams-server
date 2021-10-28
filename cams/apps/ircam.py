@@ -5,8 +5,8 @@ import os
 from ._imports import *
 import flask_login as fli
 from dash import no_update
-import dash_html_components as html
-import dash_core_components as dcc
+from dash import html
+from dash import dcc
 from dash_extensions.enrich import Trigger
 from dash.dependencies import Input, Output, State, MATCH, ALL
 

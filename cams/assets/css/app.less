@@ -9,9 +9,14 @@
 // ====[ 기본설정 - dash 설정 덮어쓰기 ]====
 
 html{ font-size: 100%; }    // reset font size set by dash 'bWLwgP.css'
-body{ background-color: @app_back_color; }
-.font-sc { font-variant: small-caps; }
+body
+{ 
+    background-color: @app_back_color; 
+    font-family: @app_font_family;
+}
 
+a { text-decoration: none; }
+.font-sc { font-variant: small-caps; }
 .btn { display: flex; }
 .flex-h
 {
@@ -118,20 +123,31 @@ body{ background-color: @app_back_color; }
 #app-sidebar
 {
     // background-color: #fdb515; //#f8f9fa;
-    background-color: transparent;
+    // background-color: transparent!important;
     font-size: 1.1rem; // 110% of html
 }
 #app-sidebar.li
 {
     margin-bottom: 0rem;
 }
-#app-sidebar ul.nav.nav-pills
+#app-sidebar .navbar-nav.nav-pills
 {
-    flex-grow: 1;
+    // flex-grow: 1;
+    width: 100%;
     align-items: center;
 }
-#app-sidebar .nav-link{
+#app-sidebar .nav-link
+{
     padding: .5rem .5rem;
+    color: @sidebar_color;
+}
+#app-sidebar .nav-link:hover
+{
+    color: @sidebar_color_hover;
+}
+#app-sidebar .nav-link:active, #app-sidebar .nav-link.active
+{
+    color: white;
 }
 
 /* ----[ app-sidebar: brand ]---- */

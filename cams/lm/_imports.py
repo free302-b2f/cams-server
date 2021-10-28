@@ -11,8 +11,8 @@
 #dash
 import dash
 from dash import callback_context as cbc
-import dash_core_components as dcc
-import dash_html_components as html
+from dash import html
+from dash import dcc
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output, State, MATCH, ALL
 

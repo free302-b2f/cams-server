@@ -9,8 +9,12 @@ if __name__ == "__main__":
     sys.path.append(dir)
 
 from apps._imports import *
+from datetime import date, datetime, time, timedelta, timezone
+from pymongo import MongoClient
+from bson.raw_bson import RawBSONDocument
 import threading
 from time import sleep
+# from utility import loadAppSettings
 
 # region ---- DB Server & Connection ----
 
@@ -28,9 +32,9 @@ def _seed():
     """7개월전 데이터를 현재 날짜로 복사"""
 
     now = datetime.now()
-    date = datetime(2021, 2, now.day).strftime("%Y%m%d")
+    date = datetime(2021, 3, now.day).strftime("%Y%m%d")
     sec = 30 if now.second > 15 and now.second < 45 else 0
-    time = datetime(2021, 2, 15, hour=now.hour, minute=now.minute, second=sec).strftime(
+    time = datetime(2021, 3, 15, hour=now.hour, minute=now.minute, second=sec).strftime(
         "%H:%M:%S"
     )
     print(f"copying: {date} {time}")

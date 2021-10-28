@@ -1,17 +1,12 @@
 """CAMs 데이터를 다운로드 하는 페이지"""
 
-from ._imports import *
+print(f"<{__name__}> loading...")
 
-debug("loading...")
-from datetime import timedelta, datetime, timezone, time, date
+from ._imports import *
 import pandas as pd
-import flask_login as fli
-from dash import no_update
-from dash.dependencies import Input, Output, State, MATCH, ALL
-import dash_html_components as html
-import dash_core_components as dcc
-from dash_table import DataTable
-from dash_table.Format import Format, Scheme, Trim
+
+from dash.dash_table import DataTable
+from dash.dash_table.Format import Format, Scheme, Trim
 
 # from db.user import AppUser
 # from db.farm import Farm

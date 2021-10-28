@@ -10,11 +10,6 @@ from datetime import timedelta, datetime, timezone
 from os import path, getcwd
 import sys, json
 
-from dash import callback_context as cbc
-import dash_core_components as dcc
-import dash_html_components as html
-import dash_bootstrap_components as dbc
-
 # endregion
 
 
@@ -44,6 +39,8 @@ def callback_triggered_by(ids: List[str]) -> bool:
 
     :param ids: 체크할 HTML 요소의 ID 목록"""
 
+    from dash import callback_context as cbc
+
     if not cbc.triggered:
         return False
     else:
@@ -54,11 +51,8 @@ def callback_triggered_by(ids: List[str]) -> bool:
         return False
 
 
-_Body = List[Tuple[dbc.Label, dbc.Input]]
-_Footer = List[dbc.Button]
 
-
-def buildPopup(id, header: str, body: _Body = [], footer: _Footer = []) -> dbc.Modal:
+def buildPopup(id, header: str, body = [], footer = []):
     """HTML 팝업창을 만든다.
 
     :param id: 팝업창의 DOM ID
@@ -66,6 +60,8 @@ def buildPopup(id, header: str, body: _Body = [], footer: _Footer = []) -> dbc.M
     :param body: 팝업창의 내용 - label과 input 쌍의 목록
     :param footer: 팝업창의 하단 버튼 목록
     :return dash_bootstrap_components.Modal"""
+
+    import dash_bootstrap_components as dbc
 
     return dbc.Modal(
         [

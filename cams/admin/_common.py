@@ -1,8 +1,8 @@
 """패키지 admin 에서 공통으로 사용하는 함수"""
 
 from ._imports import *
-import dash_html_components as html
-import dash_core_components as dcc
+from dash import html
+from dash import dcc
 
 def buildButtonRow(buttonText, modelName, showUpdateIcon: bool = True):
     """추가 항목에 사용할 버튼 생성"""
