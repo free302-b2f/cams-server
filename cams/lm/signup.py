@@ -1,3 +1,7 @@
+"""사인업 뷰"""
+
+print(f"<{__name__}> loading...")
+
 from lm._imports import *
 # from db import get_dba #db sql alchemy
 from db.user import AppUser
@@ -5,7 +9,7 @@ from app import app, debug
 import json
 
 
-_ctx = AppUser.max_len()
+# _ctx = AppUser.max_len()
 
 
 @app.server.route("/signup", methods=["GET", "POST"])
@@ -50,4 +54,6 @@ def signup():
 def set_login_context():
     """세션 컨텍스트에 추가할 dict을 리턴한다"""
 
-    return _ctx
+    print(f"lm.signup.set_login_context(): entering...")
+
+    return AppUser.max_len() #_ctx

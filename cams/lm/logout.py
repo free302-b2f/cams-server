@@ -1,5 +1,7 @@
 """로그아웃 뷰 및 콜백"""
 
+print(f"<{__name__}> loading...")
+
 from lm._imports import *
 from db.user import AppUser
 from app import app, addPage

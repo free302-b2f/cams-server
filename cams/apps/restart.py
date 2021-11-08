@@ -1,11 +1,11 @@
 """사용자 확인을 받아 WSGI 앱 재시작하는 레이아웃과 콜백"""
 
+print(f"<{__name__}> loading...")
+
 from ._imports import *
 import os
 from dash import no_update
-import dash_html_components as html
 import dash_bootstrap_components as dbc
-from dash.dependencies import Input, Output, State, MATCH, ALL
 from utility import buildPopup, callback_triggered_by
 
 # 팝업 레이아웃

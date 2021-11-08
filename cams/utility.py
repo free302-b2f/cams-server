@@ -2,6 +2,8 @@
 코드 중복 방지를 위한 자주 쓰는 함수 모음
 """
 
+print(f"<{__name__}> loading...")
+
 # region ---- imports ----
 
 from types import FunctionType, LambdaType, ModuleType

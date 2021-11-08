@@ -6,6 +6,8 @@
  - Location 제어기: app-url
 """
 
+print(f"<{__name__}> loading...")
+
 # region ---- imports ----
 
 from dash import html

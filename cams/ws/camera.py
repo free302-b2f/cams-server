@@ -1,5 +1,7 @@
 """OpenCV를 이용하여 카메라 설정 및 이미지 추출"""
 
+print(f"<{__name__}> loading...")
+
 import os, cv2 as cv
 import threading, time, queue
 from typing import Any, List

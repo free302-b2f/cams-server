@@ -3,6 +3,8 @@
 + 로그인매니저 초기화
 """
 
+print(f"<{__name__}> loading...")
+
 # region ---- __all__ 정의 ----
 
 __all__ = ["signup", "login", "logout", "profile"]

@@ -1,5 +1,7 @@
 """메타데이터 관리 화면"""
 
+print(f"<{__name__}> loading...")
+
 from ._common import *
 from ._imports import *
 from ._add_farm import *

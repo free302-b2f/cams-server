@@ -1,3 +1,8 @@
+
+"""WsPool 정의"""
+
+print(f"<{__name__}> loading...")
+
 from __future__ import annotations
 import threading
 from typing import Any, Callable, Dict

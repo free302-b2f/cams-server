@@ -2,6 +2,8 @@
 CAMs 센서데이터의 시각화
 """
 
+print(f"<{__name__}> loading...")
+
 from ._imports import *
 import pandas as pd
 from dash_extensions.enrich import Trigger
@@ -15,8 +17,6 @@ from db.farm import Farm
 from db.sensor import Sensor
 from pymongo import MongoClient
 from bson.raw_bson import RawBSONDocument
-
-debug("loading...")
 
 _set = getSettings("Mongo")  # CAMs DB 설정
 _mongo = MongoClient(

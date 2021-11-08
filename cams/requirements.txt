@@ -21,6 +21,7 @@ dash-extensions
 
 opencv-python
 websockets
+paramiko
 
 #mod_wsgi
 # mod_wsgi는 apache에 wsgi 모듈을 추가하는 작업으로

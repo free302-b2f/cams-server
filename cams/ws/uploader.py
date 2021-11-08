@@ -10,6 +10,8 @@
   - 백그라운드로 쓰레드로 실행: run()
 """
 
+print(f"<{__name__}> loading...")
+
 import asyncio, time, threading, datetime
 from asyncio.tasks import sleep
 import websockets  # pip install websockets

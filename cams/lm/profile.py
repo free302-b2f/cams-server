@@ -1,5 +1,7 @@
 """로그인한 사용자의 프로파일 뷰 및 콜백"""
 
+print(f"<{__name__}> loading...")
+
 from lm._imports import *
 import lm.logout
 
@@ -9,7 +11,6 @@ from db.sensor import Sensor
 
 from app import app, addPage
 from dash import no_update
-from dash_extensions.enrich import Trigger
 from apps._imports import *
 
 _userMaxLen = AppUser.max_len()

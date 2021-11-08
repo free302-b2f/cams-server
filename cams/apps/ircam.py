@@ -1,14 +1,14 @@
-from datetime import timedelta, datetime, timezone, time, date
+"""카메라 이미지 뷰어"""
+
+print(f"<{__name__}> loading...")
+
+# from datetime import timedelta, datetime, timezone, time, date
 from time import time as ttime, localtime, sleep
 import os
 
 from ._imports import *
-import flask_login as fli
 from dash import no_update
-from dash import html
-from dash import dcc
 from dash_extensions.enrich import Trigger
-from dash.dependencies import Input, Output, State, MATCH, ALL
 
 from db import sensor, user, farm
 

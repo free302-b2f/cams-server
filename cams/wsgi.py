@@ -1,8 +1,12 @@
 """WSGI application gateway"""
 
+print(f"<{__name__}> loading...")
+
 import sys
 
+#---- [set TEST mode On/Off] ----
 setattr(sys, "_test_", True)
+
 
 from main import app, debug
 

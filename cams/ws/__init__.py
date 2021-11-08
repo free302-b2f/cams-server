@@ -2,6 +2,8 @@
  + __all__ 정의
 """
 
+print(f"<{__name__}> loading...")
+
 # region ---- __all__ 정의 ----
 
 __all__ = ["server", "camera", "pool", "uploader"]

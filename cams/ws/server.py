@@ -1,3 +1,7 @@
+"""웹소켓 서버 구동"""
+
+print(f"<{__name__}> loading...")
+
 import asyncio, threading, websockets, json, logging, os, sys
 from typing import Any, Dict, List, Tuple
 from websockets.exceptions import ConnectionClosed

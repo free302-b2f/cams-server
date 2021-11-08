@@ -1,3 +1,7 @@
+"""로그인 뷰"""
+
+print(f"<{__name__}> loading...")
+
 from lm._imports import *
 from db.user import AppUser
 
