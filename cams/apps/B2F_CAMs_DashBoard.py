@@ -4,16 +4,10 @@ CAMs 센서데이터의 시각화
 
 from ._imports import *
 import pandas as pd
-from datetime import timedelta, datetime, timezone, time, date
-
-import flask_login as fli
-from plotly.subplots import make_subplots
-from dash import html
-from dash import dcc
-from dash.dependencies import Input, Output, State, MATCH, ALL
 from dash_extensions.enrich import Trigger
-import plotly.express as px
+from plotly.subplots import make_subplots
 import plotly.graph_objects as go
+import plotly.express as px
 
 # import db
 from db.user import AppUser
