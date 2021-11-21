@@ -26,7 +26,7 @@ with app.server.app_context():
 
     # load modules & add pages
     #! main_layout을 임포트 하기전에 메뉴등록하는 페이지를 전부 임포트해야한다.
-    from db import *
+    # from db import * # db 패키지에서 자체적으로 모두 로딩한다.
     from lm import *
     from apps import *
     from admin import *

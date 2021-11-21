@@ -3,7 +3,6 @@
 print(f"<{__name__}> loading...")
 
 from lm._imports import *
-# from db import get_dba #db sql alchemy
 from db.user import AppUser
 from app import app, debug
 import json
@@ -51,9 +50,9 @@ def signup():
 
 
 @app.server.context_processor
-def set_login_context():
+def set_context():
     """세션 컨텍스트에 추가할 dict을 리턴한다"""
 
-    print(f"lm.signup.set_login_context(): entering...")
+    debug("set_context()")
 
     return AppUser.max_len() #_ctx

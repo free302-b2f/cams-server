@@ -104,11 +104,8 @@ def addPage(layout, menuName: str = None, menuOrder: int = 0, addPath: str = Non
     if menuOrder == 0:
         menuOrder = len(router) * 10 + 1000
 
-    # null name -> redirect url
-    if menuName is None:
-        debug(addPage, "menuName == None")
-    else:
-        # check duplicated menuName
+    # check duplicated menuName
+    if menuName:
         name_count = len(
             list(filter(lambda x: x[0] == menuName, sidebar_items.values()))
         )

@@ -28,24 +28,28 @@ _app.config.update(
 _app.config.update(SQLALCHEMY_INSTANCE=SQLAlchemy(_app))
 
 
+@_app.before_request
+def before_request():
+    """ """
+
+    fl.g.dba = _app.config["SQLALCHEMY_INSTANCE"]
+    # debug("db.before_request()")
+
+    pass
+
+
 @_app.teardown_appcontext
 def teardown_appcontext(ex):
     """ """
 
-    debug("db.teardown_appcontext()")
+    # debug("db.teardown_appcontext()")
 
     # sqlalchemy 는 자동으로 종료처리한다
     # dba = fl.g.pop("dba", None)
     # if dba:
     #     dba.close()
 
-
-@_app.before_request
-def before_request():
-    """ """
-
-    fl.g.dba = _app.config["SQLALCHEMY_INSTANCE"]
-    debug("db.before_request()")
+    pass
 
 
 # Build Models - import all models

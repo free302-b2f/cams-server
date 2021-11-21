@@ -8,8 +8,6 @@ from db.user import AppUser
 from app import app, debug
 import json
 
-_ctx = AppUser.max_len()
-
 
 @app.server.route("/login", methods=["GET", "POST"])
 def login():
@@ -24,7 +22,6 @@ def login():
 
     # user = User.firstBy(filterBy={"username": un})
     user = AppUser.query.filter_by(username=un).first()
-    
 
     if not user:
         response["cause"] = "lm-login-username"
@@ -34,7 +31,7 @@ def login():
 
         elif wsec.check_password_hash(user.password, pw):
             fli.login_user(user)
-            
+
             response["isOK"] = True
             response["next"] = "/lm-profile"
         else:
@@ -44,6 +41,8 @@ def login():
 
 
 @app.server.context_processor
-def set_login_context():
+def set_context():
 
-    return _ctx
+    debug("set_context()")
+
+    return AppUser.max_len()

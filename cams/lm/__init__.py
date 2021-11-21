@@ -7,7 +7,7 @@ print(f"<{__name__}> loading...")
 
 # region ---- __all__ 정의 ----
 
-__all__ = ["signup", "login", "logout", "profile"]
+__all__ = ["signup", "login", "logout", "profile", "status"]
 
 # endregion
 

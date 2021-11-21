@@ -5,7 +5,7 @@
     },
     "Mongo": {
         "Name": "MongoDB",
-        "Ip": "192.168.0.46",
+        "Ip": "192.168.0.103",
         "Port": 27111,
         "Db": "DB_CAMs",
         "User": "CAMs",
@@ -13,7 +13,7 @@
     },
     "Postgres": {
         "Name": "PostgreSQL",
-        "Ip": "192.168.0.46",
+        "Ip": "192.168.0.103",
         "Port": 25432,
         "Db": "db_cams",
         "User": "cams",
