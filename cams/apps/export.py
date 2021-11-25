@@ -75,8 +75,6 @@ _dt_columns = [
     for h, c in zip(_headers, _meta_cols + _cols)
 ]
 
-_df: pd.DataFrame = None
-
 
 def layout():
     """Dash의 layout을 설정한다"""
@@ -189,18 +187,16 @@ def load_data(sn, start, end) -> pd.DataFrame:
         projection={"_id": False, "FarmName": False, "SN": False},
     ).sort([("Date", 1), ("Time", 1)])
 
-    global _df
-    _df = pd.DataFrame(cursor)
-    debug(load_data, f"{start}~{end}: {_df.shape = }")
+    # global _df
+    df = pd.DataFrame(cursor)
+    debug(load_data, f"{start}~{end}: {df.shape = }")
 
-    if _df.shape[0] and _df.shape[1]:
-        _df = _df.astype(_types, copy=False)  # , errors="ignore")
-        _df["time_key"] = [
-            parseDate(d, t) for d, t in zip(_df["Date"], _df["Time"])
-        ]
-        _df.set_index("time_key", inplace=True)
+    if df.shape[0] and df.shape[1]:
+        df = df.astype(_types, copy=False)  # , errors="ignore")
+        df["time_key"] = [parseDate(d, t) for d, t in zip(df["Date"], df["Time"])]
+        df.set_index("time_key", inplace=True)
 
-    return _df
+    return df
 
 
 @app.callback(
@@ -233,20 +229,26 @@ def update_graph(sensor_id, start_date, end_date):
     State("apps-export-date", "end_date"),
     prevent_initial_call=True,
 )
-def exportAsCsv(n, sensor_id, start, end):
+def exportAsCsv(n, sensor_id, start_date, end_date):
     """export data as csv"""
 
-    if _df is None:
+    if not sensor_id or not start_date or not end_date:
         return no_update
 
-    if not _df.shape[0] or not _df.shape[1]:
+    sn = _sensors[sensor_id].sn
+    start = date.fromisoformat(start_date).strftime("%Y%m%d")
+    end = date.fromisoformat(end_date).strftime("%Y%m%d")
+
+    df = load_data(sn, start, end)
+
+    if not df.shape[0] or not df.shape[1]:
         return no_update
 
-    sn = _sensors[sensor_id].name.replace(" ", "-")
-    fn = f"{sn}_{start}~{end}.csv"
+    sensorName = _sensors[sensor_id].name.replace(" ", "-")
+    fn = f"{sensorName}_{start_date}~{end_date}.csv"
     cols = _meta_cols + _cols
     return dcc.send_data_frame(
-        _df.to_csv,
+        df.to_csv,
         fn,
         # sep="\t",
         float_format="%.2f",
