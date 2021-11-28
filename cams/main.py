@@ -18,16 +18,11 @@ from utility import error, debug, info
 
 with app.server.app_context():
 
-    # db 패키지 초기화 - db 모듈 사용전에 초기화 필요
+    # db, lm 패키지 초기화 & 하위모듈 로딩
     import db
-    
     import lm
-    lm.init_app(app.server, "/login", "/signup", "/lm-profile")
 
-    # load modules & add pages
-    #! main_layout을 임포트 하기전에 메뉴등록하는 페이지를 전부 임포트해야한다.
-    # from db import * # db 패키지에서 자체적으로 모두 로딩한다.
-    from lm import *
+    #! main_layout을 임포트 하기전 메뉴등록하는 모듈 전부 임포트
     from apps import *
     from admin import *
     import main_layout
