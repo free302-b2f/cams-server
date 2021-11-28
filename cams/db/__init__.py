@@ -70,9 +70,9 @@ import db.admin
 if _set["DropTables"]:
 
     # TODO: DO NOT drop sensor_data: data never die!
-    from db.sensor_data import f0_drop_sensor_data, f0_clear_sensor_data
+    from db.sensor_data import f1_drop_sensor_data, f1_clear_sensor_data, f2_create_table
 
-    f0_drop_sensor_data()
+    f1_drop_sensor_data()
     # f0_clear_sensor_data()
 
     _dba = _app.config["SQLALCHEMY_INSTANCE"]
@@ -83,5 +83,6 @@ if _set["DropTables"]:
     # User.__table__.drop(checkfirst=True)
 
     _dba.create_all()
+    f2_create_table()
 
     from . import _seed

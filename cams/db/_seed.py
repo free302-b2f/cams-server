@@ -18,32 +18,35 @@ from db.admin import Cams
 
 dba = fl.g.dba
 
+# 마스터 계정
 # drbae + test farm + test sensor
-pw = wsec.generate_password_hash("3569", method="sha256")
+pw = wsec.generate_password_hash("1q2w#E$R", method="sha256")
 user = AppUser(
-    username="drbae",
+    username="cams",
     password=pw,
     email="amadeus.bae@gmail.com",
-    realname="Samyong Bae",
-    level=1,  # administrator
+    realname="B2F Master",
+    level=2,  # administrator
 )
-farm = Farm(name="B2F Test Farm")
+farm = Farm(name="농장 구역 #1")
 farm.sensors.append(
-    Sensor(sn="B2F_CAMs_2000000000003", name="Test Sensor", desc="DrBAE's Test CAMs")
+    Sensor(sn="B2F_CAMs_2000000000001", name="Test Sensor", desc="DrBAE's Test CAMs")
 )
 user.farms.append(farm)
 dba.session.add(user)
 
+#
 # KIST Pheno
+# 
 pw = wsec.generate_password_hash("kist1966!!!", method="sha256")
 user = AppUser(
     username="pheno",
     password=pw,
     email="kist-pheno@gmail.com",
     realname="Pheno KIST",
-    level=0,
+    level=1,
 )
-farm = Farm(name="KIST Pheno Farm")
+farm = Farm(name="Pheno 구역 #1")
 farm.sensors.append(
     Sensor(sn="B2F_CAMs_1000000000001", name="Lab Sensor 1", desc="KIST CAMs #1")
 )
@@ -71,6 +74,6 @@ dba.session.add(Cams("cams_start_date", datetime.utcnow().isoformat()))
 dba.session.commit()
 
 # 랜덤 센서 데이터 추가
-from .sensor_data import f2_init_and_seed
+from .sensor_data import f3_seed
 
-f2_init_and_seed()
+f3_seed()

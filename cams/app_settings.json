@@ -18,7 +18,7 @@
         "Db": "db_cams",
         "User": "cams",
         "Pw": "best",
-        "DropTables": false
+        "DropTables": true
     },
     "Cams": {
         "DbmsKey": "Mongo"        

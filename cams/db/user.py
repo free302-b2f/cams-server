@@ -44,11 +44,12 @@ class AppUser(fli.UserMixin, dba.Model):
     realname = dba.Column(dba.String(max_password_hash))
     level = dba.Column(dba.Integer, nullable=False, server_default="-2") # 현재 일반유저 TODO: -1로 변경
     # Column('version', Integer, server_default="SELECT MAX(1, MAX(old_versions)) FROM version_table")
-    # -2=잠금, -1=게스트, 0=일반, +1=관리자
-    # 관리자~아이디 승인/관리, 모든 팜/센서 접근()
-    # 일반~소유 팜/센서만 접근
-    # 게스트~팜/센서 소유/접근 불가, 로그인 가능  <-- 최초가입시 상태
-    # 잠금~로그인 불가
+    # -3=탈퇴(삭제예정), -2=잠금(로그인 불가), -1=게스트, 0=일반, +1=그룹관리자, +2=마스터
+    # 마스터: 아이디 승인/관리, 모든 데이터 관리 가능
+    # 그룹관리자: 그룹 일반 아이디 승인/관리, 그룹 소속 데이터 관리, 그룹당 1개
+    # 일반: 그룹 데이터 접근(읽기전용)
+    # 게스트: 로그인 가능, 그룹 없음, 그룹 관리자의 가입승인 필요 <-- 최초가입시 상태
+    # 잠금: 로그인 불가
 
     def __repr__(self):
         return f"<User: {self.username}>"

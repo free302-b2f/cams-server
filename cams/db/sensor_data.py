@@ -35,26 +35,7 @@ _pgc = pg.connect(
 # endregion
 
 
-def f0_drop_sensor_data():
-    """drop sensor_data table"""
-
-    cursor: pge.cursor = _pgc.cursor()
-    cursor.execute("DROP TABLE IF EXISTS sensor_data")
-    _pgc.commit()
-    cursor.close()
-    pass
-
-def f0_clear_sensor_data():
-    """delete all rows from sensor_data"""
-
-    cursor: pge.cursor = _pgc.cursor()
-    cursor.execute("delete from sensor_data")
-    _pgc.commit()
-    cursor.close()
-    pass
-
-
-def f1_check_db_connection():
+def f0_check_db_connection():
     cursor: pge.cursor = _pgc.cursor()
     cursor.execute("SELECT 'hello world'")
     ds = cursor.fetchone()
@@ -64,7 +45,27 @@ def f1_check_db_connection():
     return ds
 
 
-def _create_table(cursor):
+def f1_drop_sensor_data():
+    """drop sensor_data table"""
+
+    cursor: pge.cursor = _pgc.cursor()
+    cursor.execute("DROP TABLE IF EXISTS sensor_data")
+    _pgc.commit()
+    cursor.close()
+    pass
+
+
+def f1_clear_sensor_data():
+    """delete all rows from sensor_data"""
+
+    cursor: pge.cursor = _pgc.cursor()
+    cursor.execute("delete from sensor_data")
+    _pgc.commit()
+    cursor.close()
+    pass
+
+
+def f2_create_table():
     """메타데이터, 센서테이터 테이블 추가"""
 
     # 메타메이터 테이블은 별도 생성할것
@@ -98,6 +99,8 @@ def _create_table(cursor):
         if_not_exists => TRUE);
     SELECT set_chunk_time_interval('sensor_data', INTERVAL '7 days');
     """
+
+    cursor: pge.cursor = _pgc.cursor()
     cursor.execute(create_sensordata_table)
     cursor.execute(create_sensordata_hypertable)
     _pgc.commit()
@@ -110,11 +113,13 @@ def _create_table(cursor):
     ti = cursor.fetchone()
     debug(f"table info: {ti}")
 
+    cursor.close()
 
-def _seed(cursor):
+
+def f3_seed():
     """기본적인 메타데이터 및 랜덤 센서데이터 추가"""
 
-    # 메타데이터는 별도 추가할 것
+    cursor: pge.cursor = _pgc.cursor(cursor_factory=pga.DictCursor)
 
     # 센서 ID 추출
     cursor.execute("SELECT id FROM sensor")
@@ -157,19 +162,13 @@ def _seed(cursor):
     for id in ids:
         for d in dates:
             insert(id, d)
+        break  # 첫번째 센서(테스트 센서)만 추가
+
+    cursor.close()
     pass
 
 
-def f2_init_and_seed():
-    """DBMS에 기본 테이블을 생성한다"""
-
-    cursor: pge.cursor = _pgc.cursor(cursor_factory=pga.DictCursor)
-    _create_table(cursor)
-    _seed(cursor)
-    cursor.close()
-
-
-def f3_copy_mongo():
+def f4_copy_mongo():
     """MonogDB의 센서데이터를 PostgreSQL에 복사한다"""
 
     _db = getSettings("Mongo")
@@ -239,5 +238,6 @@ def f3_copy_mongo():
 
 
 if __name__ == "__main__":
-    f2_init_and_seed()
+    f2_create_table()
+    f3_seed()
     # f3_copy_mongo()
