@@ -1,79 +1,59 @@
 """WebApp 기본 데이터를 DB에 추가
 + 관리자 계정
-+ 추가계정 : pheno
-  - farm 
-  - sensor
-TODO: app_settings.json에서 불러오도록
++ json
 """
 
 from datetime import date, datetime, time, timedelta, timezone
 import flask as fl
 import werkzeug.security as wsec
+from flask_sqlalchemy import SQLAlchemy
 
 #! import all models
-from db.user import AppUser
-from db.farm import Farm
-from db.sensor import Sensor
-from db.admin import Cams
+from .user import AppUser
+from .farm import Farm
+from .sensor import Sensor
+from .admin import Cams
 
-dba = fl.g.dba
+dba: SQLAlchemy = fl.g.dba
 
-# 마스터 계정
-# drbae + test farm + test sensor
-pw = wsec.generate_password_hash("1q2w#E$R", method="sha256")
-user = AppUser(
-    username="cams",
-    password=pw,
-    email="amadeus.bae@gmail.com",
-    realname="B2F Master",
-    level=2,  # administrator
-)
-farm = Farm(name="농장 구역 #1")
-farm.sensors.append(
-    Sensor(sn="B2F_CAMs_2000000000001", name="Test Sensor", desc="DrBAE's Test CAMs")
-)
-user.farms.append(farm)
-dba.session.add(user)
-
-#
-# KIST Pheno
-# 
-pw = wsec.generate_password_hash("kist1966!!!", method="sha256")
-user = AppUser(
-    username="pheno",
-    password=pw,
-    email="kist-pheno@gmail.com",
-    realname="Pheno KIST",
-    level=1,
-)
-farm = Farm(name="Pheno 구역 #1")
-farm.sensors.append(
-    Sensor(sn="B2F_CAMs_1000000000001", name="Lab Sensor 1", desc="KIST CAMs #1")
-)
-farm.sensors.append(
-    Sensor(sn="B2F_CAMs_1000000000002", name="Lab Sensor 2", desc="KIST CAMs #2")
-)
-farm.sensors.append(
-    Sensor(sn="B2F_CAMs_1000000000003", name="Lab Sensor 3", desc="KIST CAMs #3")
-)
-farm.sensors.append(
-    Sensor(sn="B2F_CAMs_1000000000004", name="Lab Sensor 4", desc="KIST CAMs #4")
-)
-farm.sensors.append(
-    Sensor(sn="B2F_CAMs_1000000000005", name="Lab Sensor 5", desc="KIST CAMs #5")
-)
-farm.sensors.append(
-    Sensor(sn="B2F_CAMs_1000000000006", name="Lab Sensor 6", desc="KIST CAMs #6")
-)
-user.farms.append(farm)
-dba.session.add(user)
 
 # 관리 정보 추가
 dba.session.add(Cams("cams_setup_date", datetime.utcnow().isoformat()))
 dba.session.add(Cams("cams_start_date", datetime.utcnow().isoformat()))
 dba.session.commit()
 
-# 랜덤 센서 데이터 추가
-from .sensor_data import f3_seed
+# 마스터 계정
+from . import _seed_master
 
-f3_seed()
+# json 파일에서 읽어와 DB에 추가
+def _load_json_seed(filename: str):
+    import json
+
+    dic = {}
+    with open(filename, "r", encoding="utf-8") as fp:
+        dic.update(json.load(fp))
+
+    jUser = dic["user"]
+    user = AppUser(
+        username=jUser["username"],
+        password=jUser["password"],
+        email=jUser["email"],
+        realname=jUser["realname"],
+        level=jUser["level"],
+    )
+
+    for i, jFarm in enumerate(dic["farm"]):
+        farm = Farm(name=jFarm["name"])
+        for js in dic[f"sensor{i}"]:
+            farm.sensors.append(Sensor(sn=js["sn"], name=js["name"], desc=js["desc"]))
+        user.farms.append(farm)
+
+    dba.session.add(user)
+    dba.session.commit()
+
+
+# KIST Pheno
+# from . import _seed_kist as kist
+# kist.export_json()
+
+_load_json_seed("kist-seed.json")

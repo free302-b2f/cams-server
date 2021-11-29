@@ -45,7 +45,7 @@ def f0_check_db_connection():
     return ds
 
 
-def f1_drop_sensor_data():
+def f1_drop_table():
     """drop sensor_data table"""
 
     cursor: pge.cursor = _pgc.cursor()
@@ -55,7 +55,7 @@ def f1_drop_sensor_data():
     pass
 
 
-def f1_clear_sensor_data():
+def f1_clear_data():
     """delete all rows from sensor_data"""
 
     cursor: pge.cursor = _pgc.cursor()

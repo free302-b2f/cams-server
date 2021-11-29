@@ -4,6 +4,7 @@ CAMs 센서데이터의 시각화
 
 print(f"<{__name__}> loading...")
 
+from db import sensor_data
 from ._imports import *
 import pandas as pd
 from dash_extensions.enrich import Trigger
@@ -128,6 +129,9 @@ def update_graph(sensor_id, date):
     debug(update_graph, f"{sensor_id = }, {date = }")
 
     if date is None:
+        return plotAll(None), plotAll(None), plotAll(None), plotAll(None)
+
+    if not sensor_id in _sensors.keys():
         return plotAll(None), plotAll(None), plotAll(None), plotAll(None)
 
     sensor = _sensors[sensor_id]

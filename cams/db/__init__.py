@@ -30,7 +30,7 @@ _app.config.update(SQLALCHEMY_INSTANCE=SQLAlchemy(_app))
 
 @_app.before_request
 def before_request():
-    """ """
+    """모든 요청 전에 SQLAlchemy를 fl.g에 추가"""
 
     fl.g.dba = _app.config["SQLALCHEMY_INSTANCE"]
     # debug("db.before_request()")
@@ -56,10 +56,10 @@ def teardown_appcontext(ex):
 # *** DO NOT import sensor_data ***
 before_request()
 
-import db.user
-import db.farm
-import db.sensor
-import db.admin
+from . import user
+from . import farm
+from . import sensor
+from . import admin
 
 # from db.user import AppUser
 # from db.farm import Farm
@@ -70,19 +70,21 @@ import db.admin
 if _set["DropTables"]:
 
     # TODO: DO NOT drop sensor_data: data never die!
-    from db.sensor_data import f1_drop_sensor_data, f1_clear_sensor_data, f2_create_table
+    # from db.sensor_data import f1_drop_table, f1_clear_data, f2_create_table
+    from . import sensor_data as sd
 
-    f1_drop_sensor_data()
+    sd.f1_drop_table()
     # f0_clear_sensor_data()
 
-    _dba = _app.config["SQLALCHEMY_INSTANCE"]
-    _dba.drop_all()
+    dba: SQLAlchemy = fl.g.dba
+    dba.drop_all()
     # _db.Model.metadata.bind = _db.engine # drop_all()시 불필요
     # Sensor.__table__.drop(checkfirst=True)
     # Farm.__table__.drop(checkfirst=True)
     # User.__table__.drop(checkfirst=True)
 
-    _dba.create_all()
-    f2_create_table()
+    dba.create_all()
+    sd.f2_create_table()
 
+    # seed meta data
     from . import _seed
