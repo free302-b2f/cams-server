@@ -5,22 +5,23 @@ print(f"<{__name__}> loading...")
 # region ---- imports ----
 
 if __name__ == "__main__":
-    import sys, os.path as path
+    import sys, os
 
-    dir = path.join(path.dirname(__file__), "..")
+    dir = os.path.dirname(os.path.dirname(__file__))
     sys.path.append(dir)
 
 from apps._imports import *
+import utility as util
 from timeit import default_timer as timer
 import random
 
 import psycopg2 as pg
 import psycopg2.extensions as pge
 import psycopg2.extras as pga
-from pymongo import MongoClient
-from bson.raw_bson import RawBSONDocument
 
-import utility as util
+from .group import Group
+from .location import Location
+from .sensor import Sensor
 
 # endregion
 
@@ -76,9 +77,9 @@ def f2_create_table():
     CREATE TABLE IF NOT EXISTS sensor_data (
         id SERIAL, 
         time TIMESTAMPTZ NOT NULL,
-        sensor_id INTEGER,
-        location_id INTEGER,
-        group_id INTEGER,
+        sensor_id INTEGER NOT NULL,
+        location_id INTEGER NOT NULL,
+        group_id INTEGER NOT NULL,
         air_temp DOUBLE PRECISION,
         leaf_temp DOUBLE PRECISION,
         humidity DOUBLE PRECISION,
@@ -121,69 +122,82 @@ def f2_create_table():
     cursor.close()
 
 
-def f3_seed(ids):
+def f3_seed(sensors):
     """기본적인 메타데이터 및 랜덤 센서데이터 추가"""
 
-    cursor: pge.cursor = _pgc.cursor(cursor_factory=pga.DictCursor)
+    try:
+        cursor: pge.cursor = _pgc.cursor(cursor_factory=pga.DictCursor)
 
-    # 센서 ID 추출
-    # cursor.execute("SELECT id FROM sensor")
-    # ids = [x["id"] for x in cursor.fetchall()]
+        # # 센서 ID 추출
+        # if not sensors:
+        #     cursor.execute("SELECT id FROM group limit 1")
+        #     gid = [x["id"] for x in cursor.fetchall()][0]
+        #     cursor.execute(f"SELECT id FROM sensor WHERE group_id = {gid}")
+        #     ids = [x["id"] for x in cursor.fetchall()]
 
-    start = datetime.combine(datetime.now().date(), datetime.min.time())
-    dates = [start + timedelta(days=x) for x in range(-7, 1)]
+        start = datetime.combine(datetime.now().date(), datetime.min.time())
+        dates = [start + timedelta(days=x) for x in range(-7, 1)]
 
-    sql = """INSERT INTO sensor_data 
-        (time, sensor_id, air_temp, leaf_temp, humidity, 
-        light, co2, dewpoint, evapotrans, hd, vpd) 
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) 
-        ON CONFLICT DO NOTHING"""
+        sql = """INSERT INTO sensor_data 
+            (time, sensor_id, location_id, group_id, air_temp, leaf_temp, humidity, 
+            light, co2, dewpoint, evapotrans, hd, vpd) 
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) 
+            ON CONFLICT DO NOTHING"""
 
-    def insert(id: int, d: datetime):
-        debug(f"inserting: {id} @{d}")
-        for x in range(2880):
-            light = random.uniform(80, 100) * (d.hour if d.hour < 13 else 24 - d.hour)
-            cursor.execute(
-                sql,
-                (
-                    d,
-                    id,
-                    round(random.uniform(10, 30), 1),  # air temp
-                    round(random.uniform(10, 30), 1),  # leaf
-                    round(random.uniform(30, 90), 1),  # humidity
-                    round(light, 1),  # light
-                    round(random.uniform(0, 100), 1),  # co2
-                    round(random.uniform(0, 10), 1),  # dewpoint
-                    round(random.uniform(0, 10), 1),
-                    round(random.uniform(0, 10), 1),
-                    round(random.uniform(0, 10), 1),
-                ),
-            )
-            d = d + timedelta(seconds=30)
-        _pgc.commit()
-        pass
+        def insert(sid: int, dt: datetime, lid: int, gid: int):
+            debug(f"inserting: {sid} @{dt}")
+            for x in range(2880):
+                light = random.uniform(80, 100) * (
+                    dt.hour if dt.hour < 13 else 24 - dt.hour
+                )
+                cursor.execute(
+                    sql,
+                    (
+                        dt,
+                        sid,
+                        lid,
+                        gid,
+                        round(random.uniform(10, 30), 1),  # air temp
+                        round(random.uniform(10, 30), 1),  # leaf
+                        round(random.uniform(30, 90), 1),  # humidity
+                        round(light, 1),  # light
+                        round(random.uniform(0, 100), 1),  # co2
+                        round(random.uniform(0, 10), 1),  # dewpoint
+                        round(random.uniform(0, 10), 1),
+                        round(random.uniform(0, 10), 1),
+                        round(random.uniform(0, 10), 1),
+                    ),
+                )
+                dt = dt + timedelta(seconds=30)
+            _pgc.commit()
+            pass
 
-    # 각 센서에 대해 센서데이터 추가
-    for id in ids:
-        for d in dates:
-            insert(id, d)
-        break  # 첫번째 센서(테스트 센서)만 추가
-
-    cursor.close()
+        # 각 센서에 대해 센서데이터 추가
+        for s in sensors:
+            for d in dates:
+                try:
+                    insert(s.id, d, s.location_id, s.group_id)
+                except:
+                    debug(f"failed: {s.id}@{d}")
+                    pass
+    finally:
+        cursor.close()
     pass
 
 
 def f4_copy_mongo():
     """MonogDB의 센서데이터를 PostgreSQL에 복사한다"""
 
+    from pymongo import MongoClient
+    from bson.raw_bson import RawBSONDocument
+
     # mongo
-    _db = getSettings("Mongo")
-    _mongoClient = MongoClient(
-        f'mongodb://{_db["User"]}:{_db["Pw"]}@{_db["Ip"]}:{_db["Port"]}/{_db["Db"]}',
+    set = getSettings("Mongo")
+    mc = MongoClient(
+        f'mongodb://{set["User"]}:{set["Pw"]}@{set["Ip"]}:{set["Port"]}/{set["Db"]}',
         document_class=RawBSONDocument,
     )
-    _camsDb = _mongoClient[_db["Db"]]
-    _sensors = _camsDb["sensors"]
+    _sensors = mc[set["Db"]]["sensors"]
 
     # postgres: sensor 목록
     cursor: pge.cursor = _pgc.cursor(cursor_factory=pga.DictCursor)
@@ -245,7 +259,7 @@ def f4_copy_mongo():
 
 
 if __name__ == "__main__":
+    f1_drop_table()
     f2_create_table()
     f3_seed()
     # f3_copy_mongo()
-

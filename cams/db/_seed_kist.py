@@ -7,7 +7,7 @@ if __name__ == "__main__":
     __package__ = os.path.basename(dir)
     sys.path.append(os.path.dirname(dir))
     # 이렇게 하면 상대경로 임포트시 ImportError는 나지 않지만
-    # db.__init__.py이 로딩되며 
+    # db.__init__.py이 로딩되며
     # 결국 flask.current_app가 필요하다.
 
 from datetime import date, datetime, time, timedelta, timezone
@@ -50,10 +50,7 @@ def dump_json(filename):
 
     # add sensor
     sensors = [
-        Sensor(
-            sn=f"B2F_CAMs_100000000000{i}", name=f"Sensor {i}", desc=f"KIST CAMs #{i}"
-        )
-        for i in range(1, 7)
+        Sensor(sn=f"B2F_CAMs_100000000000{i}", name=f"Sensor {i}") for i in range(1, 7)
     ]
     loc.sensors.extend(sensors)
     group.sensors.extend(sensors)

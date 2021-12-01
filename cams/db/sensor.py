@@ -35,7 +35,6 @@ class Sensor(dba.Model):
     id = dba.Column(dba.Integer, primary_key=True)
     sn = dba.Column(dba.String(max_sn), nullable=False, unique=True)
     name = dba.Column(dba.String(max_name), nullable=False)
-    desc = dba.Column(dba.String(max_desc), nullable=True)
     location_id = dba.Column(dba.Integer, dba.ForeignKey("location.id"), nullable=False)
     location = dba.relationship("Location", backref=dba.backref("sensors", lazy=True))
     group_id = dba.Column(dba.Integer, dba.ForeignKey("app_group.id"), nullable=False)

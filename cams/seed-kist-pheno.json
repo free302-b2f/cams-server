@@ -9,7 +9,7 @@
             "id": null,
             "username": "pheno",
             "email": "kist-pheno@gmail.com",
-            "password": "pbkdf2:sha512:260000$u5dBfID0fYULl5SrDyKzT8fKGa4y5T1z$6c181658101a577a7e31158bcdc7be32952c3481fc0a457c562d4d6314492d75d0467292214d032a0c24bdec9e3b016f346f0f649330bf3c22244e89f128c0bf",
+            "password": "pbkdf2:sha512:260000$aCBrAHoCQu9XziklxVnmG9uaKqfOvOiK$1b7b23a693e846f9a920a73d01f42b647d10d113c6d23e12fe8f5ad9fa6f76535c1bf9ccb77fb77f81f8f65014ed99ec026ab008fa3c1c9c4b5cc13f3efd90ee",
             "realname": "Pheno KIST",
             "level": 1,
             "group_id": null
@@ -28,7 +28,6 @@
             "id": null,
             "sn": "B2F_CAMs_1000000000001",
             "name": "Sensor 1",
-            "desc": "KIST CAMs #1",
             "location_id": null,
             "group_id": null
         },
@@ -36,7 +35,6 @@
             "id": null,
             "sn": "B2F_CAMs_1000000000002",
             "name": "Sensor 2",
-            "desc": "KIST CAMs #2",
             "location_id": null,
             "group_id": null
         },
@@ -44,7 +42,6 @@
             "id": null,
             "sn": "B2F_CAMs_1000000000003",
             "name": "Sensor 3",
-            "desc": "KIST CAMs #3",
             "location_id": null,
             "group_id": null
         },
@@ -52,7 +49,6 @@
             "id": null,
             "sn": "B2F_CAMs_1000000000004",
             "name": "Sensor 4",
-            "desc": "KIST CAMs #4",
             "location_id": null,
             "group_id": null
         },
@@ -60,7 +56,6 @@
             "id": null,
             "sn": "B2F_CAMs_1000000000005",
             "name": "Sensor 5",
-            "desc": "KIST CAMs #5",
             "location_id": null,
             "group_id": null
         },
@@ -68,7 +63,6 @@
             "id": null,
             "sn": "B2F_CAMs_1000000000006",
             "name": "Sensor 6",
-            "desc": "KIST CAMs #6",
             "location_id": null,
             "group_id": null
         }

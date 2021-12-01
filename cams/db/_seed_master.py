@@ -20,13 +20,12 @@ def seed():
     dba: SQLAlchemy = fl.g.dba
 
     # add group
-    group = Group(name="PHENO", desc="KIST Pheno Project")
+    group = Group(name="TEST", desc="개발 테스트 농장")
 
     # add user
-    pw = util.generate_password_hash("1q2w#E$R")
     user = AppUser(
         username="cams",
-        password=pw,
+        password=util.generate_password_hash("1q2w#E$R"),
         email="amadeus.bae@gmail.com",
         realname="B2F Master",
         level=2,  # master
@@ -51,4 +50,4 @@ def seed():
     # 랜덤 센서 데이터 추가
     from . import sensor_data as sd
 
-    sd.f3_seed([s.id for s in sensors])
+    sd.f3_seed(sensors)
