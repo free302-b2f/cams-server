@@ -16,7 +16,7 @@ _farmName = html.Label(
         dcc.Input(
             id="admin-manage-farm-name",
             type="text",
-            maxLength=Farm.max_name,
+            maxLength=Location.max_name,
             required=True,
         ),
     ],
@@ -50,7 +50,7 @@ def onNewClick(n, uid, farmName):
         return no_update
 
     user = AppUser.query.get(uid)
-    farm = Farm(name=farmName)
+    farm = Location(name=farmName)
     user.farms.append(farm)
 
     dba = fl.g.dba
@@ -80,7 +80,7 @@ def onSaveClick(n, uid, fid, farmName):
 
     dba = fl.g.dba
     try:
-        farm = Farm.query.get(fid)
+        farm = Location.query.get(fid)
         farm.name = farmName
         dba.session.commit()
     except:
@@ -107,7 +107,7 @@ def onClearClick(n, uid, fid):
 
     dba = fl.g.dba
     try:
-        farm = Farm.query.get(fid)
+        farm = Location.query.get(fid)
         dba.session.delete(farm)
         dba.session.commit()
     except:

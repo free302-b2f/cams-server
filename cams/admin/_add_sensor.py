@@ -75,7 +75,7 @@ def onNewClick(n, fid, name, sn, desc):
     if not n:
         return no_update
 
-    farm = Farm.query.get(fid)
+    farm = Location.query.get(fid)
     sensor = Sensor(name=name, sn=sn, desc=desc)
     farm.sensors.append(sensor)
 

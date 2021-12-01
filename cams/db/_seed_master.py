@@ -6,32 +6,49 @@ import werkzeug.security as wsec
 from flask_sqlalchemy import SQLAlchemy
 
 #! import all models
+from .group import Group
 from .user import AppUser
-from .farm import Farm
+from .location import Location
 from .sensor import Sensor
 from .admin import Cams
+import utility as util
 
-dba: SQLAlchemy = fl.g.dba
 
+def seed():
+    """추가: 마스터 계정 및 테스트 센서"""
 
-# 마스터 계정 및 테스트 센서
-pw = wsec.generate_password_hash("1q2w#E$R", method="sha256")
-user = AppUser(
-    username="cams",
-    password=pw,
-    email="amadeus.bae@gmail.com",
-    realname="B2F Master",
-    level=2,  # administrator
-)
-farm = Farm(name="농장 구역 #1")
-farm.sensors.append(
-    Sensor(sn="B2F_CAMs_2000000000001", name="Test Sensor", desc="DrBAE's Test CAMs")
-)
-user.farms.append(farm)
-dba.session.add(user)
-dba.session.commit()
+    dba: SQLAlchemy = fl.g.dba
 
-# 랜덤 센서 데이터 추가
-from . import sensor_data as sd
+    # add group
+    group = Group(name="PHENO", desc="KIST Pheno Project")
 
-sd.f3_seed()
+    # add user
+    pw = util.generate_password_hash("1q2w#E$R")
+    user = AppUser(
+        username="cams",
+        password=pw,
+        email="amadeus.bae@gmail.com",
+        realname="B2F Master",
+        level=2,  # master
+    )
+    group.users.append(user)
+
+    # add location
+    loc = Location(name="제1구역", desc="2021년 12월 물토란")
+    group.locations.append(loc)
+
+    # add sensor
+    sensors = [
+        Sensor(sn=f"B2F_CAMs_200000000000{i}", name=f"DrBAE's CAMs #{i}")
+        for i in range(1, 3)
+    ]
+    loc.sensors.extend(sensors)
+    group.sensors.extend(sensors)
+
+    dba.session.add(group)
+    dba.session.commit()
+
+    # 랜덤 센서 데이터 추가
+    from . import sensor_data as sd
+
+    sd.f3_seed([s.id for s in sensors])

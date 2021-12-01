@@ -18,8 +18,8 @@ class AppUser(fli.UserMixin, dba.Model):
     max_username = 32
     max_email = 64
     max_password = 32
-    max_password_hash = 88
-    max_realname = 32
+    max_password_hash = 182
+    max_realname = 64
 
     @classmethod
     def max_len(cls):
@@ -41,8 +41,10 @@ class AppUser(fli.UserMixin, dba.Model):
     username = dba.Column(dba.String(max_username), unique=True, nullable=False)
     email = dba.Column(dba.String(max_email), unique=True)
     password = dba.Column(dba.String(max_password_hash))
-    realname = dba.Column(dba.String(max_password_hash))
-    level = dba.Column(dba.Integer, nullable=False, server_default="-2") # 현재 일반유저 TODO: -1로 변경
+    realname = dba.Column(dba.String(max_realname))
+    level = dba.Column(dba.Integer, nullable=False, server_default="-1") # 현재 일반유저 TODO: -1로 변경
+    group_id = dba.Column(dba.Integer, dba.ForeignKey("app_group.id"), nullable=False)
+    group = dba.relationship("Group", backref=dba.backref("users", lazy=True))
     # Column('version', Integer, server_default="SELECT MAX(1, MAX(old_versions)) FROM version_table")
     # -3=탈퇴(삭제예정), -2=잠금(로그인 불가), -1=게스트, 0=일반, +1=그룹관리자, +2=마스터
     # 마스터: 아이디 승인/관리, 모든 데이터 관리 가능

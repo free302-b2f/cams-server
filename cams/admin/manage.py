@@ -128,7 +128,7 @@ def onFarm(fid):
     if not fid:
         return no_update, no_update, ""
     
-    farm = Farm.query.get(fid)
+    farm = Location.query.get(fid)
 
     return *buildSensorOptions(fid), farm.name
 

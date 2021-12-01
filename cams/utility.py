@@ -53,8 +53,7 @@ def callback_triggered_by(ids: List[str]) -> bool:
         return False
 
 
-
-def buildPopup(id, header: str, body = [], footer = []):
+def buildPopup(id, header: str, body=[], footer=[]):
     """HTML 팝업창을 만든다.
 
     :param id: 팝업창의 DOM ID
@@ -102,7 +101,7 @@ def log(level: str, caller: str, method: FunctionType, msg: Any):
     """메시지를 dash.app.logger를 이용해 기록한다"""
 
     app = fl.current_app
-    
+
     message = f"[{datetime.now()}] [{level}] [{caller}]"
     if method != None:
         message += f" [{method.__name__}()]"
@@ -147,3 +146,15 @@ def _(msg):
 
 
 # endregion
+
+
+import werkzeug.security as wsec
+
+
+def generate_password_hash(password: str) -> str:
+    return wsec.generate_password_hash(password, method="pbkdf2:sha512", salt_length=32)
+
+
+def check_password_hash(pwhash: str, password: str) -> bool:
+    return wsec.check_password_hash(pwhash, password)
+

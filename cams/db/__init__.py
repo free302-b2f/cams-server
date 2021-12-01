@@ -56,8 +56,9 @@ def teardown_appcontext(ex):
 # *** DO NOT import sensor_data ***
 before_request()
 
+from . import group
 from . import user
-from . import farm
+from . import location
 from . import sensor
 from . import admin
 
@@ -84,7 +85,10 @@ if _set["DropTables"]:
     # User.__table__.drop(checkfirst=True)
 
     dba.create_all()
+    dba.session.commit()
     sd.f2_create_table()
 
     # seed meta data
     from . import _seed
+
+    _seed.seed()

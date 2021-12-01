@@ -35,7 +35,7 @@ _pgc = pg.connect(
 # endregion
 
 
-def f0_check_db_connection():
+def f0_check_connection():
     cursor: pge.cursor = _pgc.cursor()
     cursor.execute("SELECT 'hello world'")
     ds = cursor.fetchone()
@@ -59,7 +59,7 @@ def f1_clear_data():
     """delete all rows from sensor_data"""
 
     cursor: pge.cursor = _pgc.cursor()
-    cursor.execute("delete from sensor_data")
+    cursor.execute("DELETE FROM sensor_data")
     _pgc.commit()
     cursor.close()
     pass
@@ -69,6 +69,7 @@ def f2_create_table():
     """메타데이터, 센서테이터 테이블 추가"""
 
     # 메타메이터 테이블은 별도 생성할것
+    # group location sensor app-user
 
     # 센서데이터 테이블
     create_sensordata_table = """
@@ -76,6 +77,8 @@ def f2_create_table():
         id SERIAL, 
         time TIMESTAMPTZ NOT NULL,
         sensor_id INTEGER,
+        location_id INTEGER,
+        group_id INTEGER,
         air_temp DOUBLE PRECISION,
         leaf_temp DOUBLE PRECISION,
         humidity DOUBLE PRECISION,
@@ -86,6 +89,8 @@ def f2_create_table():
         hd DOUBLE PRECISION,
         vpd DOUBLE PRECISION,
         FOREIGN KEY (sensor_id) REFERENCES sensor (id),
+        FOREIGN KEY (location_id) REFERENCES location (id),
+        FOREIGN KEY (group_id) REFERENCES app_group (id),
         UNIQUE (time, sensor_id),
         UNIQUE (id, time, sensor_id)
     );
@@ -116,14 +121,14 @@ def f2_create_table():
     cursor.close()
 
 
-def f3_seed():
+def f3_seed(ids):
     """기본적인 메타데이터 및 랜덤 센서데이터 추가"""
 
     cursor: pge.cursor = _pgc.cursor(cursor_factory=pga.DictCursor)
 
     # 센서 ID 추출
-    cursor.execute("SELECT id FROM sensor")
-    ids = [x["id"] for x in cursor.fetchall()]
+    # cursor.execute("SELECT id FROM sensor")
+    # ids = [x["id"] for x in cursor.fetchall()]
 
     start = datetime.combine(datetime.now().date(), datetime.min.time())
     dates = [start + timedelta(days=x) for x in range(-7, 1)]
@@ -171,6 +176,7 @@ def f3_seed():
 def f4_copy_mongo():
     """MonogDB의 센서데이터를 PostgreSQL에 복사한다"""
 
+    # mongo
     _db = getSettings("Mongo")
     _mongoClient = MongoClient(
         f'mongodb://{_db["User"]}:{_db["Pw"]}@{_db["Ip"]}:{_db["Port"]}/{_db["Db"]}',
@@ -179,6 +185,7 @@ def f4_copy_mongo():
     _camsDb = _mongoClient[_db["Db"]]
     _sensors = _camsDb["sensors"]
 
+    # postgres: sensor 목록
     cursor: pge.cursor = _pgc.cursor(cursor_factory=pga.DictCursor)
     cursor.execute("SELECT id, sn FROM sensor")
     sensorIds = {x["sn"]: x["id"] for x in cursor.fetchall()}
@@ -241,3 +248,4 @@ if __name__ == "__main__":
     f2_create_table()
     f3_seed()
     # f3_copy_mongo()
+

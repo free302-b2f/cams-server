@@ -6,7 +6,7 @@ from lm._imports import *
 import lm.logout
 
 from db.user import AppUser
-from db.farm import Farm
+from db.location import Location
 from db.sensor import Sensor
 
 from app import app, addPage
@@ -83,7 +83,7 @@ def buildFarmLabel(id: int, name: str) -> html.Label:
                 id={"model": "farm", "id": id},
                 type="text",
                 value=name,
-                maxLength=Farm.max_name,
+                maxLength=Location.max_name,
                 required=True,
                 readOnly=True,
             ),
@@ -258,7 +258,7 @@ def addFarm(n: int):
         return no_update
 
     user = fli.current_user
-    farm = Farm(name="--new farm--")
+    farm = Location(name="--new farm--")
     user.farms.append(farm)
     
     dba = fl.g.dba
@@ -279,7 +279,7 @@ def deleteFarm(fid):
     if not cbc.triggered[0]["value"]:
         return no_update
 
-    farm = Farm.query.get(fid)
+    farm = Location.query.get(fid)
     from db import _dba
 
     try:
@@ -320,7 +320,7 @@ def saveFarm(fid, newName: str):
     if not cbc.triggered[0]["value"]:
         return no_update
 
-    farm = Farm.query.get(fid)
+    farm = Location.query.get(fid)
     farm.name = newName
 
     from db import _dba

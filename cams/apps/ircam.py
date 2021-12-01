@@ -10,7 +10,7 @@ from ._imports import *
 from dash import no_update
 from dash_extensions.enrich import Trigger
 
-from db import sensor, user, farm
+from db import location, sensor, user
 
 
 # SENSOR_ID = "B2F_CAMs_1000000000001"

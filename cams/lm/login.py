@@ -2,11 +2,11 @@
 
 print(f"<{__name__}> loading...")
 
+import json
 from lm._imports import *
 from db.user import AppUser
 
 from app import app, debug
-import json
 
 
 @app.server.route("/login", methods=["GET", "POST"])
@@ -27,9 +27,9 @@ def login():
         response["cause"] = "lm-login-username"
     else:
         if user.level <= -2:
-            response["cause"] = f"account <{un}> is locked"
+            response["cause"] = f"account <{un}> is locked or deleted"
 
-        elif wsec.check_password_hash(user.password, pw):
+        elif util.check_password_hash(user.password, pw):
             fli.login_user(user)
 
             response["isOK"] = True

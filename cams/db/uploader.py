@@ -28,7 +28,7 @@ _sensors = _mongoClient[_setMg["Db"]]["sensors"]
 
 
 def _seed():
-    """7개월전 데이터를 현재 날짜로 복사"""
+    """MongoDB: 3월 데이터를 현재 날짜로 복사"""
 
     now = datetime.now()
     date = datetime(2021, 3, now.day).strftime("%Y%m%d")

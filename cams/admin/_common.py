@@ -59,7 +59,7 @@ def buildFarmOptions(uid, selected=None):
 def buildSensorOptions(fid, selected=None):
     """Sensor dropdown에 사용할 목록"""
 
-    farm = Farm.query.get(fid)
+    farm = Location.query.get(fid)
     sensors = farm.sensors
     options = [{"label": s.name, "value": s.id} for s in sensors]
     default = options[0]["value"] if len(options) > 0 else ""

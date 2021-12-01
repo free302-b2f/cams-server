@@ -14,7 +14,7 @@ import plotly.express as px
 
 # import db
 from db.user import AppUser
-from db.farm import Farm
+from db.location import Location
 from db.sensor import Sensor
 from pymongo import MongoClient
 from bson.raw_bson import RawBSONDocument

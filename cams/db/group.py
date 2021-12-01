@@ -1,4 +1,4 @@
-"""농장 모델 정의 및 관련 로직"""
+"""조직 모델 정의 및 관련 로직"""
 
 print(f"<{__name__}> loading...")
 
@@ -9,12 +9,13 @@ import sys
 dba = fl.g.dba
 
 
-class Farm(dba.Model):
-    """농장 DB 모델"""
+class Group(dba.Model):
+    """조직 DB 모델"""
 
     # region ---- View에서 사용할 필드 정보 ----
     # 클래스 변수: 각 필드 최대 길이 등
     max_name = 64
+    max_desc = 64
 
     @classmethod
     def max_len(cls):
@@ -22,16 +23,16 @@ class Farm(dba.Model):
 
         return {
             "max_name": cls.max_name,
+            "max_desc": cls.max_desc,
         }
 
     # endregion
 
     # 테이블 컬럼 정의
-    __tablename__ = "farm"
+    __tablename__ = "app_group"
     id = dba.Column(dba.Integer, primary_key=True)
     name = dba.Column(dba.String(max_name), nullable=False)
-    user_id = dba.Column(dba.Integer, dba.ForeignKey("app_user.id"), nullable=False)
-    user = dba.relationship("AppUser", backref=dba.backref("farms", lazy=True))
+    desc = dba.Column(dba.String(max_desc), nullable=False)
 
     def __repr__(self):
         return f"<Farm: {self.name}>"
@@ -41,10 +42,10 @@ class Farm(dba.Model):
 
         keys = self.__table__.columns.keys()
         dic = {key: self.__getattribute__(key) for key in keys}
-        return dic    
+        return dic
 
 
 if getattr(sys, "_test_", None):
-    farm = Farm()
-    print(f"{Farm.max_len()= }")
-    print(f"{farm.to_dict()= }")
+    group = Group()
+    print(f"{Group.max_len()= }")
+    print(f"{group.to_dict()= }")
