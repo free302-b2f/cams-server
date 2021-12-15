@@ -4,9 +4,9 @@ print(f"<{__name__}> loading...")
 
 from ._common import *
 from ._imports import *
-from ._add_farm import *
-from ._add_sensor import *
-from ._add_user import *
+from ._location import *
+from ._sensor import *
+from ._user import *
 
 
 def layout():
@@ -38,25 +38,25 @@ def layout():
         className="admin-manage-label",
     )
 
-    farmRow = html.Label(
+    locationRow = html.Label(
         [
-            html.Span("Farm"),
+            html.Span("Location"),
             html.Span("yard", className="material-icons-two-tone"),
             dcc.Dropdown(
-                id="admin-manage-farm",
+                id="admin-manage-location",
                 clearable=False,
                 searchable=False,
             ),
             html.Span(
                 "clear",
                 className="material-icons-outlined",
-                id="admin-manage-farm-clear",
+                id="admin-manage-location-clear",
                 n_clicks=0,
             ),
             html.Span(
                 "delete",
                 className="material-icons-outlined",
-                id="admin-manage-farm-delete",
+                id="admin-manage-location-delete",
                 n_clicks=0,
             ),
         ],
@@ -92,19 +92,26 @@ def layout():
         [
             html.Header(headerRow),
             html.Section(userRow),
-            html.Section(farmRow),
             html.Section(sensorRow),
-            addUserSection,
-            addFarmSection,
-            addSensorSection,
+            html.Section(locationRow),
+            userSection,
+            sensorSection,
+            locationSection,
         ],
         id="admin-manage-container",
     )
 
 
 @app.callback(
-    Output("admin-manage-farm", "options"),
-    Output("admin-manage-farm", "value"),
+    Output("admin-manage-user-username", "value"),
+    Output("admin-manage-user-email", "value"),
+    Output("admin-manage-user-realname", "value"),
+    Output("admin-manage-user-level", "value"),
+    Output("admin-manage-user-level-label", "hidden"),
+    Output("admin-manage-sensor", "options"),
+    Output("admin-manage-sensor", "value"),
+    Output("admin-manage-location", "options"),
+    Output("admin-manage-location", "value"),
     Input("admin-manage-user", "value"),
 )
 def onUser(uid):
@@ -113,42 +120,50 @@ def onUser(uid):
     if not uid:
         return no_update
 
-    return buildFarmOptions(uid)
+    user: AppUser = fli.current_user
+
+    return [
+        user.username,
+        user.email,
+        user.realname,
+        user.level,
+        False if user.level >= 2 else True,
+        *buildSensorOptions(uid),
+        *buildLocationOptions(uid),
+    ]
 
 
 @app.callback(
-    Output("admin-manage-sensor", "options"),
-    Output("admin-manage-sensor", "value"),
-    Output("admin-manage-farm-name", "value"),
-    Input("admin-manage-farm", "value"),
+    Output("admin-manage-location-name", "value"),
+    Output("admin-manage-location-desc", "value"),
+    Input("admin-manage-location", "value"),
 )
 def onFarm(fid):
-    """Farm 선택시 sensor목록 업데이트"""
+    """Farm 선택시 업데이트"""
 
     if not fid:
-        return no_update, no_update, ""
-    
-    farm = Location.query.get(fid)
+        return "", ""
 
-    return *buildSensorOptions(fid), farm.name
+    loc = Location.query.get(fid)
 
+    # return *buildSensorOptions(fid), farm.name
+    return loc.name, loc.desc
 
 
 @app.callback(
     Output("admin-manage-sensor-name", "value"),
     Output("admin-manage-sensor-sn", "value"),
-    Output("admin-manage-sensor-desc", "value"),
     Input("admin-manage-sensor", "value"),
 )
 def onSensor(sid):
     """Sensor 선택시 업데이트"""
 
     if not sid:
-        return "", "", ""
+        return "", ""
 
     sensor = Sensor.query.get(sid)
 
-    return sensor.name, sensor.sn, sensor.desc
+    return sensor.name, sensor.sn
 
 
-addPage(layout, "Add-Farm")
+addPage(layout, "Admin")

@@ -33,26 +33,12 @@ _sn = html.Label(
     className="admin-manage-label",
 )
 
-_desc = html.Label(
-    [
-        html.Span("Description"),
-        html.Span("_", className="material-icons-two-tone"),
-        dcc.Input(
-            id="admin-manage-sensor-desc",
-            type="text",
-            maxLength=Sensor.max_desc,
-            required=True,
-        ),
-    ],
-    className="admin-manage-label",
-)
-
-addSensorSection = html.Section(
+sensorSection = html.Section(
     [
         html.Hr(),
         _name,
         _sn,
-        _desc,
+        # _desc,
         buildButtonRow("Add New Sensor", "sensor"),
     ],
     className="admin-manage-add-section",
@@ -63,21 +49,20 @@ addSensorSection = html.Section(
     Output("admin-manage-sensor", "options"),
     Output("admin-manage-sensor", "value"),
     Input("admin-manage-button-sensor", "n_clicks"),
-    State("admin-manage-farm", "value"),
+    State("admin-manage-location", "value"),
     State("admin-manage-sensor-name", "value"),
     State("admin-manage-sensor-sn", "value"),
-    State("admin-manage-sensor-desc", "value"),
     prevent_initial_call=True,
 )
-def onNewClick(n, fid, name, sn, desc):
+def onNewClick(n, fid, name, sn):
     """<Add Sensor> 버튼 클릭시 db작업 및 sensor 목록 업데이트"""
 
     if not n:
         return no_update
 
-    farm = Location.query.get(fid)
-    sensor = Sensor(name=name, sn=sn, desc=desc)
-    farm.sensors.append(sensor)
+    loc = Location.query.get(fid)
+    sensor = Sensor(name=name, sn=sn)
+    loc.sensors.append(sensor)
 
     dba = fl.g.dba
     try:
@@ -93,14 +78,13 @@ def onNewClick(n, fid, name, sn, desc):
     Output("admin-manage-sensor", "options"),
     Output("admin-manage-sensor", "value"),
     Input("admin-manage-save-sensor", "n_clicks"),
-    State("admin-manage-farm", "value"),
+    State("admin-manage-location", "value"),
     State("admin-manage-sensor", "value"),
     State("admin-manage-sensor-name", "value"),
     State("admin-manage-sensor-sn", "value"),
-    State("admin-manage-sensor-desc", "value"),
     prevent_initial_call=True,
 )
-def onSaveClick(n, fid, sid, name, sn, desc):
+def onSaveClick(n, fid, sid, name, sn):
     """<Save Fram> 버튼 클릭시 db작업 및 목록 업데이트"""
 
     if not n:
@@ -111,7 +95,6 @@ def onSaveClick(n, fid, sid, name, sn, desc):
         sensor = Sensor.query.get(fid)
         sensor.name = name
         sensor.sn = sn
-        sensor.desc = desc
         dba.session.commit()
     except:
         return no_update
@@ -125,7 +108,7 @@ def onSaveClick(n, fid, sid, name, sn, desc):
     Output("admin-manage-sensor", "options"),
     Output("admin-manage-sensor", "value"),
     Input("admin-manage-sensor-clear", "n_clicks"),
-    State("admin-manage-farm", "value"),
+    State("admin-manage-location", "value"),
     State("admin-manage-sensor", "value"),
     prevent_initial_call=True,
 )

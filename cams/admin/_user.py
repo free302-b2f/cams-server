@@ -3,12 +3,13 @@
 from ._imports import *
 from ._common import *
 
-addUserSection = html.Section(
+userSection = html.Section(
     [
         html.Hr(),
         buildInputLabel("Login ID", "user", "username", "", AppUser.max_username, True),
         buildInputLabel("Email", "user", "email", "", AppUser.max_email),
         buildInputLabel("Real Name", "user", "realname", "", AppUser.max_realname),
+        buildInputLabel("Level", "user", "level", "", AppUser.max_username, True),
         buildButtonRow("Update User", "user", False),
     ],
     className="admin-manage-add-section",
@@ -19,10 +20,9 @@ addUserSection = html.Section(
 #     Output("admin-manage-sensor", "options"),
 #     Output("admin-manage-sensor", "value"),
 #     Input("admin-manage-button-sensor", "n_clicks"),
-#     State("admin-manage-farm", "value"),
+#     State("admin-manage-location", "value"),
 #     State("admin-manage-sensor-name", "value"),
 #     State("admin-manage-sensor-sn", "value"),
-#     State("admin-manage-sensor-desc", "value"),
 #     prevent_initial_call=True,
 # )
 # def onNewClick(n, fid, name, sn, desc):
@@ -49,11 +49,10 @@ addUserSection = html.Section(
 #     Output("admin-manage-sensor", "options"),
 #     Output("admin-manage-sensor", "value"),
 #     Input("admin-manage-save-sensor", "n_clicks"),
-#     State("admin-manage-farm", "value"),
+#     State("admin-manage-location", "value"),
 #     State("admin-manage-sensor", "value"),
 #     State("admin-manage-sensor-name", "value"),
 #     State("admin-manage-sensor-sn", "value"),
-#     State("admin-manage-sensor-desc", "value"),
 #     prevent_initial_call=True,
 # )
 # def onSaveClick(n, fid, sid, name, sn, desc):
@@ -81,7 +80,7 @@ addUserSection = html.Section(
 #     Output("admin-manage-sensor", "options"),
 #     Output("admin-manage-sensor", "value"),
 #     Input("admin-manage-sensor-clear", "n_clicks"),
-#     State("admin-manage-farm", "value"),
+#     State("admin-manage-location", "value"),
 #     State("admin-manage-sensor", "value"),
 #     prevent_initial_call=True,
 # )

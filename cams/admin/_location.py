@@ -9,12 +9,12 @@ from dash.dependencies import Input, Output, State
 
 # import visdcc
 
-_farmName = html.Label(
+_name = html.Label(
     [
         html.Span("Farm Name"),
         html.Span("_", className="material-icons-two-tone"),
         dcc.Input(
-            id="admin-manage-farm-name",
+            id="admin-manage-location-name",
             type="text",
             maxLength=Location.max_name,
             required=True,
@@ -23,11 +23,26 @@ _farmName = html.Label(
     className="admin-manage-label",
 )
 
+_desc = html.Label(
+    [
+        html.Span("Description"),
+        html.Span("_", className="material-icons-two-tone"),
+        dcc.Input(
+            id="admin-manage-location-desc",
+            type="text",
+            maxLength=Sensor.max_desc,
+            required=True,
+        ),
+    ],
+    className="admin-manage-label",
+)
 
-addFarmSection = html.Section(
+
+locationSection = html.Section(
     [
         html.Hr(),
-        _farmName,
+        _name,
+        _desc,
         buildButtonRow("Add New Farm", "farm"),
         # visdcc.Run_js('admin-manage-farm-add-js'),
     ],
@@ -36,21 +51,22 @@ addFarmSection = html.Section(
 
 
 @app.callback(
-    Output("admin-manage-farm", "options"),
-    Output("admin-manage-farm", "value"),
+    Output("admin-manage-location", "options"),
+    Output("admin-manage-location", "value"),
     Input("admin-manage-button-farm", "n_clicks"),
     State("admin-manage-user", "value"),
-    State("admin-manage-farm-name", "value"),
+    State("admin-manage-location-name", "value"),
+    State("admin-manage-location-desc", "value"),
     prevent_initial_call=True,
 )
-def onNewClick(n, uid, farmName):
+def onNewClick(n, uid, name, desc):
     """<Add New Fram> 버튼 클릭시 db작업 및 farm 목록 업데이트"""
 
     if not n:
         return no_update
 
     user = AppUser.query.get(uid)
-    farm = Location(name=farmName)
+    farm = Location(name=name)
     user.farms.append(farm)
 
     dba = fl.g.dba
@@ -60,16 +76,16 @@ def onNewClick(n, uid, farmName):
         return no_update
 
     # trigger user change
-    return buildFarmOptions(uid, farm.id)
+    return buildLocationOptions(uid, farm.id)
 
 
 @app.callback(
-    Output("admin-manage-farm", "options"),
-    Output("admin-manage-farm", "value"),
+    Output("admin-manage-location", "options"),
+    Output("admin-manage-location", "value"),
     Input("admin-manage-save-farm", "n_clicks"),
     State("admin-manage-user", "value"),
-    State("admin-manage-farm", "value"),
-    State("admin-manage-farm-name", "value"),
+    State("admin-manage-location", "value"),
+    State("admin-manage-location-name", "value"),
     prevent_initial_call=True,
 )
 def onSaveClick(n, uid, fid, farmName):
@@ -87,16 +103,16 @@ def onSaveClick(n, uid, fid, farmName):
         return no_update
 
     # trigger user change
-    return buildFarmOptions(uid, fid)
+    return buildLocationOptions(uid, fid)
 
 
 # admin-manage-sensor-clear
 @app.callback(
-    Output("admin-manage-farm", "options"),
-    Output("admin-manage-farm", "value"),
-    Input("admin-manage-farm-clear", "n_clicks"),
+    Output("admin-manage-location", "options"),
+    Output("admin-manage-location", "value"),
+    Input("admin-manage-location-clear", "n_clicks"),
     State("admin-manage-user", "value"),
-    State("admin-manage-farm", "value"),
+    State("admin-manage-location", "value"),
     prevent_initial_call=True,
 )
 def onClearClick(n, uid, fid):
@@ -113,4 +129,4 @@ def onClearClick(n, uid, fid):
     except:
         return no_update
 
-    return buildFarmOptions(uid)
+    return buildLocationOptions(uid)

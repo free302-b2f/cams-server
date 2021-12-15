@@ -15,42 +15,49 @@ from utility import parseDate
 
 from pymongo import MongoClient
 from bson.raw_bson import RawBSONDocument
-import psycopg2 as pg
-import psycopg2.extensions as pge
-import psycopg2.extras as pga
 
-_set = getSettings("Postgres")
-_pgc = pg.connect(
-    f'postgres://{_set["User"]}:{_set["Pw"]}@{_set["Ip"]}:{_set["Port"]}/{_set["Db"]}'
+
+_set = getSettings("Mongo")  # CAMs DB 설정
+_mongo = MongoClient(
+    f'mongodb://{_set["User"]}:{_set["Pw"]}@{_set["Ip"]}:{_set["Port"]}/{_set["Db"]}',
+    document_class=RawBSONDocument,
 )
-
-# _farms = []  # fli.current_useruser.farms
-# sensors = {}
+_cams = _mongo[_set["Db"]]
+_farms = []  # fli.current_useruser.farms
+_sensors = {}
 
 # build data types of columns
 _cols = [
-    "air_temp",
-    "leaf_temp",
-    "humidity",
-    "light",
-    "co2",
-    "dewpoint",
-    "evapotrans",
-    "hd",
-    "vpd",
+    "Light",
+    "Air_Temp",
+    "Leaf_Temp",
+    "Humidity",
+    "CO2",
+    "Dewpoint",
+    "EvapoTranspiration",
+    "HD",
+    "VPD",
 ]
 _types = {x: "float64" for x in _cols}
-_meta_cols = ["id", "time", "sensor_id", "location_id", "group_id"]
-_types.update({x: "string" for x in _meta_cols})
+_meta_cols = [
+    # "_id",
+    # "FarmName",
+    # "SN",
+    "Date",
+    "Time",
+]
+for x in _meta_cols:
+    _types[x] = "string"
 _headers = [
-    # "Sensor",
-    # "Location",
-    # "Organization",
+    # "ID",
+    # "Farm",
+    # "SN",
+    "Date",
+    "Time",
+    "Light",
     "Tair",
     "Tleaf",
     "RH[%]",
-    "Time",
-    "Light",
     "CO₂",
     "DP",
     "EvaTrans",
@@ -75,13 +82,14 @@ def layout():
     debug(layout, f"entering...")
 
     # 센서 ID 추출
-    locs = fli.current_user.group.locations
-    sensors = fli.current_user.group.sensors
-    # for f in locs:
-    #     _sensors.update({s.id: s for s in f.sensors})
+    global _farms, _sensors
+    _farms = fli.current_user.farms
+    _sensors = {}
+    for f in _farms:
+        _sensors.update({s.id: s for s in f.sensors})
 
     dateValue = datetime.now().date()
-    snOptions = [{"label": sensors[s].name, "value": s} for s in sensors]
+    snOptions = [{"label": _sensors[s].name, "value": s} for s in _sensors]
     snDefalut = snOptions[0]["value"] if len(snOptions) > 0 else ""
 
     headerRow = html.H4(
@@ -152,50 +160,6 @@ def layout():
     )
 
 
-def load_data(sn, start, end) -> pd.DataFrame:
-    """DB에서 주어진 기간동안의 데이터를 불러온다"""
-
-    try:
-        # cursor: pge.cursor = _pgc.cursor()
-        cursor: pge.cursor = _pgc.cursor(cursor_factory=pga.DictCursor)
-
-        # sql = cursor.mogrify(
-        #     """SELECT * FROM sensor_data
-        #     WHERE (sensor_id = (SELECT id FROM sensor WHERE sn = %s))
-        #     AND (date(time) = %s)
-        #     ORDER BY time DESC LIMIT 10000""",
-        #     (sn, start),
-        # )
-        sql = cursor.mogrify(
-            """SELECT * FROM sensor_data 
-            WHERE (sensor_id = (SELECT id FROM sensor WHERE sn = %s)) 
-            AND (time BETWEEN %s AND %s)
-            ORDER BY time DESC LIMIT 10000""",
-            (sn, start, end),
-        )
-
-        cursor.execute(sql)
-        cols = [x.name for x in cursor.description]
-        ds = cursor.fetchall()
-        # global _df
-        df = pd.DataFrame(ds)
-        debug(load_data, f"{start}~{end}: {df.shape = }")
-        if len(ds) > 0:
-            df.columns = cols
-    finally:
-        cursor.close()
-
-    if df.shape[0] and df.shape[1]:
-        # types = {x: ("float64" if x in _cols else "string") for x in cols}
-        # df = df.astype(types, copy=False)  # , errors="ignore")
-        df = df.astype(_types, copy=False)  # , errors="ignore")
-        # df["time_key"] = [parseDate(d, t) for d, t in zip(df["Date"], df["Time"])]
-        # df.set_index("time_key", inplace=True)
-        df.set_index("time")
-
-    return df
-
-
 def build_data_table(df: pd.DataFrame) -> DataTable:
     """pandas.DataFrame을 dash.DataTable로 변환한다."""
 
@@ -214,6 +178,27 @@ def build_data_table(df: pd.DataFrame) -> DataTable:
     return table
 
 
+def load_data(sn, start, end) -> pd.DataFrame:
+    """DB에서 주어진 기간동안의 데이터를 불러온다"""
+
+    sensors = _cams["sensors"]
+    cursor = sensors.find(
+        {"SN": sn, "Date": {"$gte": start, "$lte": end}},
+        projection={"_id": False, "FarmName": False, "SN": False},
+    ).sort([("Date", 1), ("Time", 1)])
+
+    # global _df
+    df = pd.DataFrame(cursor)
+    debug(load_data, f"{start}~{end}: {df.shape = }")
+
+    if df.shape[0] and df.shape[1]:
+        df = df.astype(_types, copy=False)  # , errors="ignore")
+        df["time_key"] = [parseDate(d, t) for d, t in zip(df["Date"], df["Time"])]
+        df.set_index("time_key", inplace=True)
+
+    return df
+
+
 @app.callback(
     Output("apps-export-dt-section", "children"),
     Output("apps-export-rows", "children"),
@@ -221,13 +206,12 @@ def build_data_table(df: pd.DataFrame) -> DataTable:
     Input("apps-export-date", "start_date"),
     Input("apps-export-date", "end_date"),
 )
-def update_ui(sensor_id, start_date, end_date):
+def update_graph(sensor_id, start_date, end_date):
 
     if not sensor_id or not start_date or not end_date:
         return no_update
 
-    sensors = fli.current_user.group.sensors
-    sn = sensors[sensor_id].sn
+    sn = _sensors[sensor_id].sn
     start = date.fromisoformat(start_date).strftime("%Y%m%d")
     end = date.fromisoformat(end_date).strftime("%Y%m%d")
 
@@ -251,8 +235,7 @@ def exportAsCsv(n, sensor_id, start_date, end_date):
     if not sensor_id or not start_date or not end_date:
         return no_update
 
-    sensors = fli.current_user.group.sensors
-    sn = sensors[sensor_id].sn
+    sn = _sensors[sensor_id].sn
     start = date.fromisoformat(start_date).strftime("%Y%m%d")
     end = date.fromisoformat(end_date).strftime("%Y%m%d")
 
@@ -261,7 +244,7 @@ def exportAsCsv(n, sensor_id, start_date, end_date):
     if not df.shape[0] or not df.shape[1]:
         return no_update
 
-    sensorName = sensors[sensor_id].name.replace(" ", "-")
+    sensorName = _sensors[sensor_id].name.replace(" ", "-")
     fn = f"{sensorName}_{start_date}~{end_date}.csv"
     cols = _meta_cols + _cols
     return dcc.send_data_frame(
@@ -283,7 +266,7 @@ import json
 
 
 def test():
-    df1 = load_data("B2F_CAMs_2000000000001", "20211215", "20211215")
+    df1 = load_data("B2F_CAMs_1000000000001", "20200101", "20200101")
     dt1 = build_data_table(df1)
     # txt = json.dumps(dt1)
     # debug(txt)

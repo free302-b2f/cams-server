@@ -112,10 +112,8 @@ def buildSensorLabel(id: int, name: str) -> html.Label:
 def layout():
 
     user = fli.current_user
-    farms = user.farms #cursor.fetchall()
-    sensors = {}
-    for f in farms:
-        sensors.update({s.id: s for s in f.sensors})
+    farms = user.group.locations
+    sensors = {s.id: s for s in user.group.sensors}
 
     _header = html.Header(
         [
@@ -236,8 +234,8 @@ def layout():
             _header,
             _menu,
             _profile,
-            _farms,
             _sensors,
+            _farms,
             _settings,
             _security,
             dcc.Location(id="lm-profile-url", refresh=True),
@@ -247,7 +245,8 @@ def layout():
         className="content-pad",
     )
 
-# Farm : add 
+
+# Farm : add
 # @app.callback(Input("lm-profile-farms-add", "n_clicks"))
 def addFarm(n: int):
     """add new farm to current user"""
@@ -260,13 +259,14 @@ def addFarm(n: int):
     user = fli.current_user
     farm = Location(name="--new farm--")
     user.farms.append(farm)
-    
+
     dba = fl.g.dba
     local_object = dba.session.merge(farm)
     dba.session.add(local_object)
     dba.session.commit()
 
     return 0
+
 
 # Farm : delete
 # @app.callback(
@@ -285,11 +285,12 @@ def deleteFarm(fid):
     try:
         local_object = _dba.session.merge(farm)
         _dba.session.delete(local_object)
-        _dba.session.commit()    
+        _dba.session.commit()
     except:
         pass
 
     return 1
+
 
 # Farm : enter edit mode
 # @app.callback(
@@ -324,6 +325,7 @@ def saveFarm(fid, newName: str):
     farm.name = newName
 
     from db import _dba
+
     local_object = _dba.session.merge(farm)
     # db.session.update(local_object)
     _dba.session.commit()

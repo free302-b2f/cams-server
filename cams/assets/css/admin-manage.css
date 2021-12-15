@@ -35,6 +35,8 @@
 }
 .admin-manage-label {
   width: max-content;
+  margin-top: 0.2rem;
+  margin-bottom: 0.2rem;
   display: flex;
   align-items: center;
   justify-content: flex-start;
