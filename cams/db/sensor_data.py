@@ -76,10 +76,10 @@ def f2_create_table():
     create_sensordata_table = """
     CREATE TABLE IF NOT EXISTS sensor_data (
         id SERIAL, 
-        time TIMESTAMPTZ NOT NULL,
-        sensor_id INTEGER NOT NULL,
-        location_id INTEGER NOT NULL,
         group_id INTEGER NOT NULL,
+        location_id INTEGER NOT NULL,
+        sensor_id INTEGER NOT NULL,
+        time TIMESTAMPTZ NOT NULL,
         air_temp DOUBLE PRECISION,
         leaf_temp DOUBLE PRECISION,
         humidity DOUBLE PRECISION,
@@ -89,9 +89,9 @@ def f2_create_table():
         evapotrans DOUBLE PRECISION,
         hd DOUBLE PRECISION,
         vpd DOUBLE PRECISION,
-        FOREIGN KEY (sensor_id) REFERENCES sensor (id),
-        FOREIGN KEY (location_id) REFERENCES location (id),
         FOREIGN KEY (group_id) REFERENCES app_group (id),
+        FOREIGN KEY (location_id) REFERENCES location (id),
+        FOREIGN KEY (sensor_id) REFERENCES sensor (id),
         UNIQUE (time, sensor_id),
         UNIQUE (id, time, sensor_id)
     );
@@ -136,15 +136,15 @@ def f3_seed(sensors):
         #     ids = [x["id"] for x in cursor.fetchall()]
 
         start = datetime.combine(datetime.now().date(), datetime.min.time())
-        dates = [start + timedelta(days=x) for x in range(-7, 1)]
+        dates = [start + timedelta(days=x) for x in range(-7, 7)]
 
         sql = """INSERT INTO sensor_data 
-            (time, sensor_id, location_id, group_id, air_temp, leaf_temp, humidity, 
+            (group_id, location_id, sensor_id, time, air_temp, leaf_temp, humidity, 
             light, co2, dewpoint, evapotrans, hd, vpd) 
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) 
             ON CONFLICT DO NOTHING"""
 
-        def insert(sid: int, dt: datetime, lid: int, gid: int):
+        def insert(gid: int, lid: int, sid: int, dt: datetime):
             debug(f"inserting: {sid} @{dt}")
             for x in range(2880):
                 light = random.uniform(80, 100) * (
@@ -153,10 +153,10 @@ def f3_seed(sensors):
                 cursor.execute(
                     sql,
                     (
-                        dt,
-                        sid,
-                        lid,
                         gid,
+                        lid,
+                        sid,
+                        dt,
                         round(random.uniform(10, 30), 1),  # air temp
                         round(random.uniform(10, 30), 1),  # leaf
                         round(random.uniform(30, 90), 1),  # humidity
@@ -176,7 +176,7 @@ def f3_seed(sensors):
         for s in sensors:
             for d in dates:
                 try:
-                    insert(s.id, d, s.location_id, s.group_id)
+                    insert(s.group_id, s.location_id, s.id, d)
                 except:
                     debug(f"failed: {s.id}@{d}")
                     pass

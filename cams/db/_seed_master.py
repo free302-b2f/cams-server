@@ -33,7 +33,7 @@ def seed():
     group.users.append(user)
 
     # add location
-    loc = Location(name="제1구역", desc="2021년 12월 물토란")
+    loc = Location(name="제1구역", desc="물토란(2021년 12월)")
     group.locations.append(loc)
 
     # add sensor

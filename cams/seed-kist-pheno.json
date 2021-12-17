@@ -9,7 +9,7 @@
             "id": null,
             "username": "pheno",
             "email": "kist-pheno@gmail.com",
-            "password": "pbkdf2:sha512:260000$Cy4dv5TvL9tKthvBD2Or8dvNvnsGzhk6$d6bbd79a0db1bc34c64f5ad9958f899ee20288c33eca6982966a3e0fa7fd2b74363a899e3d01c2961ceaa26c2f22c5fb8a189f2bc453d20f8bb0f66bbb303850",
+            "password": "pbkdf2:sha512:260000$0yTTe1dKw1EkaUCZ7zkFr6o6C944NhRP$9b02f31277f0d0b9d7bd8b60ee66d6bd9ec423d2f09e8ff972afc790215c5d19b0628c5842774430323bd8498834411a2aec9fc2fffd6293f8f4aee73b3eec79",
             "realname": "Pheno KIST",
             "level": 1,
             "group_id": null

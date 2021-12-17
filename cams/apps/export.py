@@ -2,15 +2,16 @@
 
 print(f"<{__name__}> loading...")
 
+from db.group import Group
+from db.user import AppUser
+from db.sensor import Sensor
+from db.location import Location
 from ._imports import *
 import pandas as pd
 
 from dash.dash_table import DataTable
-from dash.dash_table.Format import Format, Scheme, Trim
+import dash.dash_table.Format as dtFmt
 
-# from db.user import AppUser
-# from db.farm import Farm
-# from db.sensor import Sensor
 from utility import parseDate
 
 from pymongo import MongoClient
@@ -24,10 +25,7 @@ _pgc = pg.connect(
     f'postgres://{_set["User"]}:{_set["Pw"]}@{_set["Ip"]}:{_set["Port"]}/{_set["Db"]}'
 )
 
-# _farms = []  # fli.current_useruser.farms
-# sensors = {}
-
-# build data types of columns
+# numeric columns
 _cols = [
     "air_temp",
     "leaf_temp",
@@ -40,8 +38,12 @@ _cols = [
     "vpd",
 ]
 _types = {x: "float64" for x in _cols}
+
+# meta columns ~ string type?
 _meta_cols = ["id", "time", "sensor_id", "location_id", "group_id"]
 _types.update({x: "string" for x in _meta_cols})
+
+# dash.DataTable columns & headers
 _headers = [
     # "Sensor",
     # "Location",
@@ -57,13 +59,12 @@ _headers = [
     "HD",
     "VPD",
 ]
-
 _dt_columns = [
     {
         "name": h,
         "id": c,
         "type": "numeric",
-        "format": Format(precision=3, scheme=Scheme.decimal_si_prefix),  # fixed)
+        "format": dtFmt.Format(precision=3, scheme=dtFmt.Scheme.decimal_si_prefix),  # fixed)
     }
     for h, c in zip(_headers, _meta_cols + _cols)
 ]
@@ -74,16 +75,7 @@ def layout():
 
     debug(layout, f"entering...")
 
-    # 센서 ID 추출
-    locs = fli.current_user.group.locations
-    sensors = fli.current_user.group.sensors
-    # for f in locs:
-    #     _sensors.update({s.id: s for s in f.sensors})
-
-    dateValue = datetime.now().date()
-    snOptions = [{"label": sensors[s].name, "value": s} for s in sensors]
-    snDefalut = snOptions[0]["value"] if len(snOptions) > 0 else ""
-
+    # 헤더
     headerRow = html.H4(
         [
             html.Span("cloud_download", className="material-icons-two-tone"),
@@ -91,20 +83,49 @@ def layout():
         ],
         className="flex-h",
     )
+
+    # 센서 선택 목록
+    sensors = {s.id: s for s in fli.current_user.group.sensors}
+    sensorOptions = [{"label": "ALL", "value": 0}]
+    sensorOptions.extend([{"label": sensors[s].name, "value": s} for s in sensors])
+    # snDefalut = snOptions[0]["value"] if len(snOptions) > 0 else ""
     sensorRow = html.Label(
         [
             html.Span("CAMs Sensor"),
             html.Span("sensors", className="material-icons-two-tone"),
             dcc.Dropdown(
                 id="apps-export-sensor",
-                options=snOptions,
-                value=snDefalut,
+                options=sensorOptions,
+                value=0,
                 clearable=False,
                 searchable=False,
             ),
         ],
         className="apps-export-label",
     )
+
+    # 위치 선택 목록
+    locationOptions = [{"label": "ALL", "value": 0}]
+    locationOptions.extend(
+        [{"label": l.name, "value": l.id} for l in fli.current_user.group.locations]
+    )
+    locationRow = html.Label(
+        [
+            html.Span("Location"),
+            html.Span("yard", className="material-icons-two-tone"),
+            dcc.Dropdown(
+                id="apps-export-location",
+                options=locationOptions,
+                value=0,
+                clearable=False,
+                searchable=False,
+            ),
+        ],
+        className="apps-export-label",
+    )
+
+    # 기간 선택 목록
+    dateValue = datetime.now().date()
     dateRow = html.Label(
         [
             html.Span("Date Range"),
@@ -144,6 +165,7 @@ def layout():
         [
             html.Header(headerRow, id="app-export-header"),
             html.Section(sensorRow),
+            html.Section(locationRow),
             html.Section(dateRow),
             html.Section(buttonRow, id="apps-export-button-section"),
             html.Section("-- data table --", id="apps-export-dt-section"),
@@ -152,42 +174,39 @@ def layout():
     )
 
 
-def load_data(sn, start, end) -> pd.DataFrame:
+def _query_data(group_id, sensor_id, location_id, start, end) -> pd.DataFrame:
     """DB에서 주어진 기간동안의 데이터를 불러온다"""
 
     try:
-        # cursor: pge.cursor = _pgc.cursor()
-        cursor: pge.cursor = _pgc.cursor(cursor_factory=pga.DictCursor)
+        cursor: pge.cursor = _pgc.cursor()
+        # cursor: pge.cursor = _pgc.cursor(cursor_factory=pga.DictCursor)
 
-        # sql = cursor.mogrify(
-        #     """SELECT * FROM sensor_data
-        #     WHERE (sensor_id = (SELECT id FROM sensor WHERE sn = %s))
-        #     AND (date(time) = %s)
-        #     ORDER BY time DESC LIMIT 10000""",
-        #     (sn, start),
-        # )
-        sql = cursor.mogrify(
-            """SELECT * FROM sensor_data 
-            WHERE (sensor_id = (SELECT id FROM sensor WHERE sn = %s)) 
-            AND (time BETWEEN %s AND %s)
-            ORDER BY time DESC LIMIT 10000""",
-            (sn, start, end),
-        )
+        format = "SELECT * FROM sensor_data WHERE (date(time) BETWEEN %s AND %s)"
+        value = (start, end)
+        if group_id > 0:
+            format = f"{format} AND (group_id = %s)"
+            value = (*value, group_id)
+        if sensor_id > 0:
+            format = f"{format} AND (sensor_id = %s)"
+            value = (*value, sensor_id)
+        if location_id > 0:
+            format = f"{format} AND (location_id = %s)"
+            value = (*value, location_id)
+        format = f"{format} ORDER BY location_id ASc, sensor_id ASC, time ASC"
+        sql = cursor.mogrify(format, value)
+        debug(str(sql))
 
         cursor.execute(sql)
         cols = [x.name for x in cursor.description]
         ds = cursor.fetchall()
-        # global _df
         df = pd.DataFrame(ds)
-        debug(load_data, f"{start}~{end}: {df.shape = }")
+        debug(_query_data, f"{start}~{end}: {df.shape = }")
         if len(ds) > 0:
             df.columns = cols
     finally:
         cursor.close()
 
     if df.shape[0] and df.shape[1]:
-        # types = {x: ("float64" if x in _cols else "string") for x in cols}
-        # df = df.astype(types, copy=False)  # , errors="ignore")
         df = df.astype(_types, copy=False)  # , errors="ignore")
         # df["time_key"] = [parseDate(d, t) for d, t in zip(df["Date"], df["Time"])]
         # df.set_index("time_key", inplace=True)
@@ -196,7 +215,7 @@ def load_data(sn, start, end) -> pd.DataFrame:
     return df
 
 
-def build_data_table(df: pd.DataFrame) -> DataTable:
+def _build_data_table(df: pd.DataFrame) -> DataTable:
     """pandas.DataFrame을 dash.DataTable로 변환한다."""
 
     data = df.to_dict("records") if df is not None else []
@@ -214,25 +233,36 @@ def build_data_table(df: pd.DataFrame) -> DataTable:
     return table
 
 
+def parse_and_load(sensor_id, location_id, start_date, end_date) -> pd.DataFrame:
+    """UI 데이터를 파싱하고 디비에 쿼리하여 DataFrame 리턴"""
+
+    if sensor_id == None or location_id == None or not start_date or not end_date:
+        return None
+
+    user: AppUser = fli.current_user
+    group_id = 0 if user.level >= 2 else user.group.id  # master's group_id -> 0
+    start = date.fromisoformat(start_date).strftime("%Y%m%d")
+    end = date.fromisoformat(end_date).strftime("%Y%m%d")
+
+    df = _query_data(group_id, sensor_id, location_id, start, end)
+    return df
+
+
 @app.callback(
     Output("apps-export-dt-section", "children"),
     Output("apps-export-rows", "children"),
     Input("apps-export-sensor", "value"),
+    Input("apps-export-location", "value"),
     Input("apps-export-date", "start_date"),
     Input("apps-export-date", "end_date"),
 )
-def update_ui(sensor_id, start_date, end_date):
+def update_ui(sensor_id, location_id, start_date, end_date):
+    """UI 변경에 따른 업데이트 수행"""
 
-    if not sensor_id or not start_date or not end_date:
+    df = parse_and_load(sensor_id, location_id, start_date, end_date)
+    if df is None:
         return no_update
-
-    sensors = fli.current_user.group.sensors
-    sn = sensors[sensor_id].sn
-    start = date.fromisoformat(start_date).strftime("%Y%m%d")
-    end = date.fromisoformat(end_date).strftime("%Y%m%d")
-
-    df = load_data(sn, start, end)
-    dt = build_data_table(df)
+    dt = _build_data_table(df)
 
     return dt, f"{df.shape[0]}"
 
@@ -241,28 +271,31 @@ def update_ui(sensor_id, start_date, end_date):
     Output("apps-export-download", "data"),
     Input("apps-export-button", "n_clicks"),
     State("apps-export-sensor", "value"),
+    State("apps-export-location", "value"),
     State("apps-export-date", "start_date"),
     State("apps-export-date", "end_date"),
     prevent_initial_call=True,
 )
-def exportAsCsv(n, sensor_id, start_date, end_date):
+def exportAsCsv(n, sensor_id, location_id, start_date, end_date):
     """export data as csv"""
 
-    if not sensor_id or not start_date or not end_date:
+    df = parse_and_load(sensor_id, location_id, start_date, end_date)
+    if df is None:
         return no_update
-
-    sensors = fli.current_user.group.sensors
-    sn = sensors[sensor_id].sn
-    start = date.fromisoformat(start_date).strftime("%Y%m%d")
-    end = date.fromisoformat(end_date).strftime("%Y%m%d")
-
-    df = load_data(sn, start, end)
-
     if not df.shape[0] or not df.shape[1]:
         return no_update
 
-    sensorName = sensors[sensor_id].name.replace(" ", "-")
-    fn = f"{sensorName}_{start_date}~{end_date}.csv"
+    g: Group = fli.current_user.group
+    sensor: Sensor = Sensor.query.get(sensor_id)
+    location: Location = Location.query.get(location_id)
+
+    fn = g.name.replace(" ", "-")
+    if sensor_id != 0:
+        fn = f'{fn}__{sensor.name.replace(" ", "-")}'
+    if location_id != 0:
+        fn = f'{fn}__{location.name.replace(" ", "-")}'    
+    fn = f"{fn}__{start_date}~{end_date}.csv"
+
     cols = _meta_cols + _cols
     return dcc.send_data_frame(
         df.to_csv,
@@ -283,10 +316,10 @@ import json
 
 
 def test():
-    df1 = load_data("B2F_CAMs_2000000000001", "20211215", "20211215")
-    dt1 = build_data_table(df1)
+    df1 = _query_data(1, 1, 1, "20211215", "20211215")
+    dt1 = _build_data_table(df1)
     # txt = json.dumps(dt1)
     # debug(txt)
 
 
-test()
+# test()
