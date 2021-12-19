@@ -4,70 +4,18 @@ CAMs 센서데이터의 시각화
 
 print(f"<{__name__}> loading...")
 
-from db import sensor_data
-from ._imports import *
-import pandas as pd
+from ._common_db import *
+from ._common_db import _cols_meta, _cols
+
+# from ._imports import *
+# import pandas as pd
 from dash_extensions.enrich import Trigger
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 import plotly.express as px
 
-# import db
-from db.user import AppUser
-from db.location import Location
-from db.sensor import Sensor
-from pymongo import MongoClient
-from bson.raw_bson import RawBSONDocument
 
-_set = getSettings("Mongo")  # CAMs DB 설정
-_mongo = MongoClient(
-    f'mongodb://{_set["User"]}:{_set["Pw"]}@{_set["Ip"]}:{_set["Port"]}/{_set["Db"]}',
-    document_class=RawBSONDocument,
-)
-_cams = _mongo[_set["Db"]]
-
-_farms = []
-_sensors = {}
-
-# build data types of columns
-_cols = [
-    "Light",
-    "Air_Temp",
-    "Leaf_Temp",
-    "Humidity",
-    "CO2",
-    "Dewpoint",
-    "EvapoTranspiration",
-    "HD",
-    "VPD",
-]
-# metas = _set["MetaColumns"]
-_data_types = {x: "float64" for x in _cols}
-# for x in metas:
-#     data_types[x] = "string"
-
-
-def load_data(sn: str, date):
-    """DB에서 하루동안의 데이터를 불러온다.
-    DataFrame 변환시간의 리스트를 생성
-    그래프에 들어갈 데이터 필드 목록을 생성
-    :return: DataFrame"""
-
-    # load dataset from DB
-    sensors = _cams["sensors"]
-    ds = sensors.find({"SN": sn, "Date": date})
-
-    df = pd.DataFrame(ds)
-    if df.shape[0] and df.shape[1]:
-        df = df.astype(_data_types, copy=False)  # , errors="ignore")
-    debug(load_data, f"{date}: {df.shape = }")
-
-    return df
-
-
-def plotAll(
-    df: pd.DataFrame, cols = [], title: str = "", colsRight = []
-) -> dict:
+def plotAll(df: pd.DataFrame, cols=[], title: str = "", colsRight=[]) -> dict:
     """데이터의 Figure 생성"""
 
     if df is None or not df.shape[0] or not df.shape[1]:
@@ -77,13 +25,13 @@ def plotAll(
             title=f"{title}",
         )
 
-    df.sort_values(by=["Time"], axis=0, inplace=True)
+    df.sort_values(by=["time"], axis=0, inplace=True)
 
     fig = make_subplots(specs=[[{"secondary_y": True}]])
     for col in cols:
         fig.add_trace(
             go.Scatter(
-                x=df["Time"],
+                x=df["time"],
                 y=df[col],
                 mode="lines",
                 name=col,
@@ -93,7 +41,7 @@ def plotAll(
     for col in colsRight:
         fig.add_trace(
             go.Scatter(
-                x=df["Time"],
+                x=df["time"],
                 y=df[col],
                 mode="lines",
                 name=col,
@@ -131,29 +79,32 @@ def update_graph(sensor_id, date):
     if date is None:
         return plotAll(None), plotAll(None), plotAll(None), plotAll(None)
 
-    if not sensor_id in _sensors.keys():
+    sensor = Sensor.query.get(sensor_id)
+    if sensor is None or sensor.group_id != fli.current_user.group.id:
         return plotAll(None), plotAll(None), plotAll(None), plotAll(None)
 
-    sensor = _sensors[sensor_id]
-    dbSN = sensor.sn  # TODO: use sensor_id (pg)
-    dbDate = datetime.fromisoformat(date).strftime("%Y%m%d")
-    df = load_data(dbSN, dbDate)
+    # sensor = Sensor.query.get(sensor_id)
+    # dbSN = sensor.sn
+    # dbDate = datetime.fromisoformat(date).strftime("%Y%m%d")
+    # df = load_data(dbSN, dbDate)
+    df = parse_and_load(sensor_id, 0, date, date)
 
     # "Light","Air_Temp","Leaf_Temp","Humidity","CO2","Dewpoint","EvapoTranspiration","HD","VPD"
+    # "air_temp", "leaf_temp", "humidity", "light","co2", "dewpoint", "evapotrans","hd","vpd",
     # figure 1 : temperature vs light
-    fig1 = plotAll(df, ["Light"], "Light vs Temperature", ["Air_Temp", "Leaf_Temp"])
+    fig1 = plotAll(df, ["light"], "Light vs Temperature", ["air_temp", "leaf_temp"])
     fig1.update_yaxes(title_text="Light", secondary_y=False)
     fig1.update_yaxes(title_text="Temperature [ºC]", secondary_y=True)
 
     # figure 2 : temp~hum
     fig2 = plotAll(
-        df, ["Air_Temp", "Leaf_Temp"], "Temperature vs Humidity", ["Humidity"]
+        df, ["air_temp", "leaf_temp"], "Temperature vs Humidity", ["humidity"]
     )
     fig2.update_yaxes(title_text="Temperature(ºC)", secondary_y=False)
     fig2.update_yaxes(title_text="Humiidty(%)", secondary_y=True)
 
     # figure 3 : light~evatr
-    fig3 = plotAll(df, ["Light"], "Light vs EvapoTranspiration", ["EvapoTranspiration"])
+    fig3 = plotAll(df, ["light"], "Light vs EvapoTranspiration", ["evapotrans"])
     fig3.update_yaxes(title_text="Light", secondary_y=False)
     fig3.update_yaxes(title_text="EvapoTrans", secondary_y=True)
 
@@ -174,16 +125,9 @@ def layout():
     app.title = "B2F - CAMs Viewer"  # TODO: 효과없음
 
     # 센서 ID 추출
-    global _farms, _sensors
-    _farms = fli.current_user.farms
-    _sensors = {}
-    for f in _farms:
-        _sensors.update({s.id: s for s in f.sensors})
-
-    dateValue = datetime.now().date()
-    snOptions = [{"label": _sensors[s].name, "value": s} for s in _sensors]
-    snDefalut = snOptions[0]["value"] if len(snOptions) > 0 else ""
-
+    sensors = {s.id: s for s in fli.current_user.group.sensors}
+    sensorOptions = [{"label": sensors[s].name, "value": s} for s in sensors]
+    snDefalut = sensorOptions[0]["value"] if len(sensorOptions) > 0 else ""
     sensorTr = html.Tr(
         [
             html.Td(
@@ -192,7 +136,7 @@ def layout():
                         html.Span("Sensor"),
                         dcc.Dropdown(
                             id="apps-cams-sensor",
-                            options=snOptions,
+                            options=sensorOptions,
                             value=snDefalut,
                             clearable=False,
                             searchable=False,
@@ -203,6 +147,8 @@ def layout():
             html.Td(),
         ]
     )
+
+    dateValue = datetime.now().date()
     dateTr = html.Tr(
         [
             html.Td(

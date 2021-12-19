@@ -8,5 +8,5 @@
 # modules = glob.glob(join(dirname(__file__), "*.py"))
 # __all__ = [ basename(f)[:-3] for f in modules if isfile(f) and not f.endswith('__init__.py')]
 
-__all__ = ["B2F_CAMs_DashBoard", "ircam", "export", "restart"]
-# __all__ = ["B2F_CAMs_DashBoard", "ircam", "export_mongo", "restart"]
+__all__ = ["cams_viewer", "ircam", "export", "restart"]
+# __all__ = ["cams_viewer", "ircam", "export_mongo", "restart"]
