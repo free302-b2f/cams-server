@@ -40,18 +40,14 @@ _cols = [
 _types = {x: "float64" for x in _cols}
 
 # meta columns ~ string type?
-_meta_cols = ["id", "time", "sensor_id", "location_id", "group_id"]
-_types.update({x: "string" for x in _meta_cols})
+_cols_meta = ["id", "group_id", "location_id", "sensor_id", "time"]
+_types.update({x: "string" for x in _cols_meta})
 
 # dash.DataTable columns & headers
 _headers = [
-    # "Sensor",
-    # "Location",
-    # "Organization",
     "Tair",
     "Tleaf",
     "RH[%]",
-    "Time",
     "Light",
     "CO₂",
     "DP",
@@ -59,14 +55,26 @@ _headers = [
     "HD",
     "VPD",
 ]
+_headers_meta = [
+    "ID",
+    "Group",
+    "Location",
+    "Sensor",
+    "Time",
+]
 _dt_columns = [
     {
         "name": h,
         "id": c,
         "type": "numeric",
-        "format": dtFmt.Format(precision=3, scheme=dtFmt.Scheme.decimal_si_prefix),  # fixed)
+        "format": dtFmt.Format(
+            precision=3, scheme=dtFmt.Scheme.decimal_si_prefix
+        ),  # fixed)
     }
-    for h, c in zip(_headers, _meta_cols + _cols)
+    # for h, c in zip(_headers, _cols)
+    # for h, c in zip(_headers_meta, _cols_meta)
+    # for h, c in zip(_headers_meta + _headers, _cols_meta + _cols)
+    for h, c in zip([_headers_meta[4], *_headers], [_cols_meta[4], *_cols])
 ]
 
 
@@ -293,10 +301,10 @@ def exportAsCsv(n, sensor_id, location_id, start_date, end_date):
     if sensor_id != 0:
         fn = f'{fn}__{sensor.name.replace(" ", "-")}'
     if location_id != 0:
-        fn = f'{fn}__{location.name.replace(" ", "-")}'    
+        fn = f'{fn}__{location.name.replace(" ", "-")}'
     fn = f"{fn}__{start_date}~{end_date}.csv"
 
-    cols = _meta_cols + _cols
+    cols = _cols_meta + _cols
     return dcc.send_data_frame(
         df.to_csv,
         fn,

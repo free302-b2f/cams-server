@@ -128,12 +128,14 @@ def f3_seed(sensors):
     try:
         cursor: pge.cursor = _pgc.cursor(cursor_factory=pga.DictCursor)
 
-        # # 센서 ID 추출
-        # if not sensors:
-        #     cursor.execute("SELECT id FROM group limit 1")
-        #     gid = [x["id"] for x in cursor.fetchall()][0]
-        #     cursor.execute(f"SELECT id FROM sensor WHERE group_id = {gid}")
-        #     ids = [x["id"] for x in cursor.fetchall()]
+        # 센서 ID 추출
+        if not sensors:
+            debug("no sensors, exting...")
+            return
+            cursor.execute("SELECT id FROM group limit 1")
+            gid = [x["id"] for x in cursor.fetchall()][0]
+            cursor.execute(f"SELECT id FROM sensor WHERE group_id = {gid}")
+            ids = [x["id"] for x in cursor.fetchall()]
 
         start = datetime.combine(datetime.now().date(), datetime.min.time())
         dates = [start + timedelta(days=x) for x in range(-7, 7)]
@@ -145,7 +147,7 @@ def f3_seed(sensors):
             ON CONFLICT DO NOTHING"""
 
         def insert(gid: int, lid: int, sid: int, dt: datetime):
-            debug(f"inserting: {sid} @{dt}")
+            info(f"inserting: {sid} @{dt}")
             for x in range(2880):
                 light = random.uniform(80, 100) * (
                     dt.hour if dt.hour < 13 else 24 - dt.hour
