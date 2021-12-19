@@ -4,8 +4,8 @@ CAMs 센서데이터의 시각화
 
 print(f"<{__name__}> loading...")
 
-from ._common_db import *
-from ._common_db import _cols_meta, _cols
+from ._common import *
+from ._common import _cols_meta, _cols, _headers
 
 # from ._imports import *
 # import pandas as pd
@@ -13,6 +13,8 @@ from dash_extensions.enrich import Trigger
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 import plotly.express as px
+
+_col_header_map = {c: h for h, c in zip(_headers, _cols)}
 
 
 def plotAll(df: pd.DataFrame, cols=[], title: str = "", colsRight=[]) -> dict:
@@ -55,10 +57,21 @@ def plotAll(df: pd.DataFrame, cols=[], title: str = "", colsRight=[]) -> dict:
     fig.update_layout(legend=dict(yanchor="bottom", y=1.05, xanchor="right", x=1.15))
 
     fig.update_xaxes(
-        tickmode="auto", title="Time [hh:mm:ss]"
-    )  # , rangeslider_visible=True)
-    fig.update_yaxes(tickmode="auto", tickformat=".3n", secondary_y=False)
+        tickmode="auto",
+        title="Time [hh:mm:ss]",
+        # rangeslider_visible=True,
+    )
+    # fig.update_yaxes(tickmode="auto", tickformat=".3n", secondary_y=False)
     fig.update_yaxes(tickmode="auto", tickformat=".3n", secondary_y=True)
+
+    # 범례 항목명 대체: evapotrans -> EvaTrans
+    # fig.update_traces(name="EvaTrans", selector=dict(name="evapotrans"))
+    def rename(old):
+        new = _col_header_map[old]
+        fig.update_traces(name=new, selector=dict(name=old))
+
+    fig.for_each_trace(lambda sc: rename(sc.name))
+
     return fig
 
 
@@ -83,14 +96,10 @@ def update_graph(sensor_id, date):
     if sensor is None or sensor.group_id != fli.current_user.group.id:
         return plotAll(None), plotAll(None), plotAll(None), plotAll(None)
 
-    # sensor = Sensor.query.get(sensor_id)
-    # dbSN = sensor.sn
-    # dbDate = datetime.fromisoformat(date).strftime("%Y%m%d")
-    # df = load_data(dbSN, dbDate)
     df = parse_and_load(sensor_id, 0, date, date)
 
-    # "Light","Air_Temp","Leaf_Temp","Humidity","CO2","Dewpoint","EvapoTranspiration","HD","VPD"
     # "air_temp", "leaf_temp", "humidity", "light","co2", "dewpoint", "evapotrans","hd","vpd",
+
     # figure 1 : temperature vs light
     fig1 = plotAll(df, ["light"], "Light vs Temperature", ["air_temp", "leaf_temp"])
     fig1.update_yaxes(title_text="Light", secondary_y=False)
@@ -107,13 +116,13 @@ def update_graph(sensor_id, date):
     fig3 = plotAll(df, ["light"], "Light vs EvapoTranspiration", ["evapotrans"])
     fig3.update_yaxes(title_text="Light", secondary_y=False)
     fig3.update_yaxes(title_text="EvapoTrans", secondary_y=True)
+    # fig3.update_traces(name="EvaTrans", selector=dict(name="evapotrans"))
 
     # figure 4 : ALL
     fig4 = plotAll(df, _cols, "Time vs Various")
     fig4.update_yaxes(title_text="Quantities", secondary_y=False)
     fig4.update_xaxes(rangeslider_visible=True)
     fig4.update_layout(legend=dict(yanchor="top", y=1.15, xanchor="left", x=0.95))
-    fig4.update_traces(name="EvaTrans", selector=dict(name="EvapoTranspiration"))
 
     return fig1, fig2, fig3, fig4
 

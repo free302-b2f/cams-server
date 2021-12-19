@@ -2,8 +2,8 @@
 
 print(f"<{__name__}> loading...")
 
-from ._common_db import *
-from ._common_db import _cols_meta, _cols
+from ._common import *
+from ._common import _cols_meta, _cols
 
 
 def layout():

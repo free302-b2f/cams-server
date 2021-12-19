@@ -44,8 +44,8 @@ _types.update({x: "string" for x in _cols_meta})
 
 # dash.DataTable header
 _headers = [
-    "Tair",
-    "Tleaf",
+    "T-air",
+    "T-leaf",
     "RH[%]",
     "Light",
     "CO₂",
@@ -98,7 +98,7 @@ def _query_data(group_id, sensor_id, location_id, start, end) -> pd.DataFrame:
         if location_id > 0:
             format = f"{format} AND (location_id = %s)"
             value = (*value, location_id)
-        format = f"{format} ORDER BY location_id ASc, sensor_id ASC, time ASC"
+        format = f"{format} ORDER BY location_id ASC, sensor_id ASC, time ASC"
         sql = cursor.mogrify(format, value)
         debug(str(sql))
 
