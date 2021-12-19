@@ -32,8 +32,9 @@ def seed():
     from . import _seed_kist
 
     _seed_master.seed()
+
     kist_json = "seed-kist-pheno.json"  # KIST Pheno
-    _seed_kist.dump_json(kist_json)
+    # _seed_kist.dump_json(kist_json)
     load_json_seed(kist_json)
 
 

@@ -5,7 +5,6 @@ CAMs 센서데이터의 시각화
 print(f"<{__name__}> loading...")
 
 from ._common import *
-from ._common import _cols_meta, _cols, _headers
 
 # from ._imports import *
 # import pandas as pd
@@ -14,7 +13,7 @@ from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 import plotly.express as px
 
-_col_header_map = {c: h for h, c in zip(_headers, _cols)}
+_col_header_map = {c: h for h, c in zip(sd_headers, sd_cols)}
 
 
 def plotAll(df: pd.DataFrame, cols=[], title: str = "", colsRight=[]) -> dict:
@@ -119,7 +118,7 @@ def update_graph(sensor_id, date):
     # fig3.update_traces(name="EvaTrans", selector=dict(name="evapotrans"))
 
     # figure 4 : ALL
-    fig4 = plotAll(df, _cols, "Time vs Various")
+    fig4 = plotAll(df, sd_cols, "Time vs Various")
     fig4.update_yaxes(title_text="Quantities", secondary_y=False)
     fig4.update_xaxes(rangeslider_visible=True)
     fig4.update_layout(legend=dict(yanchor="top", y=1.15, xanchor="left", x=0.95))

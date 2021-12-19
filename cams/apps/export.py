@@ -3,7 +3,6 @@
 print(f"<{__name__}> loading...")
 
 from ._common import *
-from ._common import _cols_meta, _cols
 
 
 def layout():
@@ -158,7 +157,7 @@ def exportAsCsv(n, sensor_id, location_id, start_date, end_date):
         fn = f'{fn}__{location.name.replace(" ", "-")}'
     fn = f"{fn}__{start_date}~{end_date}.csv"
 
-    cols = _cols_meta + _cols
+    cols = sd_cols_meta + sd_cols
     return dcc.send_data_frame(
         df.to_csv,
         fn,

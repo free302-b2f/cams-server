@@ -23,27 +23,14 @@ _pgc = pg.connect(
     f'postgres://{_set["User"]}:{_set["Pw"]}@{_set["Ip"]}:{_set["Port"]}/{_set["Db"]}'
 )
 
-# 측정값 컬럼 목록
-_cols = [
-    "air_temp",
-    "leaf_temp",
-    "humidity",
-    "light",
-    "co2",
-    "dewpoint",
-    "evapotrans",
-    "hd",
-    "vpd",
-]
-# 메타 컬럼 목록 ~ string type?
-_cols_meta = ["id", "group_id", "location_id", "sensor_id", "time"]
+from db.sensor_data import sd_cols, sd_cols_meta
 
 # pd.DataFrame column type
-_types = {x: "float64" for x in _cols}
-_types.update({x: "string" for x in _cols_meta})
+_types = {x: "float64" for x in sd_cols}
+_types.update({x: "string" for x in sd_cols_meta})
 
 # dash.DataTable header
-_headers = [
+sd_headers = [
     "T-air",
     "T-leaf",
     "RH[%]",
@@ -76,7 +63,7 @@ _dt_columns = [
     # for h, c in zip(_headers_meta, _cols_meta)
     # for h, c in zip(_headers_meta + _headers, _cols_meta + _cols)
     # 시간 + 측정값 컬럼 전체
-    for h, c in zip([_headers_meta[4], *_headers], [_cols_meta[4], *_cols])
+    for h, c in zip([_headers_meta[4], *sd_headers], [sd_cols_meta[4], *sd_cols])
 ]
 
 

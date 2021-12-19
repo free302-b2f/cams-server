@@ -5,10 +5,10 @@ print(f"<{__name__}> loading...")
 # region ---- imports ----
 
 if __name__ == "__main__":
-    import sys, os
+    import sys, os.path as path
 
-    dir = os.path.dirname(os.path.dirname(__file__))
-    sys.path.append(dir)
+    dir = path.dirname(path.dirname(__file__))
+    sys.path.insert(0, dir)
 
 from apps._imports import *
 import utility as util
@@ -19,11 +19,26 @@ import psycopg2 as pg
 import psycopg2.extensions as pge
 import psycopg2.extras as pga
 
-from .group import Group
-from .location import Location
-from .sensor import Sensor
+# from .group import Group
+# from .location import Location
+# from .sensor import Sensor
 
 # endregion
+
+# 측정값 컬럼 목록
+sd_cols = [
+    "air_temp",
+    "leaf_temp",
+    "humidity",
+    "light",
+    "co2",
+    "dewpoint",
+    "evapotrans",
+    "hd",
+    "vpd",
+]
+# 메타 컬럼 목록 ~ string type?
+sd_cols_meta = ["id", "group_id", "location_id", "sensor_id", "time"]
 
 
 # region ---- DB Server & Connection ----
@@ -122,6 +137,90 @@ def f2_create_table():
     cursor.close()
 
 
+_sql_insert = """INSERT INTO sensor_data 
+    (group_id, location_id, sensor_id, time, air_temp, leaf_temp, humidity, 
+    light, co2, dewpoint, evapotrans, hd, vpd) 
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) 
+    ON CONFLICT DO NOTHING"""
+
+
+def _insert(cursor: pge.cursor, gid: int, lid: int, sid: int, record):
+    """sensor_data테이블 레코드를 추가"""
+
+    sql = cursor.mogrify(_sql_insert)
+    cursor.execute(
+        sql,
+        (
+            gid,
+            lid,
+            sid,
+            record["time"],
+            record["air_temp"],
+            record["leaf_temp"],
+            record["humidity"],
+            record["light"],
+            record["co2"],
+            record["dewpoint"],
+            record["evapotrans"],
+            record["hd"],
+            record["vpd"],
+        ),
+    )
+    cursor.connection.commit()
+    pass
+
+
+def Insert(dic):
+    """주어진 sn에서 그룹/장소/센서 id를 구해서 테이블에 추가"""
+
+    cursor: pge.cursor = None
+    sn = dic["sn"]
+    
+    try:
+        # postgres: sensor 목록
+        cursor = _pgc.cursor(cursor_factory=pga.DictCursor)
+        cursor.execute(f"SELECT group_id, location_id, id FROM sensor WHERE sn = '{sn}' ")
+        sensor = cursor.fetchone()
+
+        _insert(cursor, *sensor, dic)
+
+    finally:
+        if cursor:
+            cursor.close()
+
+
+def _insert_random(cursor: pge.cursor, gid: int, lid: int, sid: int, dt: datetime):
+    """sensor_data테이블에 하루치 랜덤 레코드를 추가"""
+
+    info(f"inserting: {sid} @{dt}")
+    sql = cursor.mogrify(_sql_insert)
+    for x in range(2880):
+        light = random.uniform(80, 100) * (dt.hour if dt.hour < 13 else 24 - dt.hour)
+
+        cursor.execute(
+            sql,
+            (
+                gid,
+                lid,
+                sid,
+                dt,
+                round(random.uniform(10, 30), 1),  # air temp
+                round(random.uniform(10, 30), 1),  # leaf
+                round(random.uniform(30, 90), 1),  # humidity
+                round(light, 1),  # light
+                round(random.uniform(0, 100), 1),  # co2
+                round(random.uniform(0, 10), 1),  # dewpoint
+                round(random.uniform(0, 10), 1),
+                round(random.uniform(0, 10), 1),
+                round(random.uniform(0, 10), 1),
+            ),
+        )
+        dt = dt + timedelta(seconds=30)
+    cursor.connection.commit()
+
+    pass
+
+
 def f3_seed(sensors):
     """기본적인 메타데이터 및 랜덤 센서데이터 추가"""
 
@@ -138,47 +237,13 @@ def f3_seed(sensors):
             ids = [x["id"] for x in cursor.fetchall()]
 
         start = datetime.combine(datetime.now().date(), datetime.min.time())
-        dates = [start + timedelta(days=x) for x in range(-7, 7)]
-
-        sql = """INSERT INTO sensor_data 
-            (group_id, location_id, sensor_id, time, air_temp, leaf_temp, humidity, 
-            light, co2, dewpoint, evapotrans, hd, vpd) 
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) 
-            ON CONFLICT DO NOTHING"""
-
-        def insert(gid: int, lid: int, sid: int, dt: datetime):
-            info(f"inserting: {sid} @{dt}")
-            for x in range(2880):
-                light = random.uniform(80, 100) * (
-                    dt.hour if dt.hour < 13 else 24 - dt.hour
-                )
-                cursor.execute(
-                    sql,
-                    (
-                        gid,
-                        lid,
-                        sid,
-                        dt,
-                        round(random.uniform(10, 30), 1),  # air temp
-                        round(random.uniform(10, 30), 1),  # leaf
-                        round(random.uniform(30, 90), 1),  # humidity
-                        round(light, 1),  # light
-                        round(random.uniform(0, 100), 1),  # co2
-                        round(random.uniform(0, 10), 1),  # dewpoint
-                        round(random.uniform(0, 10), 1),
-                        round(random.uniform(0, 10), 1),
-                        round(random.uniform(0, 10), 1),
-                    ),
-                )
-                dt = dt + timedelta(seconds=30)
-            _pgc.commit()
-            pass
+        dates = [start + timedelta(days=x) for x in range(-7, 0)]
 
         # 각 센서에 대해 센서데이터 추가
         for s in sensors:
             for d in dates:
                 try:
-                    insert(s.group_id, s.location_id, s.id, d)
+                    _insert_random(cursor, s.group_id, s.location_id, s.id, d)
                 except:
                     debug(f"failed: {s.id}@{d}")
                     pass
