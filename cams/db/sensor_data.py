@@ -4,11 +4,15 @@ print(f"<{__name__}> loading...")
 
 # region ---- imports ----
 
-if __name__ == "__main__":
+# 단독실행시 db 패키지 초기화 생략 (flask context 없이)
+if __name__ == "__main__" or not __package__:
     import sys, os.path as path
 
     dir = path.dirname(path.dirname(__file__))
     sys.path.insert(0, dir)
+    from _postgresql import connect
+else:
+    from ._postgresql import connect
 
 from apps._imports import *
 import utility as util
@@ -25,7 +29,22 @@ import psycopg2.extras as pga
 
 # endregion
 
+
+# region ---- column names ----
+
 # 측정값 컬럼 목록
+# mongodb는 대소문자를 구별한다.. dict라서?
+sd_cols_raw = [
+    "Air_Temp",
+    "Leaf_Temp",
+    "Humidity",
+    "Light",
+    "CO2",
+    "Dewpoint",
+    "EvapoTranspiration",
+    "HD",
+    "VPD",
+]
 sd_cols = [
     "air_temp",
     "leaf_temp",
@@ -33,52 +52,50 @@ sd_cols = [
     "light",
     "co2",
     "dewpoint",
-    "evapotrans",
+    "evapotranspiration",
     "hd",
     "vpd",
 ]
 # 메타 컬럼 목록 ~ string type?
 sd_cols_meta = ["id", "group_id", "location_id", "sensor_id", "time"]
 
-
-# region ---- DB Server & Connection ----
-
-_set = getSettings("Postgres")
-_pgc = pg.connect(
-    f'postgres://{_set["User"]}:{_set["Pw"]}@{_set["Ip"]}:{_set["Port"]}/{_set["Db"]}'
-)
-
 # endregion
 
 
 def f0_check_connection():
-    cursor: pge.cursor = _pgc.cursor()
-    cursor.execute("SELECT 'hello world'")
-    ds = cursor.fetchone()
-    print(ds)
-    _pgc.commit()
-    cursor.close()
-    return ds
+
+    try:
+        pgc, cursor = connect()
+        cursor.execute("SELECT 'hello world'")
+        ds = cursor.fetchone()
+        print(ds)
+    finally:
+        cursor.close()
+        pgc.close()
 
 
 def f1_drop_table():
     """drop sensor_data table"""
 
-    cursor: pge.cursor = _pgc.cursor()
-    cursor.execute("DROP TABLE IF EXISTS sensor_data")
-    _pgc.commit()
-    cursor.close()
-    pass
+    try:
+        pgc, cursor = connect()
+        cursor.execute("DROP TABLE IF EXISTS sensor_data")
+        pgc.commit()
+    finally:
+        cursor.close()
+        pgc.close()
 
 
 def f1_clear_data():
     """delete all rows from sensor_data"""
 
-    cursor: pge.cursor = _pgc.cursor()
-    cursor.execute("DELETE FROM sensor_data")
-    _pgc.commit()
-    cursor.close()
-    pass
+    try:
+        pgc, cursor = connect()
+        cursor.execute("DELETE FROM sensor_data")
+        pgc.commit()
+    finally:
+        cursor.close()
+        pgc.close()
 
 
 def f2_create_table():
@@ -101,7 +118,7 @@ def f2_create_table():
         light DOUBLE PRECISION,
         co2 DOUBLE PRECISION,
         dewpoint DOUBLE PRECISION,
-        evapotrans DOUBLE PRECISION,
+        evapotranspiration DOUBLE PRECISION,
         hd DOUBLE PRECISION,
         vpd DOUBLE PRECISION,
         FOREIGN KEY (group_id) REFERENCES app_group (id),
@@ -121,79 +138,88 @@ def f2_create_table():
     SELECT set_chunk_time_interval('sensor_data', INTERVAL '7 days');
     """
 
-    cursor: pge.cursor = _pgc.cursor()
-    cursor.execute(create_sensordata_table)
-    cursor.execute(create_sensordata_hypertable)
-    _pgc.commit()
-
     # 하이퍼테이블 정보 출력
     query_table_info = """
     SELECT h.table_name, c.interval_length FROM _timescaledb_catalog.dimension c
         JOIN _timescaledb_catalog.hypertable h ON h.id = c.hypertable_id;"""
-    cursor.execute(query_table_info)
-    ti = cursor.fetchone()
-    debug(f"table info: {ti}")
 
-    cursor.close()
+    try:
+        pgc, cursor = connect()
+        cursor.execute(create_sensordata_table)
+        cursor.execute(create_sensordata_hypertable)
+        pgc.commit()
+
+        cursor.execute(query_table_info)
+        ti = cursor.fetchone()
+        debug(f"table info: {ti}")
+        pgc.commit()
+    finally:
+        cursor.close()
+        pgc.close()
 
 
-_sql_insert = """INSERT INTO sensor_data 
-    (group_id, location_id, sensor_id, time, air_temp, leaf_temp, humidity, 
-    light, co2, dewpoint, evapotrans, hd, vpd) 
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) 
-    ON CONFLICT DO NOTHING"""
+def _build_insert() -> str:
+
+    cols = sd_cols_meta[1:] + sd_cols
+    sql = "INSERT INTO sensor_data AS sd ("
+    s1 = ",".join(cols)
+    sql = f"{sql} {s1} ) VALUES ("
+    s2 = ",".join(["%s" for x in cols])
+    sql = f"{sql} {s2}"
+    sql = f"{sql} ) ON CONFLICT (time, sensor_id) DO UPDATE SET "
+    s3 = ",".join([f"{x}=EXCLUDED.{x}" for x in cols])
+    sql = f"{sql} {s3}"
+
+    # s4 = f"WHERE sd.time < EXCLUDED.time"
+    # sql = f"{sql} {s4}"
+    return sql
 
 
-def _insert(cursor: pge.cursor, gid: int, lid: int, sid: int, record):
+def _insert(cursor: pge.cursor, gid: int, lid: int, sid: int, dati: datetime, dic):
     """sensor_data테이블 레코드를 추가"""
 
-    sql = cursor.mogrify(_sql_insert)
-    cursor.execute(
-        sql,
-        (
-            gid,
-            lid,
-            sid,
-            record["time"],
-            record["air_temp"],
-            record["leaf_temp"],
-            record["humidity"],
-            record["light"],
-            record["co2"],
-            record["dewpoint"],
-            record["evapotrans"],
-            record["hd"],
-            record["vpd"],
-        ),
-    )
+    sql = cursor.mogrify(_build_insert())
+    values = (gid, lid, sid, dati, *[dic[x] for x in sd_cols])
+
+    cursor.execute(sql, values)
     cursor.connection.commit()
     pass
 
 
-def Insert(dic):
-    """주어진 sn에서 그룹/장소/센서 id를 구해서 테이블에 추가"""
+def InsertRawDic(rawDic):
+    """주어진 dic에서 그룹/장소/센서 id를 구해서 테이블에 추가"""
 
-    cursor: pge.cursor = None
-    sn = dic["sn"]
-    
     try:
-        # postgres: sensor 목록
-        cursor = _pgc.cursor(cursor_factory=pga.DictCursor)
-        cursor.execute(f"SELECT group_id, location_id, id FROM sensor WHERE sn = '{sn}' ")
-        sensor = cursor.fetchone()
+        pgc, cursor = connect()
 
-        _insert(cursor, *sensor, dic)
+        # 주어진 SN의 센서에 관한 메타 데이터 조회
+        sn = rawDic["SN"]
+        dati = util.parseDate(rawDic["Date"], rawDic["Time"])
+        cursor.execute(
+            f"SELECT group_id, location_id, id FROM sensor WHERE sn = '{sn}'"
+        )
+        meta = cursor.fetchone()
+
+        # 센서 항목명을 DB 컬럼이름으로 변환
+        # dic = {c: rawDic[r] for c, r in zip(sd_cols, sd_cols_raw)}
+        # _insert(cursor, *meta, dati, dic)
+
+        # DB에 추가
+        sql = cursor.mogrify(_build_insert())
+        values = (*meta, dati, *[rawDic[x] for x in sd_cols_raw])
+        cursor.execute(sql, values)
+        cursor.connection.commit()
 
     finally:
-        if cursor:
-            cursor.close()
+        cursor.close()
+        pgc.close()
 
 
 def _insert_random(cursor: pge.cursor, gid: int, lid: int, sid: int, dt: datetime):
     """sensor_data테이블에 하루치 랜덤 레코드를 추가"""
 
     info(f"inserting: {sid} @{dt}")
-    sql = cursor.mogrify(_sql_insert)
+    sql = cursor.mogrify(_build_insert())
     for x in range(2880):
         light = random.uniform(80, 100) * (dt.hour if dt.hour < 13 else 24 - dt.hour)
 
@@ -225,7 +251,7 @@ def f3_seed(sensors):
     """기본적인 메타데이터 및 랜덤 센서데이터 추가"""
 
     try:
-        cursor: pge.cursor = _pgc.cursor(cursor_factory=pga.DictCursor)
+        pgc, cursor = connect()
 
         # 센서 ID 추출
         if not sensors:
@@ -249,84 +275,25 @@ def f3_seed(sensors):
                     pass
     finally:
         cursor.close()
+        pgc.close()
     pass
 
 
-def f4_copy_mongo():
-    """MonogDB의 센서데이터를 PostgreSQL에 복사한다"""
-
-    from pymongo import MongoClient
-    from bson.raw_bson import RawBSONDocument
-
-    # mongo
-    set = getSettings("Mongo")
-    mc = MongoClient(
-        f'mongodb://{set["User"]}:{set["Pw"]}@{set["Ip"]}:{set["Port"]}/{set["Db"]}',
-        document_class=RawBSONDocument,
-    )
-    _sensors = mc[set["Db"]]["sensors"]
-
-    # postgres: sensor 목록
-    cursor: pge.cursor = _pgc.cursor(cursor_factory=pga.DictCursor)
-    cursor.execute("SELECT id, sn FROM sensor")
-    sensorIds = {x["sn"]: x["id"] for x in cursor.fetchall()}
-    cursor.close()
-
-    #
-    def insert(cursor, record, sensorDic):
-        """convert mongodb record to postgresql record"""
-
-        cursor.execute(
-            """
-            INSERT INTO sensor_data 
-            (time, sensor_id, air_temp, leaf_temp, humidity, light, co2, dewpoint, evapotrans, hd, vpd) 
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-            ON CONFLICT DO NOTHING
-            """,
-            (
-                util.parseDate(record["Date"], record["Time"]),  # time
-                sensorDic[record["SN"]],  # sensor id
-                # data_columns = ['Light','Air_Temp','Leaf_Temp','Humidity','CO2','Dewpoint','EvapoTranspiration','HD','VPD']
-                record["Air_Temp"],  # air temp
-                record["Leaf_Temp"],  # leaf
-                record["Humidity"],  # humidity
-                record["Light"],  # light
-                record["CO2"],  # co2
-                record["Dewpoint"],  # dewpoint
-                record["EvapoTranspiration"],  # EvapoTranspiration
-                record["HD"],  # HD
-                record["VPD"],  # VPD
-            ),
-        )
-
-    # get first last day
-    first = _sensors.find().sort([("_id", 1), ("Date", 1)]).limit(1)[0]["Date"]
-    last = _sensors.find().sort([("_id", -1), ("Date", -1)]).limit(1)[0]["Date"]
-
-    t1 = util.parseDate(first)
-    t2 = util.parseDate(last)
-    numDays = (t2 - t1).days
-    for d in range(0, numDays):
-        date = (t1 + timedelta(days=d)).strftime("%Y%m%d")
-        info(f"converting {date}...")
-
-        startTime = timer()
-        src = _sensors.find({"Date": date}).sort([("_id", 1)])
-
-        cursor: pge.cursor = _pgc.cursor()
-        for record in src:
-            insert(cursor, record, sensorIds)
-        _pgc.commit()
-        cursor.close()
-
-        elapsedTime = round(timer() - startTime, 3)
-        info(f" -> {elapsedTime} sec")
-
-    return
-
-
 if __name__ == "__main__":
-    f1_drop_table()
-    f2_create_table()
-    f3_seed()
+
+    pgc, cursor = connect()
+    with pgc:
+        with cursor:
+            print(f"{pgc.closed=} {cursor.closed=}")
+
+        print(f"{pgc.closed=} {cursor.closed=}")
+
+        cursor.close()
+        print(f"{pgc.closed=} {cursor.closed=}")
+
+    print(f"{pgc.closed=} {cursor.closed=}")
+
+    # f1_drop_table()
+    # f2_create_table()
+    # f3_seed()
     # f3_copy_mongo()

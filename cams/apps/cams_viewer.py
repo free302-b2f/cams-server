@@ -63,8 +63,8 @@ def plotAll(df: pd.DataFrame, cols=[], title: str = "", colsRight=[]) -> dict:
     # fig.update_yaxes(tickmode="auto", tickformat=".3n", secondary_y=False)
     fig.update_yaxes(tickmode="auto", tickformat=".3n", secondary_y=True)
 
-    # 범례 항목명 대체: evapotrans -> EvaTrans
-    # fig.update_traces(name="EvaTrans", selector=dict(name="evapotrans"))
+    # 범례 항목명 대체: evapotranspiration -> EvaTrans
+    # fig.update_traces(name="EvaTrans", selector=dict(name="evapotranspiration"))
     def rename(old):
         new = _col_header_map[old]
         fig.update_traces(name=new, selector=dict(name=old))
@@ -97,7 +97,7 @@ def update_graph(sensor_id, date):
 
     df = parse_and_load(sensor_id, 0, date, date)
 
-    # "air_temp", "leaf_temp", "humidity", "light","co2", "dewpoint", "evapotrans","hd","vpd",
+    # "air_temp", "leaf_temp", "humidity", "light","co2", "dewpoint", "evapotranspiration","hd","vpd",
 
     # figure 1 : temperature vs light
     fig1 = plotAll(df, ["light"], "Light vs Temperature", ["air_temp", "leaf_temp"])
@@ -112,10 +112,10 @@ def update_graph(sensor_id, date):
     fig2.update_yaxes(title_text="Humiidty(%)", secondary_y=True)
 
     # figure 3 : light~evatr
-    fig3 = plotAll(df, ["light"], "Light vs EvapoTranspiration", ["evapotrans"])
+    fig3 = plotAll(df, ["light"], "Light vs EvapoTranspiration", ["evapotranspiration"])
     fig3.update_yaxes(title_text="Light", secondary_y=False)
     fig3.update_yaxes(title_text="EvapoTrans", secondary_y=True)
-    # fig3.update_traces(name="EvaTrans", selector=dict(name="evapotrans"))
+    # fig3.update_traces(name="EvaTrans", selector=dict(name="evapotranspiration"))
 
     # figure 4 : ALL
     fig4 = plotAll(df, sd_cols, "Time vs Various")

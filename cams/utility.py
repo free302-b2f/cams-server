@@ -15,6 +15,14 @@ import sys, json
 # endregion
 
 
+def addSuperDir(filepath):
+    import sys, os.path as path
+
+    # dir = path.dirname(path.dirname(__file__))
+    dir = path.dirname(path.dirname(filepath))
+    sys.path.insert(0, dir)
+    
+
 def getCallerModule(level=2) -> str:
     """호출하는 함수가 정의된 모듈의 이름을 구한다"""
 
