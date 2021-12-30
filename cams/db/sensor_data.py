@@ -1,11 +1,11 @@
-"""PostgreSQL: sensor_data 테이블"""
+"""PostgreSQL: sensor_data 테이블 관련 기능"""
 
 print(f"<{__name__}> loading...")
 
 # region ---- imports ----
 
-# 단독실행시 db 패키지 초기화 생략 (flask context 없이)
 if __name__ == "__main__" or not __package__:
+    # 단독실행시 db 패키지 초기화 생략 (flask context 없이)
     import sys, os.path as path
 
     dir = path.dirname(path.dirname(__file__))
@@ -159,7 +159,8 @@ def f2_create_table():
 
 
 def _build_insert() -> str:
-
+    """SQL INSERT 문 생성"""
+    
     cols = sd_cols_meta[1:] + sd_cols
     sql = "INSERT INTO sensor_data AS sd ("
     s1 = ",".join(cols)
@@ -175,19 +176,8 @@ def _build_insert() -> str:
     return sql
 
 
-def _insert(cursor: pge.cursor, gid: int, lid: int, sid: int, dati: datetime, dic):
-    """sensor_data테이블 레코드를 추가"""
-
-    sql = cursor.mogrify(_build_insert())
-    values = (gid, lid, sid, dati, *[dic[x] for x in sd_cols])
-
-    cursor.execute(sql, values)
-    cursor.connection.commit()
-    pass
-
-
 def InsertRawDic(rawDic):
-    """주어진 dic에서 그룹/장소/센서 id를 구해서 테이블에 추가"""
+    """센서에서 생성된 rawDic을 DB에서 그룹/장소/센서 id를 구해서 DB에 추가"""
 
     try:
         pgc, cursor = connect()
@@ -202,13 +192,12 @@ def InsertRawDic(rawDic):
 
         # 센서 항목명을 DB 컬럼이름으로 변환
         # dic = {c: rawDic[r] for c, r in zip(sd_cols, sd_cols_raw)}
-        # _insert(cursor, *meta, dati, dic)
 
         # DB에 추가
         sql = cursor.mogrify(_build_insert())
         values = (*meta, dati, *[rawDic[x] for x in sd_cols_raw])
         cursor.execute(sql, values)
-        cursor.connection.commit()
+        pgc.commit()
 
     finally:
         cursor.close()
@@ -280,6 +269,7 @@ def f3_seed(sensors):
 
 
 if __name__ == "__main__":
+    """pg connection/cursor test"""
 
     pgc, cursor = connect()
     with pgc:
@@ -288,7 +278,7 @@ if __name__ == "__main__":
 
         print(f"{pgc.closed=} {cursor.closed=}")
 
-        cursor.close()
+        cursor.close() # cursor.close()는 with에의해 호출되지 않음
         print(f"{pgc.closed=} {cursor.closed=}")
 
     print(f"{pgc.closed=} {cursor.closed=}")

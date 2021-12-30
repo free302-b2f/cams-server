@@ -8,6 +8,8 @@ from datetime import date, datetime, time, timedelta, timezone
 
 
 def connect():
+    """설정파일에서 DB설정을 읽어와 연결하고 커서를 리턴"""
+
     set = util.loadAppSettings("Postgres")
     pgc = pg.connect(
         f'postgres://{set["User"]}:{set["Pw"]}@{set["Ip"]}:{set["Port"]}/{set["Db"]}'

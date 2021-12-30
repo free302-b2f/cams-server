@@ -1,5 +1,6 @@
 """MongoDB 연결을 위한 공통 기능"""
 
+import pymongo
 import utility as util
 from pymongo import MongoClient
 from bson.raw_bson import RawBSONDocument
@@ -17,15 +18,16 @@ def _connectMongo():
     return mc, dsMG
 
 
-def ReadMongo(dt, sn:str): # return dict
-    """dsMG에서 date일의 sn의 레코드를 읽어들임"""
+def ReadMongo(sn: str, date, time=None):  # return dict
+    """MongoDB에서 date 일 time 시각 sn의 레코드를 읽어들임"""
 
     try:
         mc, ds = _connectMongo()
-        dbDate = dt.strftime("%Y%m%d") # .strftime("%Y%m%d") .strftime("%H:%M:%S")
-        dbTime = dt.strftime("%H:%M:%S")
-        docs = ds.find({"Date": dbDate, "Time": dbTime, "SN": sn})
+        # .strftime("%Y%m%d") .strftime("%H:%M:%S")
+        keys = {"SN": sn, "Date": date.strftime("%Y%m%d")}
+        if time:
+            keys["Time"] = time.strftime("%H:%M:%S")
+        docs = ds.find(keys).sort("_id", pymongo.ASCENDING)
         return list(docs)
     finally:
         mc.close()
-    
