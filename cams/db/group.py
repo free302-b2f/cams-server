@@ -35,7 +35,7 @@ class Group(dba.Model):
     desc = dba.Column(dba.String(max_desc), nullable=False)
 
     def __repr__(self):
-        return f"<Farm: {self.name}>"
+        return f"<Group: {self.name}>"
 
     def to_dict(self):
         """인스턴스 객체의 dict 표현을 구한다"""

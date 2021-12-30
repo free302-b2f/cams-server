@@ -3,7 +3,8 @@
 print(f"<{__name__}> loading...")
 
 from ._common import *
-from ._imports import *
+
+# from ._imports import *
 from ._location import *
 from ._sensor import *
 from ._user import *
@@ -92,16 +93,17 @@ def layout():
         [
             html.Header(headerRow),
             html.Section(userRow),
-            html.Section(sensorRow),
             html.Section(locationRow),
+            html.Section(sensorRow),
             userSection,
-            sensorSection,
             locationSection,
+            sensorSection,
         ],
         id="admin-manage-container",
     )
 
 
+# AppUser 선택시 location/sensor 목록 업데이트
 @app.callback(
     Output("admin-manage-user-username", "value"),
     Output("admin-manage-user-email", "value"),
@@ -115,12 +117,13 @@ def layout():
     Input("admin-manage-user", "value"),
 )
 def onUser(uid):
-    """AppUser 선택시 farm/sensor 목록 업데이트"""
+    """AppUser 선택시 location/sensor 목록 업데이트"""
 
     if not uid:
         return no_update
 
-    user: AppUser = fli.current_user
+    # user: AppUser = fli.current_user
+    user: AppUser = AppUser.query.get(uid)
 
     return [
         user.username,

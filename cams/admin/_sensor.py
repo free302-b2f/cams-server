@@ -3,7 +3,6 @@
 from ._imports import *
 from ._common import *
 from dash.dependencies import Input, Output, State
-import flask_login as fl
 
 _name = html.Label(
     [

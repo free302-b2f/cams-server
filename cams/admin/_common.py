@@ -1,12 +1,17 @@
 """패키지 admin 에서 공통으로 사용하는 함수"""
 
 from ._imports import *
-from dash import html
-from dash import dcc
+# from dash import html
+# from dash import dcc
 
 
 def buildButtonRow(buttonText, modelName, showUpdateIcon: bool = True):
-    """추가 항목에 사용할 버튼 생성"""
+    """추가 항목에 사용할 버튼 생성
+      + HTML IDs:
+        - admin-manage-save-{modelName}   : save icon
+        - admin-manage-button-{modelName} : add new button 
+        - data-model="{modelName}"        : button data-* property
+    """
 
     icon = html.Span(
         "save",
