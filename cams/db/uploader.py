@@ -17,39 +17,64 @@ else:
 from time import sleep
 from datetime import date, datetime, time, timedelta, timezone
 
+# 복사할 장비 SN
+srcSN = "B2F_CAMs_1000000000002"
+destSN = "B2F_CAMs_2000000000002"
 
-def run():
+
+def _copyCurrentOne():
+    """2021년 3월 현재 날짜의 현재 시각 데이터를 복사"""
+
+    now = datetime.now()
+    sec = 30 if now.second > 15 and now.second < 45 else 0
+    ti = time(hour=now.hour, minute=now.minute, second=sec)
+    dati = datetime(2021, 3, now.day, **ti)
+    dics = ReadMongo(srcSN, dati, dati)
+
+    # 레코드 수정: 테스트 센서, 오늘 날짜로 변경
+    dati = datetime(now.year, now.month, now.day, **ti)
+    dbDate = dati.strftime("%Y%m%d")
+    dbTime = dati.strftime("%H:%M:%S")
+
+    # Postgresql에 추가
+    for dic in dics:
+        dic["SN"] = destSN
+        dic["Date"] = dbDate
+        dic["Time"] = dbTime
+        print(f"inserting: {destSN} {dati}")
+
+        sd.InsertRawDic(dic)
+    pass
+
+
+def simulate():
     """MongoDB에서 읽어서 SN과 시간을 수정하여 Postgresql에 추가"""
 
     while True:
-        # 레코드 생성: MongoDB에서 읽어오기
-        now = datetime.now()
-        sec = 30 if now.second > 15 and now.second < 45 else 0
-        ti = time(hour=now.hour, minute=now.minute, second=sec)
-        dati = datetime(2021, 3, now.day, **ti)
-        dics = ReadMongo("B2F_CAMs_1000000000002", dati, dati)
-
-        # 레코드 수정: 테스트 센서, 오늘 날짜로 변경
-        sn = "B2F_CAMs_2000000000002"
-        dati = datetime(now.year, now.month, now.day, **ti)
-        dbDate = dati.strftime("%Y%m%d")
-        dbTime = dati.strftime("%H:%M:%S")
-
-        # Postgresql에 추가
-        for dic in dics:
-            dic["SN"] = sn
-            dic["Date"] = dbDate
-            dic["Time"] = dbTime
-            print(f"inserting: {sn} {dati}")
-
-            sd.InsertRawDic(dic)
-
+        _copyCurrentOne()
         sleep(30)
 
 
+def _copyDay(srcDate, destDate=datetime.now()):
+    """srcDate의 데이터를 destDays로 복사"""
+
+    dics = ReadMongo(srcSN, srcDate)
+
+    # Postgresql에 추가
+    print(f"inserting: {destSN} : {srcDate} -> {destDate}")
+    sd.InsertRawDics(dics, destSN, destDate)
+
+
+def copy():
+    """2021-02-15 데이터를 오늘 날짜로 복사"""
+
+    src = datetime(2021, 2, 15).date()
+    _copyDay(src)
+
+
 if __name__ == "__main__":
-    # dics = ReadMongo("B2F_CAMs_1000000000002", datetime(2021, 3, 1))
-    run()
+    # simulate()
+    copy()
 # else:
 #     import threading
 #     _thread = threading.Thread(target=run, args=())

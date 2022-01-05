@@ -3,16 +3,46 @@
 from ._imports import *
 from ._common import *
 
+
+def buildLevelOptions(defaultLevel=None):
+    """UserSection level dropdown에 사용할 목록"""
+
+    # -3=탈퇴(삭제예정), -2=잠금(로그인 불가), -1=게스트, 0=일반, +1=그룹관리자, +2=마스터
+    dic = {2: "마스터계정", 1: "그룹관리자", 0: "일반사용자", -1: "게스트", -2: "잠금", -3: "탈퇴(삭제)"}
+    levels = [0]
+
+    user: AppUser = fli.current_user
+    if user:
+        if user.level >= 1:
+            # 기타 - 관리 권한 없음
+            levels.insert(0, 1)
+            levels.extend([-1, -2, -3])
+        if user.level >= 2:
+            # 마스터 계정인 경우 - 모든 사용자 관리
+            levels.insert(0, 2)        
+
+    options = [{"label": dic[v], "value": v} for v in levels]
+
+    default = defaultLevel if defaultLevel in levels else 0
+    if defaultLevel:
+        default = defaultLevel if defaultLevel in levels else 0
+    else:
+        default = 0
+
+    return options, default
+
+
 userSection = html.Section(
     [
         html.Hr(),
         buildInputLabel("Login ID", "user", "username", "", AppUser.max_username, True),
         buildInputLabel("Email", "user", "email", "", AppUser.max_email),
         buildInputLabel("Real Name", "user", "realname", "", AppUser.max_realname),
-        buildInputLabel("Level", "user", "level", "", AppUser.max_username, True),
+        # buildInputLabel("Level", "user", "level", "", 2),
+        buildDropdownLabel("Level", "user", "level", *buildLevelOptions()),
         buildButtonRow("Update User", "user", False),
     ],
-    className="admin-manage-add-section",
+    className="admin-manage-edit-section",
 )
 
 

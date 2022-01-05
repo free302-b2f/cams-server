@@ -160,7 +160,7 @@ def f2_create_table():
 
 def _build_insert() -> str:
     """SQL INSERT 문 생성"""
-    
+
     cols = sd_cols_meta[1:] + sd_cols
     sql = "INSERT INTO sensor_data AS sd ("
     s1 = ",".join(cols)
@@ -196,7 +196,45 @@ def InsertRawDic(rawDic):
         # DB에 추가
         sql = cursor.mogrify(_build_insert())
         values = (*meta, dati, *[rawDic[x] for x in sd_cols_raw])
+
         cursor.execute(sql, values)
+
+        pgc.commit()
+
+    finally:
+        cursor.close()
+        pgc.close()
+
+
+def InsertRawDics(rawDics, sn=None, sameDate=None):
+    """센서 sn에서 생성된 rawDics을 DB에서 그룹/장소/센서 id를 구해서 DB에 추가"""
+
+    try:
+        pgc, cursor = connect()
+
+        # 주어진 SN의 센서에 관한 메타 데이터 조회
+        def queryMeta():
+            cursor.execute(
+                f"SELECT group_id, location_id, id FROM sensor WHERE sn = '{sn}'"
+            )
+            return cursor.fetchone()
+
+        # 공통 메타 데이터
+        meta = queryMeta() if sn else None
+        dbDate = sameDate.strftime("%Y%m%d") if sameDate else None
+
+        # DB에 추가
+        sql = cursor.mogrify(_build_insert())
+
+        for dic in rawDics:
+            dati = util.parseDate(dbDate if dbDate else dic["Date"], dic["Time"])
+            values = (
+                *(meta if meta else queryMeta()),
+                dati,
+                *[dic[x] for x in sd_cols_raw],
+            )
+            cursor.execute(sql, values)
+
         pgc.commit()
 
     finally:
@@ -278,7 +316,7 @@ if __name__ == "__main__":
 
         print(f"{pgc.closed=} {cursor.closed=}")
 
-        cursor.close() # cursor.close()는 with에의해 호출되지 않음
+        cursor.close()  # cursor.close()는 with에의해 호출되지 않음
         print(f"{pgc.closed=} {cursor.closed=}")
 
     print(f"{pgc.closed=} {cursor.closed=}")

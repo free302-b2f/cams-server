@@ -40,7 +40,7 @@ sensorSection = html.Section(
         # _desc,
         buildButtonRow("Add New Sensor", "sensor"),
     ],
-    className="admin-manage-add-section",
+    className="admin-manage-edit-section",
 )
 
 

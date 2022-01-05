@@ -86,7 +86,7 @@ def buildSensorOptions(uid, selected=None):
 def buildInputLabel(
     labelText, modelName, colName, value, maxLen, readonly: bool = False, addId=False
 ):
-    """html.Input을 포함한 html.Label 생성"""
+    """dcc.Input을 포함한 html.Label 생성"""
 
     return html.Label(
         [
@@ -99,6 +99,30 @@ def buildInputLabel(
                 maxLength=maxLen,
                 required=True,
                 readOnly=readonly,
+            ),
+        ],
+        className="admin-manage-label",
+        id=f"admin-manage-{modelName}-{colName}-label",
+    )
+
+
+def buildDropdownLabel(
+    labelText, modelName, colName, options, defaultValue, readonly: bool = False, addId=False
+):
+    """html.Input을 포함한 html.Label 생성"""
+
+    return html.Label(
+        [
+            html.Span(labelText),
+            html.Span("_", className="material-icons-two-tone"),
+            dcc.Dropdown(
+                id=f"admin-manage-{modelName}-{colName}",
+                options=options,
+                value=defaultValue,
+                # required=True,
+                # readOnly=readonly,
+                clearable=False,
+                searchable=False,
             ),
         ],
         className="admin-manage-label",

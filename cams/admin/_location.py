@@ -46,7 +46,7 @@ locationSection = html.Section(
         buildButtonRow("Add New Location", "location"),
         # visdcc.Run_js('admin-manage-farm-add-js'),
     ],
-    className="admin-manage-add-section",
+    className="admin-manage-edit-section",
 )
 
 

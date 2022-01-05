@@ -109,6 +109,7 @@ def layout():
     Output("admin-manage-user-email", "value"),
     Output("admin-manage-user-realname", "value"),
     Output("admin-manage-user-level", "value"),
+    Output("admin-manage-user-level", "options"),
     Output("admin-manage-user-level-label", "hidden"),
     Output("admin-manage-sensor", "options"),
     Output("admin-manage-sensor", "value"),
@@ -122,15 +123,17 @@ def onUser(uid):
     if not uid:
         return no_update
 
-    # user: AppUser = fli.current_user
     user: AppUser = AppUser.query.get(uid)
+    showLevel = fli.current_user.level >= 2
+    options = buildLevelOptions()[0] if showLevel  else no_update
 
     return [
         user.username,
         user.email,
         user.realname,
         user.level,
-        False if user.level >= 2 else True,
+        options,
+        not showLevel,
         *buildSensorOptions(uid),
         *buildLocationOptions(uid),
     ]

@@ -27,10 +27,10 @@
 #admin-manage-container > section:last-child {
   margin-top: 2rem;
 }
-.admin-manage-add-section {
+.admin-manage-edit-section {
   flex-direction: column;
 }
-.admin-manage-add-section > hr {
+.admin-manage-edit-section > hr {
   width: 100%;
 }
 .admin-manage-label {

@@ -62,16 +62,10 @@ from . import location
 from . import sensor
 from . import admin
 
-# from db.user import AppUser
-# from db.farm import Farm
-# from db.sensor import Sensor
-# from db.admin import Cams
-
 # create all model tables & seed
 if _set["DropTables"]:
 
     # TODO: DO NOT drop sensor_data: data never die!
-    # from db.sensor_data import f1_drop_table, f1_clear_data, f2_create_table
     from . import sensor_data as sd
 
     sd.f1_drop_table()
@@ -79,10 +73,12 @@ if _set["DropTables"]:
 
     dba: SQLAlchemy = fl.g.dba
     dba.drop_all()
-    # _db.Model.metadata.bind = _db.engine # drop_all()시 불필요
-    # Sensor.__table__.drop(checkfirst=True)
-    # Farm.__table__.drop(checkfirst=True)
-    # User.__table__.drop(checkfirst=True)
+    # dba.Model.metadata.bind = dba.engine # drop_all()시 불필요
+    # admin.Cams.__table__.drop(checkfirst=True)
+    # sensor.Sensor.__table__.drop(checkfirst=True)
+    # user.AppUser.__table__.drop(checkfirst=True)
+    # location.Location.__table__.drop(checkfirst=True)
+    # group.Group.__table__.drop(checkfirst=True)
 
     dba.create_all()
     dba.session.commit()
