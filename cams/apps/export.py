@@ -19,11 +19,11 @@ def layout():
         className="flex-h",
     )
 
-    # 센서 선택 목록
+    # 센서 목록
     sensors = {s.id: s for s in fli.current_user.group.sensors}
     sensorOptions = [{"label": "ALL", "value": 0}]
     sensorOptions.extend([{"label": sensors[s].name, "value": s} for s in sensors])
-    # snDefalut = snOptions[0]["value"] if len(snOptions) > 0 else ""
+    sensorDefault = sensorOptions[1]["value"] if len(sensorOptions) > 1 else 0
     sensorRow = html.Label(
         [
             html.Span("CAMs Sensor"),
@@ -31,7 +31,7 @@ def layout():
             dcc.Dropdown(
                 id="apps-export-sensor",
                 options=sensorOptions,
-                value=0,
+                value=sensorDefault,
                 clearable=False,
                 searchable=False,
             ),
@@ -39,11 +39,12 @@ def layout():
         className="apps-export-label",
     )
 
-    # 위치 선택 목록
+    # 위치 목록
     locationOptions = [{"label": "ALL", "value": 0}]
     locationOptions.extend(
         [{"label": l.name, "value": l.id} for l in fli.current_user.group.locations]
     )
+    locationDefault = sensors[sensorDefault].location.id
     locationRow = html.Label(
         [
             html.Span("Location"),
@@ -51,7 +52,7 @@ def layout():
             dcc.Dropdown(
                 id="apps-export-location",
                 options=locationOptions,
-                value=0,
+                value=locationDefault,
                 clearable=False,
                 searchable=False,
             ),
@@ -77,6 +78,28 @@ def layout():
         className="apps-export-label",
     )
 
+    # 옵션 버튼
+    dpOptions = [
+        {"label": "평균 데이터 (5분 간격)", "value": 5},
+        {"label": "전체 데이터 (30초 간격)", "value": 0},
+    ]
+
+    dpRow = html.Label(
+        [
+            html.Span("Data Point"),
+            html.Span("_", className="material-icons-two-tone"),
+            dcc.Dropdown(
+                id="apps-export-dp",
+                options=dpOptions,
+                value=5,
+                clearable=False,
+                searchable=False,
+            ),
+        ],
+        className="apps-export-label",
+    )
+
+    # 실행 버튼
     buttonRow = html.Div(
         [
             html.Span(
@@ -102,6 +125,7 @@ def layout():
             html.Section(sensorRow),
             html.Section(locationRow),
             html.Section(dateRow),
+            html.Section(dpRow),
             html.Section(buttonRow, id="apps-export-button-section"),
             html.Section("-- data table --", id="apps-export-dt-section"),
         ],
@@ -116,11 +140,12 @@ def layout():
     Input("apps-export-location", "value"),
     Input("apps-export-date", "start_date"),
     Input("apps-export-date", "end_date"),
+    Input("apps-export-dp", "value"),
 )
-def update_ui(sensor_id, location_id, start_date, end_date):
+def update_ui(sensor_id, location_id, start_date, end_date, dp):
     """UI 변경에 따른 업데이트 수행"""
 
-    df = parse_and_load(sensor_id, location_id, start_date, end_date)
+    df = parse_and_load(sensor_id, location_id, start_date, end_date, dp)
     if df is None:
         return no_update
     dt = build_data_table(df)
@@ -135,12 +160,13 @@ def update_ui(sensor_id, location_id, start_date, end_date):
     State("apps-export-location", "value"),
     State("apps-export-date", "start_date"),
     State("apps-export-date", "end_date"),
+    State("apps-export-dp", "value"),
     prevent_initial_call=True,
 )
-def exportAsCsv(n, sensor_id, location_id, start_date, end_date):
+def exportAsCsv(n, sensor_id, location_id, start_date, end_date, dp):
     """export data as csv"""
 
-    df = parse_and_load(sensor_id, location_id, start_date, end_date)
+    df = parse_and_load(sensor_id, location_id, start_date, end_date, dp)
     if df is None:
         return no_update
     if not df.shape[0] or not df.shape[1]:

@@ -95,7 +95,7 @@ def update_graph(sensor_id, date):
     if sensor is None or sensor.group_id != fli.current_user.group.id:
         return plotAll(None), plotAll(None), plotAll(None), plotAll(None)
 
-    df = parse_and_load(sensor_id, 0, date, date)
+    df = parse_and_load(sensor_id, 0, date, date, 5)
 
     # "air_temp", "leaf_temp", "humidity", "light","co2", "dewpoint", "evapotranspiration","hd","vpd",
 

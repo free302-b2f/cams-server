@@ -24,6 +24,7 @@ _pgc = pg.connect(
 )
 
 from db.sensor_data import sd_cols, sd_cols_meta
+from db import sensor_data as sd
 
 # pd.DataFrame column type
 _types = {x: "float64" for x in sd_cols}
@@ -42,7 +43,7 @@ sd_headers = [
     "VPD",
 ]
 _headers_meta = [
-    "ID",
+    # "ID",
     "Group",
     "Location",
     "Sensor",
@@ -59,51 +60,28 @@ _dt_columns = [
             precision=3, scheme=dtFmt.Scheme.decimal_si_prefix
         ),  # fixed)
     }
-    # for h, c in zip(_headers, _cols)
-    # for h, c in zip(_headers_meta, _cols_meta)
-    # for h, c in zip(_headers_meta + _headers, _cols_meta + _cols)
     # 시간 + 측정값 컬럼 전체
-    for h, c in zip([_headers_meta[4], *sd_headers], [sd_cols_meta[4], *sd_cols])
+    for h, c in zip([_headers_meta[3], *sd_headers], [sd_cols_meta[3], *sd_cols])
 ]
 
 
-def _query_data(group_id, sensor_id, location_id, start, end) -> pd.DataFrame:
-    """DB에서 주어진 기간동안의 데이터를 불러온다"""
+def _query_data(group_id, sensor_id, location_id, start, end, dp) -> pd.DataFrame:
+    """DB에서 주어진 기간동안의 데이터를 불러온다
+    - group_id, sensor_id, location_id가 0일 경우 무시
+    - dp가 0일 경우 DB데이터 그대로 출력
+    """
 
-    try:
-        cursor: pge.cursor = _pgc.cursor()
-        # cursor: pge.cursor = _pgc.cursor(cursor_factory=pga.DictCursor)
-
-        format = "SELECT * FROM sensor_data WHERE (date(time) BETWEEN %s AND %s)"
-        value = (start, end)
-        if group_id > 0:
-            format = f"{format} AND (group_id = %s)"
-            value = (*value, group_id)
-        if sensor_id > 0:
-            format = f"{format} AND (sensor_id = %s)"
-            value = (*value, sensor_id)
-        if location_id > 0:
-            format = f"{format} AND (location_id = %s)"
-            value = (*value, location_id)
-        format = f"{format} ORDER BY location_id ASC, sensor_id ASC, time ASC"
-        sql = cursor.mogrify(format, value)
-        debug(str(sql))
-
-        cursor.execute(sql)
-        cols = [x.name for x in cursor.description]
-        ds = cursor.fetchall()
-        df = pd.DataFrame(ds)
-        debug(_query_data, f"{start}~{end}: {df.shape = }")
-        if len(ds) > 0:
-            df.columns = cols
-    finally:
-        cursor.close()
+    ds, cols = sd.Select(group_id, sensor_id, location_id, start, end, dp)
+    df = pd.DataFrame(ds)
+    debug(_query_data, f"{start}~{end}: {df.shape = }")
+    if len(ds) > 0:
+        if dp:
+            cols[cols.index(f"time{dp}")] = "time"
+        df.columns = cols
 
     if df.shape[0] and df.shape[1]:
         df = df.astype(_types, copy=False)  # , errors="ignore")
-        # df["time_key"] = [parseDate(d, t) for d, t in zip(df["Date"], df["Time"])]
-        # df.set_index("time_key", inplace=True)
-        df.set_index("time")
+        df.set_index("time") #, inplace=True)
 
     return df
 
@@ -126,24 +104,18 @@ def build_data_table(df: pd.DataFrame) -> DataTable:
     return table
 
 
-def parse_and_load(sensor_id, location_id, start_date, end_date) -> pd.DataFrame:
+def parse_and_load(sensor_id, location_id, start_date, end_date, dp) -> pd.DataFrame:
     """UI 데이터를 파싱하고 디비에 쿼리하여 DataFrame 리턴"""
-
-    if sensor_id == None or location_id == None or not start_date or not end_date:
-        return None
 
     user: AppUser = fli.current_user
     group_id = 0 if user.level >= 2 else user.group.id  # master's group_id -> 0
-    df = _query_data(group_id, sensor_id, location_id, start_date, end_date)
+    df = _query_data(group_id, sensor_id, location_id, start_date, end_date, dp)
     return df
 
 
 # test
-import json
-
-
 def test():
-    df1 = _query_data(1, 1, 1, "20211215", "20211215")
+    df1 = parse_and_load(1, 1, "20211215", "20211215", 5)
     dt1 = build_data_table(df1)
 
 

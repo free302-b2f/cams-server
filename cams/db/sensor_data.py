@@ -57,7 +57,8 @@ sd_cols = [
     "vpd",
 ]
 # 메타 컬럼 목록 ~ string type?
-sd_cols_meta = ["id", "group_id", "location_id", "sensor_id", "time"]
+# sd_cols_meta = ["id", "group_id", "location_id", "sensor_id", "time"]
+sd_cols_meta = ["group_id", "location_id", "sensor_id", "time"]
 
 # endregion
 
@@ -144,7 +145,7 @@ def f2_create_table():
         JOIN _timescaledb_catalog.hypertable h ON h.id = c.hypertable_id;"""
 
     try:
-        pgc, cursor = connect()
+        pgc, cursor = connect(True)
         cursor.execute(create_sensordata_table)
         cursor.execute(create_sensordata_hypertable)
         pgc.commit()
@@ -159,21 +160,22 @@ def f2_create_table():
 
 
 def _build_insert() -> str:
-    """SQL INSERT 문 생성"""
+    """SQL INSERT문 생성 - id를 제외한 모든 컬럼의 데이터를 추가하는 포맷"""
 
-    cols = sd_cols_meta[1:] + sd_cols
-    sql = "INSERT INTO sensor_data AS sd ("
-    s1 = ",".join(cols)
-    sql = f"{sql} {s1} ) VALUES ("
-    s2 = ",".join(["%s" for x in cols])
-    sql = f"{sql} {s2}"
-    sql = f"{sql} ) ON CONFLICT (time, sensor_id) DO UPDATE SET "
-    s3 = ",".join([f"{x}=EXCLUDED.{x}" for x in cols])
-    sql = f"{sql} {s3}"
+    # 메타 컬럼과 측정값 컬럼
+    cols = sd_cols_meta + sd_cols
+    format = "INSERT INTO sensor_data AS sd ("
+    tmp = ",".join(cols)
+    format = f"{format} {tmp} ) VALUES ("
+    tmp = ",".join(["%s" for c in cols])
+    format = f"{format} {tmp} )"
 
-    # s4 = f"WHERE sd.time < EXCLUDED.time"
-    # sql = f"{sql} {s4}"
-    return sql
+    # 중복시 덮어쓰기
+    format = f"{format} ON CONFLICT (time, sensor_id) DO UPDATE SET "
+    tmp = ",".join([f"{c}=EXCLUDED.{c}" for c in cols])
+    format = f"{format} {tmp}"
+
+    return format
 
 
 def InsertRawDic(rawDic):
@@ -194,10 +196,9 @@ def InsertRawDic(rawDic):
         # dic = {c: rawDic[r] for c, r in zip(sd_cols, sd_cols_raw)}
 
         # DB에 추가
-        sql = cursor.mogrify(_build_insert())
         values = (*meta, dati, *[rawDic[x] for x in sd_cols_raw])
-
-        cursor.execute(sql, values)
+        sql = cursor.mogrify(_build_insert(), values)
+        cursor.execute(sql)
 
         pgc.commit()
 
@@ -206,8 +207,11 @@ def InsertRawDic(rawDic):
         pgc.close()
 
 
-def InsertRawDics(rawDics, sn=None, sameDate=None):
-    """센서 sn에서 생성된 rawDics을 DB에서 그룹/장소/센서 id를 구해서 DB에 추가"""
+def InsertRawDics(rawDics, sameSn=None, sameDate=None):
+    """센서 sn에서 생성된 rawDics을 DB에서 그룹/장소/센서 id를 구해서 DB에 추가
+    - sameSn : None이 아니면 모든 레코드의 sn이 같은 것으로 간주
+    - sameDate : None이 아니면 모든 레코드의 date가 같은 것으로 간주
+    """
 
     try:
         pgc, cursor = connect()
@@ -215,21 +219,21 @@ def InsertRawDics(rawDics, sn=None, sameDate=None):
         # 주어진 SN의 센서에 관한 메타 데이터 조회
         def queryMeta():
             cursor.execute(
-                f"SELECT group_id, location_id, id FROM sensor WHERE sn = '{sn}'"
+                f"SELECT group_id, location_id, id FROM sensor WHERE sn = '{sameSn}'"
             )
             return cursor.fetchone()
 
         # 공통 메타 데이터
-        meta = queryMeta() if sn else None
-        dbDate = sameDate.strftime("%Y%m%d") if sameDate else None
+        meta = queryMeta()
+        dbDate = sameDate.strftime("%Y%m%d")
 
         # DB에 추가
         sql = cursor.mogrify(_build_insert())
 
         for dic in rawDics:
-            dati = util.parseDate(dbDate if dbDate else dic["Date"], dic["Time"])
+            dati = util.parseDate(dbDate if sameDate else dic["Date"], dic["Time"])
             values = (
-                *(meta if meta else queryMeta()),
+                *(meta if sameSn else queryMeta()),
                 dati,
                 *[dic[x] for x in sd_cols_raw],
             )
@@ -278,7 +282,7 @@ def f3_seed(sensors):
     """기본적인 메타데이터 및 랜덤 센서데이터 추가"""
 
     try:
-        pgc, cursor = connect()
+        pgc, cursor = connect(True)
 
         # 센서 ID 추출
         if not sensors:
@@ -306,20 +310,104 @@ def f3_seed(sensors):
     pass
 
 
+def _build_select(group_id, sensor_id, location_id, start, end, avgTime: int = 0):
+    """SQL SELECT문 포맷 생성
+    - avgTime: 데이터 포인트 간격 (분단위), 0이면 DB값 그대로
+    - 포맷과 값 튜플 리턴
+    """
+
+    # 메타 컬럼: id제외 모든 컬럼
+    # sd_cols_meta = ["group_id", "location_id", "sensor_id", "time"]
+    metas = list(sd_cols_meta[0:3])
+    fmt = ",".join(metas)
+    colTime = f"time{avgTime}" if avgTime else "time"
+    metas.append(colTime)
+
+    if not avgTime:
+        fmt = f"{fmt}, time"
+        tmp = ",".join(sd_cols)
+    else:
+        fmt = f"{fmt}, time_bucket('{avgTime} minutes', time) AS {colTime}"
+        tmp = ",".join([f"AVG({c}) as {c}" for c in sd_cols])
+    fmt = f"{fmt}, {tmp}"
+    fmt = f"SELECT {fmt} FROM sensor_data"
+
+    # WHERE : date
+    fmt = f"{fmt} WHERE (date(time) BETWEEN %s AND %s)"
+    paramValues = [start, end]
+
+    # WHERE : meta
+    def _param(name, value):
+        if value > 0:
+            paramValues.append(value)
+            return f"{fmt} AND ({name} = %s)"
+        return fmt
+
+    fmt = _param(sd_cols_meta[0], group_id)
+    fmt = _param(sd_cols_meta[1], location_id)
+    fmt = _param(sd_cols_meta[2], sensor_id)
+
+    # group by
+    if avgTime:
+        fmt = f"{fmt} GROUP BY {','.join(metas)}"
+
+    # order by
+    tmp = ",".join([f"{c} ASC" for c in metas])
+    fmt = f"{fmt} ORDER BY {tmp}"
+    params = tuple(paramValues)
+
+    return fmt, params
+
+
+def Select(group_id, sensor_id, location_id, start, end, avgTime: int = 0):
+    """select form sensor_data"""
+
+    try:
+        pgc, cursor = connect()
+
+        fmt, values = _build_select(
+            group_id, sensor_id, location_id, start, end, avgTime
+        )
+
+        sql = cursor.mogrify(fmt, values)
+        # debug(str(sql))
+
+        cursor.execute(sql)
+        ds = cursor.fetchall()
+        cols = [x.name for x in cursor.description]
+
+        return ds, cols
+    finally:
+        cursor.close()
+        pgc.close()
+
+
 if __name__ == "__main__":
     """pg connection/cursor test"""
 
-    pgc, cursor = connect()
-    with pgc:
-        with cursor:
+    def test_pgc():
+        pgc, cursor = connect()
+        with pgc:
+            with cursor:
+                print(f"{pgc.closed=} {cursor.closed=}")
+
+            print(f"{pgc.closed=} {cursor.closed=}")
+
+            cursor.close()  # cursor.close()는 with에의해 호출되지 않음
             print(f"{pgc.closed=} {cursor.closed=}")
 
         print(f"{pgc.closed=} {cursor.closed=}")
 
-        cursor.close()  # cursor.close()는 with에의해 호출되지 않음
-        print(f"{pgc.closed=} {cursor.closed=}")
+    # test_pgc()
 
-    print(f"{pgc.closed=} {cursor.closed=}")
+    def test_select():
+        d = datetime.now()
+        _build_select(0, 1, 1, d, d, 0)
+        _build_select(0, 1, 1, d, d, 5)
+        _build_select(1, 1, 1, d, d, 5)
+        pass
+
+    test_select()
 
     # f1_drop_table()
     # f2_create_table()

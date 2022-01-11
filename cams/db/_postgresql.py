@@ -7,14 +7,15 @@ import psycopg2.extras as pga
 from datetime import date, datetime, time, timedelta, timezone
 
 
-def connect():
+def connect(dictCursor:bool = False):
     """설정파일에서 DB설정을 읽어와 연결하고 커서를 리턴"""
 
     set = util.loadAppSettings("Postgres")
     pgc = pg.connect(
         f'postgres://{set["User"]}:{set["Pw"]}@{set["Ip"]}:{set["Port"]}/{set["Db"]}'
     )
-    cursor = pgc.cursor(cursor_factory=pga.DictCursor)
+    cursor = pgc.cursor(cursor_factory=pga.DictCursor) if dictCursor else pgc.cursor()
+    
     return pgc, cursor
 
     

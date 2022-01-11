@@ -17,17 +17,17 @@ else:
 from time import sleep
 from datetime import date, datetime, time, timedelta, timezone
 
-# 복사할 장비 SN
-srcSN = "B2F_CAMs_1000000000002"
-destSN = "B2F_CAMs_2000000000002"
-
 
 def _copyCurrentOne():
     """2021년 3월 현재 날짜의 현재 시각 데이터를 복사"""
 
+    # 복사할 장비 SN
+    srcSN = "B2F_CAMs_1000000000001"
+    destSN = "B2F_CAMs_2000000000001"    
+    
     now = datetime.now()
     sec = 30 if now.second > 15 and now.second < 45 else 0
-    ti = time(hour=now.hour, minute=now.minute, second=sec)
+    ti = dict(hour=now.hour, minute=now.minute, second=sec)
     dati = datetime(2021, 3, now.day, **ti)
     dics = ReadMongo(srcSN, dati, dati)
 
@@ -55,7 +55,7 @@ def simulate():
         sleep(30)
 
 
-def _copyDay(srcDate, destDate=datetime.now()):
+def _copyDay(srcSN, destSN, srcDate, destDate=datetime.now()):
     """srcDate의 데이터를 destDays로 복사"""
 
     dics = ReadMongo(srcSN, srcDate)
@@ -68,8 +68,12 @@ def _copyDay(srcDate, destDate=datetime.now()):
 def copy():
     """2021-02-15 데이터를 오늘 날짜로 복사"""
 
-    src = datetime(2021, 2, 15).date()
-    _copyDay(src)
+    # 복사할 장비 SN
+    srcSN = "B2F_CAMs_1000000000002"
+    destSN = "B2F_CAMs_2000000000002"
+    srcDate = datetime(2021, 2, 15).date()
+
+    _copyDay(srcSN, destSN,srcDate)
 
 
 if __name__ == "__main__":
