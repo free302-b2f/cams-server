@@ -60,7 +60,7 @@ from . import group
 from . import user
 from . import location
 from . import sensor
-from . import admin
+from . import cams_info
 
 # create all model tables & seed
 if _set["DropTables"]:

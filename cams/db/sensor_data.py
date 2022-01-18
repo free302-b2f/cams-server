@@ -217,24 +217,23 @@ def InsertRawDics(rawDics, sameSn=None, sameDate=None):
         pgc, cursor = connect()
 
         # 주어진 SN의 센서에 관한 메타 데이터 조회
-        def queryMeta():
+        def queryMeta(sn):
             cursor.execute(
-                f"SELECT group_id, location_id, id FROM sensor WHERE sn = '{sameSn}'"
+                f"SELECT group_id, location_id, id FROM sensor WHERE sn = '{sn}'"
             )
             return cursor.fetchone()
 
         # 공통 메타 데이터
-        meta = queryMeta()
-        dbDate = sameDate.strftime("%Y%m%d")
+        meta = queryMeta(sameSn) if sameSn else None
+        dbDate = sameDate.strftime("%Y%m%d") if sameDate else None
 
         # DB에 추가
         sql = cursor.mogrify(_build_insert())
 
         for dic in rawDics:
-            dati = util.parseDate(dbDate if sameDate else dic["Date"], dic["Time"])
             values = (
-                *(meta if sameSn else queryMeta()),
-                dati,
+                *(meta if sameSn else queryMeta(dic["SN"])),
+                util.parseDate(dbDate if sameDate else dic["Date"], dic["Time"]),
                 *[dic[x] for x in sd_cols_raw],
             )
             cursor.execute(sql, values)

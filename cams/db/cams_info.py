@@ -2,11 +2,14 @@
 
 print(f"<{__name__}> loading...")
 
+from enum import unique
 from ._imports import *
 import flask as fl
-import sys
+from ._postgresql import connect
+from utility import debug
 
 dba = fl.g.dba
+
 
 class Cams(dba.Model):
     """관리용 모델 - dict 형식으로 각 row는 하나의 키-값 쌍에 해당"""
@@ -29,8 +32,8 @@ class Cams(dba.Model):
     # 테이블 컬럼 정의
     __tablename__ = "cams"
     id = dba.Column(dba.Integer, primary_key=True)
-    key = dba.Column(dba.String(max_key), nullable=False)  # 키
-    text = dba.Column(dba.Text(), nullable=True)  # 객체를 직렬화 저랑
+    key = dba.Column(dba.String(max_key), unique=True, nullable=False)  # 키
+    text = dba.Column(dba.Text(), default="")  # 객체를 직렬화 저장
 
     def __init__(self, key: str, text: str):
         self.key = key
@@ -46,6 +49,8 @@ class Cams(dba.Model):
         dic = {key: self.__getattribute__(key) for key in keys}
         return dic
 
+
+import sys
 
 if getattr(sys, "_test_", None):
     cams = Cams("abc", "ABC")

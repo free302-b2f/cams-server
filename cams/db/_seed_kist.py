@@ -21,7 +21,7 @@ from .group import Group
 from .user import AppUser
 from .location import Location
 from .sensor import Sensor
-from .admin import Cams
+from .cams_info import Cams
 import utility as util
 
 

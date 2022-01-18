@@ -27,6 +27,7 @@
             "type": "python",
             "request": "launch",
             "program": "${file}",
+            "args": ["2"],
             "console": "integratedTerminal"
         },        
     ]

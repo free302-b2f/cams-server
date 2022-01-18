@@ -21,7 +21,7 @@ def addSuperDir(filepath):
     # dir = path.dirname(path.dirname(__file__))
     dir = path.dirname(path.dirname(filepath))
     sys.path.insert(0, dir)
-    
+
 
 def getCallerModule(level=2) -> str:
     """호출하는 함수가 정의된 모듈의 이름을 구한다"""
@@ -108,19 +108,22 @@ import flask as fl
 def log(level: str, caller: str, method: FunctionType, msg: Any):
     """메시지를 dash.app.logger를 이용해 기록한다"""
 
-    app = fl.current_app
-
     message = f"[{datetime.now()}] [{level}] [{caller}]"
     if method != None:
         message += f" [{method.__name__}()]"
     message += f" {msg}"
 
-    if level == "E":
-        app.logger.error(message)
-    elif level == "D":
-        app.logger.debug(message)
-    elif level == "I":
-        app.logger.info(message)
+    try:
+        app = fl.current_app._get_current_object()
+
+        if level == "E":
+            app.logger.error(message)
+        elif level == "D":
+            app.logger.debug(message)
+        elif level == "I":
+            app.logger.info(message)
+    except:
+        print(message)
 
 
 @singledispatch
@@ -165,4 +168,3 @@ def generate_password_hash(password: str) -> str:
 
 def check_password_hash(pwhash: str, password: str) -> bool:
     return wsec.check_password_hash(pwhash, password)
-
