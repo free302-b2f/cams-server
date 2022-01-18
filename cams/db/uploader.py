@@ -24,12 +24,12 @@ from bson.objectid import ObjectId
 
 
 def _copyOne_M2P(srcSN, destSN):
-    """MongoDB의 2021년 3월 현재 날짜의 현재 시각 데이터를 Postgresql에 복사"""
+    """MongoDB의 2021년 2월 현재 날짜의 현재 시각 데이터를 Postgresql에 복사"""
 
     now = datetime.now()
-    sec = 30 if now.second > 15 and now.second < 45 else 0
+    sec = 0 if now.second < 30 else 30
     ti = dict(hour=now.hour, minute=now.minute, second=sec)
-    dati = datetime(2021, 3, now.day, **ti)
+    dati = datetime(2021, 2, now.day % 28, **ti)
     dics = ReadMongo(srcSN, dati, dati)
 
     # 레코드 수정: 테스트 센서, 오늘 날짜로 변경
@@ -49,14 +49,14 @@ def _copyOne_M2P(srcSN, destSN):
 
 
 def _copyOne_M2M(srcSN, destSN):
-    """2021년 3월 현재 날짜의 현재 시각 데이터를 복사"""
+    """2021년 2월 현재 날짜의 현재 시각 데이터를 복사"""
 
     now = datetime.now()
     sec = 0 if now.second < 30 else 30
     # now = now + timedelta(minutes=1)
 
     ti = dict(hour=now.hour, minute=now.minute, second=sec)
-    dati = datetime(2021, 3, now.day, **ti)
+    dati = datetime(2021, 2, now.day % 28, **ti)
     dics = ReadMongo(srcSN, dati, dati)
 
     # 레코드 수정: 테스트 센서, 오늘 날짜로 변경

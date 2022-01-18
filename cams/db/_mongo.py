@@ -29,7 +29,7 @@ def InsertMongo(dic: Dict):
         mc.close()
 
 
-def ReadMongo(sn: str, date, time=None):  # return dict
+def ReadMongo(sn: str, date, time=None, asCursor:bool = False):  # return dict
     """MongoDB에서 date 일 time 시각 sn의 레코드를 읽어들임"""
 
     try:
@@ -38,8 +38,8 @@ def ReadMongo(sn: str, date, time=None):  # return dict
         keys = {"SN": sn, "Date": date.strftime("%Y%m%d")}
         if time:
             keys["Time"] = time.strftime("%H:%M:%S")
-        docs = ds.find(keys).sort("_id", pymongo.ASCENDING)
-        return list(docs)
+        docs = ds.find(keys).sort("Time", pymongo.ASCENDING)
+        return docs if asCursor else list(docs)
     finally:
         mc.close()
 

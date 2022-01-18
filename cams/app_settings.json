@@ -21,7 +21,8 @@
         "DropTables": false
     },
     "Cams": {
-        "DbmsKey": "Mongo"        
+        "DbmsKey": "Postgres",
+        "DbmsKey-backup": "Mongo"
     },
     "LoginManager": {
         "SECRET_KEY": "605feac2f60784caf7126e08f69932b4915b4fc3bf590881"

@@ -59,6 +59,7 @@ sd_cols = [
 # 메타 컬럼 목록 ~ string type?
 # sd_cols_meta = ["id", "group_id", "location_id", "sensor_id", "time"]
 sd_cols_meta = ["group_id", "location_id", "sensor_id", "time"]
+sd_cols_meta_raw = ["_id", "FarmName", "SN", "Date"]
 
 # endregion
 
@@ -309,7 +310,9 @@ def f3_seed(sensors):
     pass
 
 
-def _build_select(group_id, sensor_id, location_id, start, end, avgTime: int = 0):
+def _build_select(
+    group_id, sensor_id, location_id, startDati, endDati, avgTime: int = 0
+):
     """SQL SELECT문 포맷 생성
     - avgTime: 데이터 포인트 간격 (분단위), 0이면 DB값 그대로
     - 포맷과 값 튜플 리턴
@@ -333,7 +336,7 @@ def _build_select(group_id, sensor_id, location_id, start, end, avgTime: int = 0
 
     # WHERE : date
     fmt = f"{fmt} WHERE (date(time) BETWEEN %s AND %s)"
-    paramValues = [start, end]
+    paramValues = [startDati, endDati]
 
     # WHERE : meta
     def _param(name, value):
@@ -358,14 +361,14 @@ def _build_select(group_id, sensor_id, location_id, start, end, avgTime: int = 0
     return fmt, params
 
 
-def Select(group_id, sensor_id, location_id, start, end, avgTime: int = 0):
+def Select(group_id, sensor_id, location_id, startDati, endDati, avgTime: int = 0):
     """select form sensor_data"""
 
     try:
         pgc, cursor = connect()
 
         fmt, values = _build_select(
-            group_id, sensor_id, location_id, start, end, avgTime
+            group_id, sensor_id, location_id, startDati, endDati, avgTime
         )
 
         sql = cursor.mogrify(fmt, values)

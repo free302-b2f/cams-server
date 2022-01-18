@@ -2,6 +2,7 @@
 
 print(f"<{__name__}> loading...")
 
+from db import sensor
 from db.group import Group
 from db.user import AppUser
 from db.sensor import Sensor
@@ -18,17 +19,16 @@ import psycopg2 as pg
 import psycopg2.extensions as pge
 import psycopg2.extras as pga
 
-_set = getSettings("Postgres")
-_pgc = pg.connect(
-    f'postgres://{_set["User"]}:{_set["Pw"]}@{_set["Ip"]}:{_set["Port"]}/{_set["Db"]}'
-)
-
-from db.sensor_data import sd_cols, sd_cols_meta
+from db.sensor_data import sd_cols, sd_cols_meta, sd_cols_raw, sd_cols_meta_raw
 from db import sensor_data as sd
+from db._mongo import ReadMongo
+from utility import loadAppSettings
 
 # pd.DataFrame column type
 _types = {x: "float64" for x in sd_cols}
 _types.update({x: "string" for x in sd_cols_meta})
+_types_mongo = {x: "float64" for x in sd_cols_raw}
+_types_mongo.update({x: "string" for x in sd_cols_meta_raw})
 
 # dash.DataTable header
 sd_headers = [
@@ -65,15 +65,17 @@ _dt_columns = [
 ]
 
 
-def _query_data(group_id, sensor_id, location_id, start, end, dp) -> pd.DataFrame:
+def _query_data(
+    group_id, sensor_id, location_id, startDati, endDati, dp
+) -> pd.DataFrame:
     """DB에서 주어진 기간동안의 데이터를 불러온다
     - group_id, sensor_id, location_id가 0일 경우 무시
     - dp가 0일 경우 DB데이터 그대로 출력
     """
 
-    ds, cols = sd.Select(group_id, sensor_id, location_id, start, end, dp)
+    ds, cols = sd.Select(group_id, sensor_id, location_id, startDati, endDati, dp)
     df = pd.DataFrame(ds)
-    debug(_query_data, f"{start}~{end}: {df.shape = }")
+    debug(_query_data, f"{startDati}~{endDati}: {df.shape = }")
     if len(ds) > 0:
         if dp:
             cols[cols.index(f"time{dp}")] = "time"
@@ -81,8 +83,42 @@ def _query_data(group_id, sensor_id, location_id, start, end, dp) -> pd.DataFram
 
     if df.shape[0] and df.shape[1]:
         df = df.astype(_types, copy=False)  # , errors="ignore")
-        df.set_index("time") #, inplace=True)
+        df.set_index("time")  # , inplace=True)
 
+    return df
+
+
+def _query_data_mongo(sn: str, startDati) -> pd.DataFrame:
+    """MongoDB에서 하루동안의 데이터를 불러온다."""
+
+    dics = ReadMongo(sn, startDati, asCursor=True)
+    df = pd.DataFrame(dics)   
+
+    if df.shape[0] and df.shape[1]:
+        df = df.astype(_types_mongo, copy=False)  # , errors="ignore")
+        cols = [str(c).lower() for c in df.columns]
+        df.columns = cols
+        df.set_index("time")  # , inplace=True)
+    debug(_query_data_mongo, f"{startDati}: {df.shape = }")    
+
+    return df
+
+
+def parse_and_load(
+    sensor_id, location_id, start_date_str, end_date_str, dp
+) -> pd.DataFrame:
+    """UI 데이터를 파싱하고 디비에 쿼리하여 DataFrame 리턴"""
+
+    startDati = datetime.strptime(start_date_str, "%Y-%m-%d")
+    endDati = datetime.strptime(end_date_str, "%Y-%m-%d")
+    dbmsKey = getSettings("Cams")["DbmsKey"]
+    if dbmsKey == "Postgres":
+        user: AppUser = fli.current_user
+        group_id = 0 if user.level >= 2 else user.group.id  # master's group_id -> 0
+        df = _query_data(group_id, sensor_id, location_id, startDati, endDati, dp)
+    elif dbmsKey == "Mongo":
+        sn = Sensor.query.get(sensor_id).sn
+        df = _query_data_mongo(sn, startDati)
     return df
 
 
@@ -104,19 +140,12 @@ def build_data_table(df: pd.DataFrame) -> DataTable:
     return table
 
 
-def parse_and_load(sensor_id, location_id, start_date, end_date, dp) -> pd.DataFrame:
-    """UI 데이터를 파싱하고 디비에 쿼리하여 DataFrame 리턴"""
-
-    user: AppUser = fli.current_user
-    group_id = 0 if user.level >= 2 else user.group.id  # master's group_id -> 0
-    df = _query_data(group_id, sensor_id, location_id, start_date, end_date, dp)
-    return df
-
-
 # test
 def test():
-    df1 = parse_and_load(1, 1, "20211215", "20211215", 5)
+    # df1 = parse_and_load(1, 1, "2021-12-15", "2021-12-15", 5)
+    df1 = parse_and_load(1, 1, "2022-01-18", "2022-01-18", 5)
     dt1 = build_data_table(df1)
-
+    json = dt1.to_plotly_json()
+    print(json)
 
 # test()

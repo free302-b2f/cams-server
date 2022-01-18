@@ -183,7 +183,10 @@ def exportAsCsv(n, sensor_id, location_id, start_date, end_date, dp):
         fn = f'{fn}__{location.name.replace(" ", "-")}'
     fn = f"{fn}__{start_date}~{end_date}.csv"
 
-    cols = sd_cols_meta + sd_cols
+    # columns to export
+    meta = ["sn", "date", "time"] if "sn" in df.columns else sd_cols_meta
+    cols = meta + sd_cols
+
     return dcc.send_data_frame(
         df.to_csv,
         fn,
