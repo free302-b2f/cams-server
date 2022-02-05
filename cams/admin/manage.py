@@ -18,7 +18,7 @@ def layout():
     headerRow = html.H4(
         [
             html.Span("settings", className="material-icons-two-tone"),
-            html.Span("Manage Farm & Sensor", className="font-sc"),
+            html.Span("Manage Locations & Sensors", className="font-sc"),
         ],
         className="flex-h",
     )

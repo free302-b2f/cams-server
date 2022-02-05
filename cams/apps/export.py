@@ -19,11 +19,34 @@ def layout():
         className="flex-h",
     )
 
+    # 위치 목록
+    locs = {l.id: l for l in fli.current_user.group.locations}
+    locOptions = [{"label": "ALL", "value": 0}]
+    locOptions.extend([{"label": locs[l].name, "value": l} for l in locs])
+    locDefault = locOptions[1]["value"] if len(locOptions) > 1 else 0
+    # locDefault = sensors[sensorDefault].location.id
+    locationRow = html.Label(
+        [
+            html.Span("Location"),
+            html.Span("yard", className="material-icons-two-tone"),
+            dcc.Dropdown(
+                id="apps-export-location",
+                options=locOptions,
+                value=locDefault,
+                clearable=False,
+                searchable=False,
+            ),
+        ],
+        className="apps-export-label",
+    )
+
     # 센서 목록
-    sensors = {s.id: s for s in fli.current_user.group.sensors}
+    sensors = {s.id: s for s in fli.current_user.group.sensors}  # 그룹의 모든 센서
     sensorOptions = [{"label": "ALL", "value": 0}]
     sensorOptions.extend([{"label": sensors[s].name, "value": s} for s in sensors])
-    sensorDefault = sensorOptions[1]["value"] if len(sensorOptions) > 1 else 0
+    locSensors = locs[locDefault].sensors
+    sensorDefault = locSensors[0].id if len(locSensors) else 0  # 위치의 첫 센서
+    # sensorDefault = sensorOptions[1]["value"] if len(sensorOptions) > 1 else 0
     sensorRow = html.Label(
         [
             html.Span("CAMs Sensor"),
@@ -32,27 +55,6 @@ def layout():
                 id="apps-export-sensor",
                 options=sensorOptions,
                 value=sensorDefault,
-                clearable=False,
-                searchable=False,
-            ),
-        ],
-        className="apps-export-label",
-    )
-
-    # 위치 목록
-    locationOptions = [{"label": "ALL", "value": 0}]
-    locationOptions.extend(
-        [{"label": l.name, "value": l.id} for l in fli.current_user.group.locations]
-    )
-    locationDefault = sensors[sensorDefault].location.id
-    locationRow = html.Label(
-        [
-            html.Span("Location"),
-            html.Span("yard", className="material-icons-two-tone"),
-            dcc.Dropdown(
-                id="apps-export-location",
-                options=locationOptions,
-                value=locationDefault,
                 clearable=False,
                 searchable=False,
             ),
@@ -122,8 +124,8 @@ def layout():
     return html.Div(
         [
             html.Header(headerRow, id="app-export-header"),
-            html.Section(sensorRow),
             html.Section(locationRow),
+            html.Section(sensorRow),
             html.Section(dateRow),
             html.Section(dpRow),
             html.Section(buttonRow, id="apps-export-button-section"),
