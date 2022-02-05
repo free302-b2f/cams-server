@@ -23,19 +23,21 @@ def seed():
     dba: SQLAlchemy = fl.g.dba
 
     # 관리 정보 추가
-    dba.session.add(Cams("cams_setup_date", datetime.utcnow().isoformat()))
-    dba.session.add(Cams("cams_start_date", datetime.utcnow().isoformat()))
+    dba.session.add(Cams("cams_setup_date", datetime.now().isoformat()))
+    dba.session.add(Cams("cams_start_date", datetime.now().isoformat()))
     dba.session.commit()
 
-    # 마스터 계정
+    # ----[ 마스터 계정 ]----
     from . import _seed_master
-    from . import _seed_kist
 
     _seed_master.seed()
 
-    kist_json = "seed-kist-pheno.json"  # KIST Pheno
-    # _seed_kist.dump_json(kist_json)
-    load_json_seed(kist_json)
+    # ----[ KIST Pheno ]----
+    from . import _seed_kist
+
+    kist_json = "seed-kist-pheno.json"
+    # _seed_kist.dump_json(kist_json) # save to json file
+    load_json_seed(kist_json)  # load from json file
 
 
 # json 파일에서 읽어와 DB에 추가

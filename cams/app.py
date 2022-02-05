@@ -75,10 +75,10 @@ cache = Cache(
 """다른 모듈에서 설정 내용을 가져가는 API"""
 
 
-def getSettings(section: str):
+def getSettings(section: str, key:str = None):
     """설정파일에서 주어진 섹션을 딕셔너리로 리턴한다"""
 
-    return _set[section]
+    return _set[section][key] if key else _set[section]
 
 
 # endregion

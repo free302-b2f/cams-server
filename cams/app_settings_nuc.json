@@ -1,7 +1,7 @@
 {
     "logging": {
-        "Level": "DEBUG",
-        "DevUi": true
+        "Level": "INFO",
+        "DevUi": false
     },
     "Mongo": {
         "Name": "MongoDB",
@@ -13,7 +13,7 @@
     },
     "Postgres": {
         "Name": "PostgreSQL",
-        "Ip": "192.168.0.103",
+        "Ip": "localhost",
         "Port": 25432,
         "Db": "db_cams",
         "User": "cams",

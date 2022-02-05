@@ -83,7 +83,6 @@ def buildPopup(id, header: str, body=[], footer=[]):
 
 
 _APP_SETTINGS_FILE = "app_settings.json"
-# _APP_SETTINGS_FILE = "app_settings_b2f.json"
 
 
 def loadAppSettings(section: str = None) -> Dict[str, Any]:

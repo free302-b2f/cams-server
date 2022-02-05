@@ -16,11 +16,45 @@ else:
     from . import sensor_data as sd
     from ._postgresql import connect
 
-from random import seed
 from time import sleep
 from datetime import date, datetime, time, timedelta, timezone
-from utility import debug
+from utility import debug, loadAppSettings
 from bson.objectid import ObjectId
+
+
+# region ---- [cmd 0 : 하루치 데이터 복사] ----
+
+
+def _copyDay(srcSN, destSN, srcDate, destDate=datetime.now()):
+    """srcDate의 데이터를 destDays로 복사"""
+
+    dics = ReadMongo(srcSN, srcDate)
+
+    # Postgresql에 추가
+    print(f"inserting: {destSN} : {srcDate} -> {destDate}")
+    sd.InsertRawDics(dics, destSN, destDate)
+
+
+def copy210215():
+    """MongoDB 2021-02-15 데이터를 오늘 날짜로 복사"""
+
+    srcDate = datetime(2021, 2, 15).date()
+
+    # 복사할 장비 SN
+    srcSN = "B2F_CAMs_1000000000001"
+    destSN = "B2F_CAMs_2000000000001"
+    _copyDay(srcSN, destSN, srcDate)
+
+    # 복사할 장비 SN
+    srcSN = "B2F_CAMs_1000000000002"
+    destSN = "B2F_CAMs_2000000000002"
+    _copyDay(srcSN, destSN, srcDate)
+
+
+# endregion
+
+
+# region ---- [cmd 1 : 실시간 장비업로드 흉내] ----
 
 
 def _copyOne_M2P(srcSN, destSN):
@@ -95,32 +129,13 @@ def simulate():
             sleep(sec)
 
 
-def _copyDay(srcSN, destSN, srcDate, destDate=datetime.now()):
-    """srcDate의 데이터를 destDays로 복사"""
-
-    dics = ReadMongo(srcSN, srcDate)
-
-    # Postgresql에 추가
-    print(f"inserting: {destSN} : {srcDate} -> {destDate}")
-    sd.InsertRawDics(dics, destSN, destDate)
+# endregion
 
 
-def copy210215():
-    """MongoDB 2021-02-15 데이터를 오늘 날짜로 복사"""
+# region ---- [cmd 2 : MongoDB -> Postgres 동기화 ] ----
 
-    srcDate = datetime(2021, 2, 15).date()
-
-    # 복사할 장비 SN
-    srcSN = "B2F_CAMs_1000000000001"
-    destSN = "B2F_CAMs_2000000000001"
-    _copyDay(srcSN, destSN, srcDate)
-
-    # 복사할 장비 SN
-    srcSN = "B2F_CAMs_1000000000002"
-    destSN = "B2F_CAMs_2000000000002"
-    _copyDay(srcSN, destSN, srcDate)
-
-
+_set = loadAppSettings("Cams")
+_DB_START_DATI = datetime.fromisoformat(_set["DbmsSyncStartDate"])
 _SYNCH_KEY = "db_uploader_last_synch"
 
 
@@ -138,9 +153,8 @@ def _get_last_synch() -> str:
         if ds == None:  # no record
             fmt = "INSERT INTO Cams (key, text) VALUES (%s,%s)"
 
-            # oid = ObjectId(b'000000000000')
-            oid = ObjectId.from_datetime(datetime(2022, 1, 17))
-            txt = f"{oid}"  # datetime.now().isoformat()
+            oid = ObjectId.from_datetime(_DB_START_DATI)  # (datetime(2022, 1, 17))
+            txt = f"{oid}"
             values = (_SYNCH_KEY, txt)
             sql = cursor.mogrify(fmt, values)
             cursor.execute(sql)
@@ -149,8 +163,6 @@ def _get_last_synch() -> str:
             txt = ds[0]
 
         # debug(f"{_SYNCH_KEY}= {txt}")
-
-        # dati = datetime.fromisoformat(txt if txt else datetime.min)
         return txt
     finally:
         cursor.close()
@@ -214,7 +226,11 @@ def synch_worker():
             sleep(sec)
 
 
+# endregion
+
+
 if __name__ == "__main__":
+    # 단독실행시 - 명령줄 분석 실행
 
     if len(sys.argv) < 2:
         pass
@@ -227,6 +243,7 @@ if __name__ == "__main__":
     else:
         debug(f"invalid arugment: {sys.argv[1]}")
 else:
+    # 웹에서 실행시 - 동기화 쓰레드 시작
     import threading
 
     _thread = threading.Thread(target=synch_worker, args=())

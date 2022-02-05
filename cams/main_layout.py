@@ -14,7 +14,7 @@ from dash import html
 from dash import dcc
 import dash_bootstrap_components as dbc
 
-from app import app, sidebar_items as sb
+from app import app, sidebar_items as sb, getSettings
 
 # endregion
 
@@ -46,22 +46,23 @@ import lm.status
 pages.append(lm.status.layout)
 
 
-# ----[임시항목: GitHub Repository ]----
-pages.append(
-    dbc.NavLink(
-        html.Div(),
-        href="https://github.com/free302-b2f/cams-server",
-        target="github",
-        n_clicks=0,
-        id="app-sidebar-github",
+# ----[임시항목]----
+showTempUIs = getSettings("Cams", "ShowTempUIs")
+if showTempUIs:
+    # ----[GitHub Repository ]----
+    pages.append(
+        dbc.NavLink(
+            html.Div(),
+            href="https://github.com/free302-b2f/cams-server",
+            target="github",
+            n_clicks=0,
+            id="app-sidebar-github",
+        )
     )
-)
+    # ----[restart CAMs app ]----
+    import apps.restart
 
-
-# ----[임시항목: restart CAMs ]----
-import apps.restart
-
-pages.append(apps.restart.layout)
+    pages.append(apps.restart.layout)
 
 
 # 메인 레이아웃 - 메뉴바
