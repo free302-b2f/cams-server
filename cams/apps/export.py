@@ -15,6 +15,16 @@ def layout():
         [
             html.Span("cloud_download", className="material-icons-two-tone"),
             html.Span("Export CAMs Data", className="font-sc"),
+            dcc.Loading(
+                type="circle",
+                fullscreen=True,
+                id="apps-export-loading1",
+            ),
+            dcc.Loading(
+                type="circle",
+                fullscreen=True,
+                id="apps-export-loading2",
+            ),
         ],
         className="flex-h",
     )
@@ -115,16 +125,6 @@ def layout():
                 n_clicks=0,
             ),
             dcc.Download(id="apps-export-download"),
-            dcc.Loading(
-                type="circle",
-                fullscreen=True,
-                id="apps-export-loading1",
-            ),
-            dcc.Loading(
-                type="circle",
-                fullscreen=True,
-                id="apps-export-loading2",                
-            ),
         ],
         className="apps-export-label",
     )
