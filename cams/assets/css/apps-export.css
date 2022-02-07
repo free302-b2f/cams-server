@@ -97,3 +97,10 @@
 .DateRangePickerInput {
   background-color: inherit;
 }
+.dash-spinner-container {
+  background-color: rgba(0, 0, 0, 0.5) !important;
+}
+.dash-spinner,
+.dash-sk-circle {
+  height: 25%!important;
+}

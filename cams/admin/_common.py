@@ -54,7 +54,7 @@ def buildUserOptions():
     else:
         # 일반 계정 경우 - 로그인한 사용자 자신만 관리
         users = [user]
-    options = [{"label": u.username, "value": u.id} for u in users]
+    options = [{"label": f"{u.username}({u.realname})", "value": u.id} for u in users]
     default = options[0]["value"] if len(options) > 0 else ""
     return options, default
 

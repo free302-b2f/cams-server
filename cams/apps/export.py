@@ -104,9 +104,7 @@ def layout():
     # 실행 버튼
     buttonRow = html.Div(
         [
-            html.Span(
-                id="apps-export-rows"
-            ),  # [html.Span(id="apps-export-rows"), " rows"]),
+            html.Span(id="apps-export-rows"),
             html.Span("_", className="material-icons-two-tone"),
             html.Button(
                 [
@@ -117,6 +115,16 @@ def layout():
                 n_clicks=0,
             ),
             dcc.Download(id="apps-export-download"),
+            dcc.Loading(
+                type="circle",
+                fullscreen=True,
+                id="apps-export-loading1",
+            ),
+            dcc.Loading(
+                type="circle",
+                fullscreen=True,
+                id="apps-export-loading2",                
+            ),
         ],
         className="apps-export-label",
     )
@@ -138,6 +146,7 @@ def layout():
 @app.callback(
     Output("apps-export-dt-section", "children"),
     Output("apps-export-rows", "children"),
+    Output("apps-export-loading1", "children"),
     Input("apps-export-sensor", "value"),
     Input("apps-export-location", "value"),
     Input("apps-export-date", "start_date"),
@@ -152,11 +161,12 @@ def update_ui(sensor_id, location_id, start_date, end_date, dp):
         return no_update
     dt = build_data_table(df)
 
-    return dt, f"{df.shape[0]}"
+    return dt, f"{df.shape[0]}", no_update
 
 
 @app.callback(
     Output("apps-export-download", "data"),
+    Output("apps-export-loading2", "children"),
     Input("apps-export-button", "n_clicks"),
     State("apps-export-sensor", "value"),
     State("apps-export-location", "value"),
@@ -189,13 +199,16 @@ def exportAsCsv(n, sensor_id, location_id, start_date, end_date, dp):
     meta = ["sn", "date", "time"] if "sn" in df.columns else sd_cols_meta
     cols = meta + sd_cols
 
-    return dcc.send_data_frame(
-        df.to_csv,
-        fn,
-        # sep="\t",
-        float_format="%.2f",
-        columns=cols,
-        index=False,
+    return (
+        dcc.send_data_frame(
+            df.to_csv,
+            fn,
+            # sep="\t",
+            float_format="%.2f",
+            columns=cols,
+            index=False,
+        ),
+        no_update,
     )
 
 
