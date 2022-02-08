@@ -3,11 +3,10 @@
 print(f"<{__name__}> loading...")
 
 from ._common import *
-
-# from ._imports import *
 from ._location import *
 from ._sensor import *
 from ._user import *
+from ._group import *
 
 
 def layout():
@@ -15,87 +14,21 @@ def layout():
 
     debug(layout, f"entering...")
 
-    headerRow = html.H4(
-        [
-            html.Span("settings", className="material-icons-two-tone"),
-            html.Span("Manage Locations & Sensors", className="font-sc"),
-        ],
-        className="flex-h",
-    )
-
-    userOpt = buildUserOptions()
-    userRow = html.Label(
-        [
-            html.Span("User"),
-            html.Span("badge", className="material-icons-two-tone"),
-            dcc.Dropdown(
-                id="admin-manage-user",
-                options=userOpt[0],
-                value=userOpt[1],
-                clearable=False,
-                searchable=False,
-            ),
-        ],
-        className="admin-manage-label",
-    )
-
-    locationRow = html.Label(
-        [
-            html.Span("Location"),
-            html.Span("yard", className="material-icons-two-tone"),
-            dcc.Dropdown(
-                id="admin-manage-location",
-                clearable=False,
-                searchable=False,
-            ),
-            html.Span(
-                "clear",
-                className="material-icons-outlined",
-                id="admin-manage-location-clear",
-                n_clicks=0,
-            ),
-            html.Span(
-                "delete",
-                className="material-icons-outlined",
-                id="admin-manage-location-delete",
-                n_clicks=0,
-            ),
-        ],
-        className="admin-manage-label",
-    )
-
-    sensorRow = html.Label(
-        [
-            html.Span("CAMs"),
-            html.Span("sensors", className="material-icons-two-tone"),
-            dcc.Dropdown(
-                id="admin-manage-sensor",
-                clearable=False,
-                searchable=False,
-            ),
-            html.Span(
-                "clear",
-                className="material-icons-outlined",
-                id="admin-manage-sensor-clear",
-                n_clicks=0,
-            ),
-            html.Span(
-                "delete",
-                className="material-icons-outlined",
-                id="admin-manage-sensor-delete",
-                n_clicks=0,
-            ),
-        ],
-        className="admin-manage-label",
+    headerSection = html.Header(
+        html.H4(
+            [
+                html.Span("settings", className="material-icons-two-tone"),
+                html.Span("Manage Locations & Sensors", className="font-sc"),
+            ],
+            className="flex-h",
+        )
     )
 
     return html.Div(
         [
-            html.Header(headerRow),
-            html.Section(userRow),
-            html.Section(locationRow),
-            html.Section(sensorRow),
-            userSection,
+            headerSection,
+            buildUserSection(),
+            buildGroupSection(),
             locationSection,
             sensorSection,
         ],
@@ -111,6 +44,8 @@ def layout():
     Output("admin-manage-user-level", "value"),
     Output("admin-manage-user-level", "options"),
     Output("admin-manage-user-level-label", "hidden"),
+    Output("admin-manage-group", "options"),
+    Output("admin-manage-group", "value"),
     Output("admin-manage-sensor", "options"),
     Output("admin-manage-sensor", "value"),
     Output("admin-manage-location", "options"),
@@ -125,7 +60,7 @@ def onUser(uid):
 
     user: AppUser = AppUser.query.get(uid)
     showLevel = fli.current_user.level >= 2
-    options = buildLevelOptions()[0] if showLevel  else no_update
+    options = buildLevelOptions()[0] if showLevel else no_update
 
     return [
         user.username,
@@ -134,9 +69,27 @@ def onUser(uid):
         user.level,
         options,
         not showLevel,
+        *buildGroupOptions(uid),
         *buildSensorOptions(uid),
         *buildLocationOptions(uid),
     ]
+
+
+@app.callback(
+    Output("admin-manage-group-name", "value"),
+    Output("admin-manage-group-desc", "value"),
+    Input("admin-manage-group", "value"),
+)
+def onGroup(gid):
+    """Location 선택시 업데이트"""
+
+    if not gid:
+        return "", ""
+
+    grp = Group.query.get(gid)
+
+    # return *buildSensorOptions(fid), farm.name
+    return grp.name, grp.desc
 
 
 @app.callback(
@@ -144,8 +97,8 @@ def onUser(uid):
     Output("admin-manage-location-desc", "value"),
     Input("admin-manage-location", "value"),
 )
-def onFarm(fid):
-    """Farm 선택시 업데이트"""
+def onLocation(fid):
+    """Location 선택시 업데이트"""
 
     if not fid:
         return "", ""

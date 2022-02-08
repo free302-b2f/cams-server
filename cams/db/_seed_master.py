@@ -20,7 +20,7 @@ def seed():
     dba: SQLAlchemy = fl.g.dba
 
     # add group
-    group = Group(name="TEST", desc="개발 테스트 농장")
+    group = Group(name="MASTER", desc="마스터 그룹")
 
     # add user
     user = AppUser(
@@ -33,18 +33,22 @@ def seed():
     group.users.append(user)
 
     # add location
-    loc = Location(name="제1구역", desc="물토란(2021년 12월)")
+    loc = Location(name="제1구역", desc="물토란(2021년 12월 파종)")
+    loc2 = Location(name="제2구역", desc="개구리밥(2022년 2월 파종)")
     group.locations.append(loc)
+    group.locations.append(loc2)
 
     # add sensor
     sensors = [
         Sensor(sn=f"B2F_CAMs_200000000000{i}", name=f"DrBAE's CAMs #{i}")
-        for i in range(1, 3)
+        for i in range(1, 5)
     ]
-    loc.sensors.extend(sensors)
+    loc.sensors.extend(sensors[:2])
+    loc2.sensors.extend(sensors[2:4])
     group.sensors.extend(sensors)
 
     dba.session.add(group)
+    dba.session.add(Group(name="GUEST", desc="게스트 그룹"))
     dba.session.commit()
 
     # 랜덤 센서 데이터 추가

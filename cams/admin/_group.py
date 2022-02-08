@@ -1,25 +1,20 @@
-"""센서 추가 화면"""
+"""그룹 관리 화면"""
 
 from ._common import *
 from dash.dependencies import Input, Output, State
 
-_list = buildLabel_Dropdown(
-    "CAMs",
-    "sensor",
-    None,
-    [],
-    None,
-    "sensors",
-    [("clear", "clear"), ("delete", "delete")],
-)
-_name = buildLabel_Input("Sensor Name", "sensor", "name", "", Sensor.max_name)
-_sn = buildLabel_Input("Sensor SN", "sensor", "sn", "", Sensor.max_sn)
-_button = buildButtonRow("Add New Sensor", "sensor", True)
 
-sensorSection = html.Section(
-    [html.Hr(), _list, _name, _sn, _button],
-    className="admin-manage-edit-section",
-)
+def buildGroupSection():
+    _list = buildLabel_Dropdown(
+        "Group", "group", None, *buildGroupOptions(), "groups"
+    )
+    _name = buildLabel_Input("Group Name", "group", "name", "", Group.max_name)
+    _desc = buildLabel_Input("Sensor SN", "group", "desc", "", Group.max_desc)
+    _button = buildButtonRow("Add New Group", "group", True)
+    return html.Section(
+        [html.Hr(), _list, _name, _desc, _button],
+        className="admin-manage-edit-section",
+    )
 
 
 @app.callback(

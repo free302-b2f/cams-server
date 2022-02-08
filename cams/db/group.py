@@ -44,8 +44,13 @@ class Group(dba.Model):
         dic = {key: self.__getattribute__(key) for key in keys}
         return dic
 
+    @classmethod
+    def guest(cls):
+        return Group.query.filter_by(name="GUEST")[0]
+
 
 if getattr(sys, "_test_", None):
     group = Group()
     print(f"{Group.max_len()= }")
     print(f"{group.to_dict()= }")
+    # print(f"{Group.guest().to_dict()= }")

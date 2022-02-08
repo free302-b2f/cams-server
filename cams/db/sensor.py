@@ -16,7 +16,6 @@ class Sensor(dba.Model):
     # 클래스 변수: 각 필드 최대 길이 등
     max_sn = 32
     max_name = 64
-    max_desc = 128
 
     @classmethod
     def max_len(cls):
@@ -25,7 +24,6 @@ class Sensor(dba.Model):
         return {
             "max_sn": cls.max_sn,
             "max_name": cls.max_name,
-            "max_desc": cls.max_desc,
         }
 
     # endregion

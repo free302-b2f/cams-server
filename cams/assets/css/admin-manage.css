@@ -24,9 +24,6 @@
   padding-left: 1rem;
   padding-right: 1rem;
 }
-#admin-manage-container > section:last-child {
-  margin-top: 2rem;
-}
 .admin-manage-edit-section {
   flex-direction: column;
 }

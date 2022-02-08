@@ -1,51 +1,24 @@
-"""팜 추가 화면"""
+"""위치 추가 화면"""
 
-# from ._imports import *
 from ._common import *
-# import flask as fl
-# from dash import html
-# from dash import dcc
 from dash.dependencies import Input, Output, State
 
-# import visdcc
-
-_name = html.Label(
-    [
-        html.Span("Location Name"),
-        html.Span("_", className="material-icons-two-tone"),
-        dcc.Input(
-            id="admin-manage-location-name",
-            type="text",
-            maxLength=Location.max_name,
-            required=True,
-        ),
-    ],
-    className="admin-manage-label",
+_list = buildLabel_Dropdown(
+    "Location",
+    "location",
+    None,
+    [],
+    None,
+    "yard",
+    [("clear", "clear"), ("delete", "delete")],
 )
 
-_desc = html.Label(
-    [
-        html.Span("Description"),
-        html.Span("_", className="material-icons-two-tone"),
-        dcc.Input(
-            id="admin-manage-location-desc",
-            type="text",
-            maxLength=Sensor.max_desc,
-            required=True,
-        ),
-    ],
-    className="admin-manage-label",
-)
-
+_name = buildLabel_Input("Name", "location", "name", "", Location.max_name)
+_desc = buildLabel_Input("Description", "location", "desc", "", Location.max_desc)
+_button = buildButtonRow("Add New Location", "location", True)
 
 locationSection = html.Section(
-    [
-        html.Hr(),
-        _name,
-        _desc,
-        buildButtonRow("Add New Location", "location"),
-        # visdcc.Run_js('admin-manage-farm-add-js'),
-    ],
+    [html.Hr(), _list, _name, _desc, _button],
     className="admin-manage-edit-section",
 )
 
@@ -60,7 +33,7 @@ locationSection = html.Section(
     prevent_initial_call=True,
 )
 def onNewClick(n, uid, name, desc):
-    """<Add New Location> 버튼 클릭시 db작업 및 farm 목록 업데이트"""
+    """<Add> 버튼 작업 및 farm 목록 업데이트"""
 
     if not n:
         return no_update
@@ -89,7 +62,7 @@ def onNewClick(n, uid, name, desc):
     prevent_initial_call=True,
 )
 def onSaveClick(n, uid, fid, name, desc):
-    """<Save Fram> 버튼 클릭시 db작업 및 목록 업데이트"""
+    """<Save> 버튼 작업 및 목록 업데이트"""
 
     if not n:
         return no_update
@@ -116,7 +89,7 @@ def onSaveClick(n, uid, fid, name, desc):
     prevent_initial_call=True,
 )
 def onClearClick(n, uid, fid):
-    """<Clear> 버튼 작업 - 팜 삭제, 연결되 센서/센서데이터가 있으면 삭제 안함"""
+    """<Clear> 버튼 작업 - 위치 삭제, 연결되 센서/센서데이터가 있으면 삭제 안함"""
 
     if not n:
         return no_update
