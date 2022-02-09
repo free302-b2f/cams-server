@@ -113,16 +113,25 @@ def simulate():
     """MongoDB에서 읽어서 SN과 시간을 수정하여 DB에 추가"""
 
     # 복사할 장비 SN
-    srcSN = ["B2F_CAMs_1000000000001", "B2F_CAMs_1000000000002"]
-    destSN = ["B2F_CAMs_2000000000001", "B2F_CAMs_2000000000002"]
+    srcSN = [
+        "B2F_CAMs_1000000000001",
+        "B2F_CAMs_1000000000002",
+        "B2F_CAMs_1000000000001",
+        "B2F_CAMs_1000000000002",
+    ]
+    destSN = [
+        "B2F_CAMs_2000000000001",
+        "B2F_CAMs_2000000000002",
+        "B2F_CAMs_2000000000003",
+        "B2F_CAMs_2000000000004",
+    ]
 
     while True:
         t1 = datetime.now()
 
-        # _copyOne_M2P(srcSN[0], destSN[0])
-        # _copyOne_M2P(srcSN[1], destSN[1])
-        _copyOne_M2M(srcSN[0], destSN[0])
-        _copyOne_M2M(srcSN[1], destSN[1])
+        for i in range(len(srcSN)):
+            # _copyOne_M2P(srcSN[i], destSN[i])
+            _copyOne_M2M(srcSN[i], destSN[i])
 
         sec = 30 - (datetime.now() - t1).total_seconds()
         if sec > 0:

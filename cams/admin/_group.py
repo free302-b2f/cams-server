@@ -9,7 +9,7 @@ def buildGroupSection():
         "Group", "group", None, *buildGroupOptions(), "groups"
     )
     _name = buildLabel_Input("Group Name", "group", "name", "", Group.max_name)
-    _desc = buildLabel_Input("Sensor SN", "group", "desc", "", Group.max_desc)
+    _desc = buildLabel_Input("Description", "group", "desc", "", Group.max_desc)
     _button = buildButtonRow("Add New Group", "group", True)
     return html.Section(
         [html.Hr(), _list, _name, _desc, _button],

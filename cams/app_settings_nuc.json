@@ -1,6 +1,6 @@
 {
     "logging": {
-        "Level": "INFO",
+        "Level": "DEBUG",
         "DevUi": false
     },
     "Mongo": {
