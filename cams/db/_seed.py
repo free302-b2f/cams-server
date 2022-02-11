@@ -15,6 +15,12 @@ from .user import AppUser
 from .location import Location
 from .sensor import Sensor
 from .cams_info import Cams
+import utility as util
+
+# seed data files
+SEED_MASTER_FILE = "seed-master.json"  # 마스터 계정과 테스트용 센서 추가
+SEED_GUEST_FILE = "seed-guest.json"  # 게스트 그룹 추가
+SEED_GROUP_FILE = "seed-kist.json"  # 사용자 그룹 추가 - kist
 
 
 def seed():
@@ -27,22 +33,22 @@ def seed():
     dba.session.add(Cams("cams_start_date", datetime.now().isoformat()))
     dba.session.commit()
 
-    # ----[ 마스터 계정 ]----
-    from . import _seed_master
+    # ----[ 마스터 그룹 ]----
+    group = seed_group_json(SEED_MASTER_FILE)
+    from . import sensor_data as sd
 
-    _seed_master.seed()
+    sd.f3_seed(group.sensors)  # 랜덤 센서 데이터 추가
 
-    # ----[ KIST Pheno ]----
-    from . import _seed_kist
+    # ----[ 게스트 그룹 ]----
+    seed_group_json(SEED_GUEST_FILE)
 
-    kist_json = "seed-kist-pheno.json"
-    # _seed_kist.dump_json(kist_json) # save to json file
-    load_json_seed(kist_json)  # load from json file
+    # ----[ 추가그룹 ]----
+    seed_group_json(SEED_GROUP_FILE)
 
 
 # json 파일에서 읽어와 DB에 추가
-def load_json_seed(filename: str):
-    """json 파일에서 메타데이터를 읽어들여 DB에 추가"""
+def seed_group_json(filename: str) -> Group:
+    """json 파일에서 group을 읽어들여 DB에 추가"""
 
     # read json
     dic = {}
@@ -50,14 +56,15 @@ def load_json_seed(filename: str):
         dic.update(json.load(fp))
 
     # add group
-    jGroup = dic["group"]
-    group = Group(name=jGroup["name"], desc=jGroup["desc"])
+    group = Group(name=dic["name"], desc=dic["desc"])
 
     # add user
-    for i, jUser in enumerate(dic["user"]):
+    for jUser in dic["users"]:
+        pw = jUser["password"]
+        pwHash = pw if pw.startswith("pbkdf2:") else util.generate_password_hash(pw)
         user = AppUser(
             username=jUser["username"],
-            password=jUser["password"],
+            password=pwHash,
             email=jUser["email"],
             realname=jUser["realname"],
             level=jUser["level"],
@@ -65,9 +72,9 @@ def load_json_seed(filename: str):
         group.users.append(user)
 
     # add location
-    for i, jLoc in enumerate(dic["location"]):
+    for jLoc in dic["locations"]:
         loc = Location(name=jLoc["name"], desc=jLoc["desc"])
-        for jS in dic[f"sensor{i}"]:
+        for jS in jLoc["sensors"]:
             loc.sensors.append(Sensor(sn=jS["sn"], name=jS["name"]))
         group.locations.append(loc)
         group.sensors.extend(loc.sensors)
@@ -75,3 +82,51 @@ def load_json_seed(filename: str):
     dba: SQLAlchemy = fl.g.dba
     dba.session.add(group)
     dba.session.commit()
+
+    return group
+
+
+def save_group_json(group: Group, filename):
+    """group을 json 파일에 저장"""
+
+    u: AppUser
+    l: Location
+    s: Sensor
+
+    dic = group.to_dict()
+    dic["users"] = [u.to_dict() for u in group.users]
+
+    locs = []
+    for l in group.locations:
+        locDic = l.to_dict()
+        locDic["sensors"] = [s.to_dict() for s in l.sensors]
+        locs.append(locDic)
+
+    # python3.9: z = x|y
+    dic["locations"] = [
+        {**l.to_dict(), **{"sensors": [s.to_dict() for s in l.sensors]}}
+        for l in group.locations
+    ]
+
+    dic = _clean_nones(dic)
+
+    with open(filename, "w", encoding="utf-8") as fp:
+        json.dump(dic, fp, indent=4, ensure_ascii=False)
+
+    util.info(f"{group} -> {filename}")
+
+
+def _clean_nones(value):
+    """리스트와 사전에서 None값을 제거하여 새 객체 리턴"""
+
+    # 리스트
+    if isinstance(value, list):
+        return [_clean_nones(x) for x in value if x is not None]
+
+    # 사전
+    elif isinstance(value, dict):
+        return {key: _clean_nones(val) for key, val in value.items() if val is not None}
+
+    # 그외값
+    else:
+        return value

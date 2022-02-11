@@ -39,7 +39,8 @@ def signup():
         else:
             try:
                 dba = fl.g.dba
-                pwHash = wsec.generate_password_hash(pw, method="sha256")
+                # pwHash = wsec.generate_password_hash(pw, method="sha256")
+                pwHash = util.generate_password_hash(pw)
                 newUser = AppUser(username=un, password=pwHash, email=em, realname=rn)
                 dba.session.add(newUser)
                 dba.session.commit()

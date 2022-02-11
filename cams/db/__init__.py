@@ -63,9 +63,10 @@ from . import sensor
 from . import cams_info
 
 # create all model tables & seed
-if _set["DropTables"]:
+# if _set["DropTables"]:
 
-    # TODO: DO NOT drop sensor_data: data never die!
+def drop_create_seed():
+
     from . import sensor_data as sd
 
     sd.f1_drop_table()

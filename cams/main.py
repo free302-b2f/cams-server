@@ -13,13 +13,16 @@ from dash import no_update
 # import flask as fl
 import flask_login as fli
 
-from app import app, router
+from app import app, router, getSettings
 from utility import error, debug, info
 
 with app.server.app_context():
 
     # db, lm 패키지 초기화 & 하위모듈 로딩
     import db
+
+    if getSettings("Postgres", "DropTables"):
+        db.drop_create_seed()
     import lm
 
     #! main_layout을 임포트 하기전 메뉴등록하는 모듈 전부 임포트
@@ -65,7 +68,6 @@ def display_page(appPath: str):
     if not fli.current_user or not fli.current_user.is_authenticated:
         debug(display_page, f"redirecting: {appPath} -> {lm.login_view()}")
         return no_update, lm.login_view()
-        
 
     # 경로의 레이아웃 얻기
     v = router.get(appPath, None)

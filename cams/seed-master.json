@@ -1,0 +1,43 @@
+{
+    "name": "MASTER",
+    "desc": "마스터 그룹",
+    "users": [
+        {
+            "username": "cams",
+            "email": "amadeus.bae@gmail.com",
+            "password": "pbkdf2:sha512:260000$8Vo8SxskK9ScoC0bs6p25BLcklofg6Yv$a613e06045bcfbdcd69d54f7ad2c127a9c59f39d05aaa74bcdc9751829e2ac139838df847fd2b435c0d2bb0631d4601b3448c88a54f2fdb2fd08729b2d67f758",
+            "realname": "B2F Master",
+            "level": 2
+        }
+    ],
+    "locations": [
+        {
+            "name": "제1구역",
+            "desc": "물토란(2022-02-01~)",
+            "sensors": [
+                {
+                    "sn": "B2F_CAMs_2000000000001",
+                    "name": "DrBAE's CAMs #1"
+                },
+                {
+                    "sn": "B2F_CAMs_2000000000002",
+                    "name": "DrBAE's CAMs #2"
+                }
+            ]
+        },
+        {
+            "name": "제2구역",
+            "desc": "개구리밥(2021-12-01~2022-05-31)",
+            "sensors": [
+                {
+                    "sn": "B2F_CAMs_2000000000003",
+                    "name": "DrBAE's CAMs #3"
+                },
+                {
+                    "sn": "B2F_CAMs_2000000000004",
+                    "name": "DrBAE's CAMs #4"
+                }
+            ]
+        }
+    ]
+}

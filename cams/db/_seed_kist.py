@@ -1,74 +1,66 @@
-"""KIST 메타 데이터 추가"""
-
-if __name__ == "__main__":
-    import sys, os
-
-    dir = os.path.dirname(__file__)
-    __package__ = os.path.basename(dir)
-    sys.path.append(os.path.dirname(dir))
-    # 이렇게 하면 상대경로 임포트시 ImportError는 나지 않지만
-    # db.__init__.py이 로딩되며
-    # 결국 flask.current_app가 필요하다.
-
-from datetime import date, datetime, time, timedelta, timezone
-import flask as fl
-import werkzeug.security as wsec
-from flask_sqlalchemy import SQLAlchemy
-import json
-
-#! import all models
-from .group import Group
-from .user import AppUser
-from .location import Location
-from .sensor import Sensor
-from .cams_info import Cams
-import utility as util
+"""KIST 메타 데이터를 위한 json 파일 생생"""
 
 
-def dump_json(filename):
+def dump_json():
     """추가할 메타데이터를 json으로 저장"""
 
-    dba: SQLAlchemy = fl.g.dba
+    import flask as fl
 
-    # add group
-    group = Group(name="PHENO", desc="KIST Pheno Project")
+    app = fl.Flask(__name__)
+    with app.app_context():
+        import db
+        from .group import Group
+        from .user import AppUser
+        from .location import Location
+        from .sensor import Sensor
+        from .cams_info import Cams
+        from ._seed import save_group_json, SEED_GROUP_FILE
 
-    # add user
-    pw = util.generate_password_hash("kist1966!!!")
-    user = AppUser(
-        username="pheno",
-        password=pw,
-        email="kist-pheno@gmail.com",
-        realname="Pheno KIST",
-        level=1,  # group admin
-    )
-    group.users.append(user)
+        # add group
+        group = Group(name="PHENO", desc="KIST Pheno 그룹")
 
-    # add location
-    loc = Location(name="제1동 제1구역", desc="2021년 12월 작물1")
-    group.locations.append(loc)
+        # add user
+        # pw = util.generate_password_hash("kist1966!!!")
+        user = AppUser(
+            username="pheno",
+            password="kist1966!!!",
+            email="kist-pheno@gmail.com",
+            realname="Pheno KIST",
+            level=1,  # group admin
+        )
+        group.users.append(user)
 
-    # add sensor
-    sensors = [
-        Sensor(sn=f"B2F_CAMs_100000000000{i}", name=f"Sensor {i}") for i in range(1, 7)
-    ]
-    loc.sensors.extend(sensors)
-    group.sensors.extend(sensors)
+        # add location #1
+        loc = Location(name="제1동 제1구역", desc="작물1 (2021년 5월 파종)")
+        group.locations.append(loc)
 
-    # TEST: json dump all seed data
-    dic = {"group": group.to_dict()}
-    dic["user"] = [u.to_dict() for u in group.users]
-    dic["location"] = [l.to_dict() for l in group.locations]
+        # add sensor
+        sensors = [
+            Sensor(sn=f"B2F_CAMs_100000000000{i}", name=f"Sensor {i}") for i in range(1, 3)
+        ]
+        loc.sensors.extend(sensors)
+        group.sensors.extend(sensors)
 
-    for i in range(len(group.locations)):
-        dic[f"sensor{i}"] = [s.to_dict() for s in group.locations[i].sensors]
+        # add location #2
+        loc = Location(name="제1동 제2구역", desc="작물2 (2021년 12월 파종)")
+        group.locations.append(loc)
 
-    with open(filename, "w", encoding="utf-8") as fp:
-        json.dump(dic, fp, indent=4, ensure_ascii=False)
+        # add sensor
+        sensors = [
+            Sensor(sn=f"B2F_CAMs_100000000000{i}", name=f"Sensor {i}") for i in range(3, 7)
+        ]
+        loc.sensors.extend(sensors)
+        group.sensors.extend(sensors)
 
-    print(f"json dump: {filename}")
+        save_group_json(group, SEED_GROUP_FILE)
 
 
-# if __name__ == "__main__":
-#     # flask.app 필요
-#     dump_json()
+if __name__ == "__main__":
+
+    import sys, os.path as path
+
+    dir = path.dirname(path.dirname(__file__))
+    sys.path.insert(0, dir)
+    __package__ = "db"
+    
+    dump_json()
