@@ -19,8 +19,6 @@ import utility as util
 
 # seed data files
 SEED_MASTER_FILE = "seed-master.json"  # 마스터 계정과 테스트용 센서 추가
-SEED_GUEST_FILE = "seed-guest.json"  # 게스트 그룹 추가
-SEED_GROUP_FILE = "seed-kist.json"  # 사용자 그룹 추가 - kist
 
 
 def seed():
@@ -33,17 +31,16 @@ def seed():
     dba.session.add(Cams("cams_start_date", datetime.now().isoformat()))
     dba.session.commit()
 
-    # ----[ 마스터 그룹 ]----
-    group = seed_group_json(SEED_MASTER_FILE)
+    # ----[ 비투팜 그룹 & 마스터 계정 ]----
+    groups = seed_group_json(SEED_MASTER_FILE)
     from . import sensor_data as sd
 
-    sd.f3_seed(group.sensors)  # 랜덤 센서 데이터 추가
+    for group in groups:
+        sd.f3_seed(group.sensors)  # 랜덤 센서 데이터 추가
 
-    # ----[ 게스트 그룹 ]----
-    seed_group_json(SEED_GUEST_FILE)
-
-    # ----[ 추가그룹 ]----
-    seed_group_json(SEED_GROUP_FILE)
+    # ----[ 추가 그룹 ]----
+    fn = fl.g.settings["Cams"]["SEED_FILE"]
+    seed_group_json(fn)
 
 
 # json 파일에서 읽어와 DB에 추가
@@ -51,47 +48,57 @@ def seed_group_json(filename: str) -> Group:
     """json 파일에서 group을 읽어들여 DB에 추가"""
 
     # read json
-    dic = {}
     with open(filename, "r", encoding="utf-8") as fp:
-        dic.update(json.load(fp))
+        dics = json.load(fp)
 
-    # add group
-    group = Group(name=dic["name"], desc=dic["desc"])
+    groups = []
+    for dic in dics:
+        # add group
+        group = Group(name=dic["name"], desc=dic["desc"])
 
-    # add user
-    for jUser in dic["users"]:
-        pw = jUser["password"]
-        pwHash = pw if pw.startswith("pbkdf2:") else util.generate_password_hash(pw)
-        user = AppUser(
-            username=jUser["username"],
-            password=pwHash,
-            email=jUser["email"],
-            realname=jUser["realname"],
-            level=jUser["level"],
-        )
-        group.users.append(user)
+        # add user
+        for jUser in dic["users"]:
+            pw = jUser["password"]
+            pwHash = pw if pw.startswith("pbkdf2:") else util.generate_password_hash(pw)
+            user = AppUser(
+                username=jUser["username"],
+                password=pwHash,
+                email=jUser["email"],
+                realname=jUser["realname"],
+                level=jUser["level"],
+            )
+            group.users.append(user)
 
-    # add location
-    for jLoc in dic["locations"]:
-        loc = Location(name=jLoc["name"], desc=jLoc["desc"])
-        for jS in jLoc["sensors"]:
-            loc.sensors.append(Sensor(sn=jS["sn"], name=jS["name"]))
-        group.locations.append(loc)
-        group.sensors.extend(loc.sensors)
+        # add location
+        for jLoc in dic["locations"]:
+            loc = Location(name=jLoc["name"], desc=jLoc["desc"])
+            for jS in jLoc["sensors"]:
+                loc.sensors.append(Sensor(sn=jS["sn"], name=jS["name"]))
+            group.locations.append(loc)
+            group.sensors.extend(loc.sensors)
 
-    dba: SQLAlchemy = fl.g.dba
-    dba.session.add(group)
-    dba.session.commit()
+        dba: SQLAlchemy = fl.g.dba
+        dba.session.add(group)
+        dba.session.commit()
 
-    return group
+        groups.append(group)
+
+    return groups
 
 
-def save_group_json(group: Group, filename):
-    """group을 json 파일에 저장"""
+def save_groups_json(groups, filename):
+    """group 리스트를 json 파일에 저장"""
 
-    u: AppUser
-    l: Location
-    s: Sensor
+    dic = [_group_to_dic(group) for group in groups]
+
+    with open(filename, "w", encoding="utf-8") as fp:
+        json.dump(dic, fp, indent=4, ensure_ascii=False)
+
+    util.info(f"{filename} saved")
+
+
+def _group_to_dic(group):
+    """group을 json 직렬화에 적합한 dict으로 변환"""
 
     dic = group.to_dict()
     dic["users"] = [u.to_dict() for u in group.users]
@@ -109,11 +116,8 @@ def save_group_json(group: Group, filename):
     ]
 
     dic = _clean_nones(dic)
-
-    with open(filename, "w", encoding="utf-8") as fp:
-        json.dump(dic, fp, indent=4, ensure_ascii=False)
-
-    util.info(f"{group} -> {filename}")
+    return dic
+    # return json.dumps(dic, indent=4, ensure_ascii=False)
 
 
 def _clean_nones(value):

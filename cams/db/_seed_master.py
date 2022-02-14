@@ -15,10 +15,10 @@ def dump_json():
         from .location import Location
         from .sensor import Sensor
         from .cams_info import Cams
-        from ._seed import save_group_json, SEED_MASTER_FILE, SEED_GUEST_FILE
+        from ._seed import save_groups_json, SEED_MASTER_FILE
 
         # add group
-        group = Group(name="MASTER", desc="마스터 그룹")
+        masterGroup = Group(name="비투팜", desc="(주)비투팜")
 
         # add user
         user = AppUser(
@@ -28,13 +28,13 @@ def dump_json():
             realname="B2F Master",
             level=2,  # master
         )
-        group.users.append(user)
+        masterGroup.users.append(user)
 
         # TEST: add location
-        loc = Location(name="제1구역", desc="물토란(2022-02-01~)")
-        loc2 = Location(name="제2구역", desc="개구리밥(2021-12-01~2022-05-31)")
-        group.locations.append(loc)
-        group.locations.append(loc2)
+        loc = Location(name="제1구역", desc="물토란(2022년 2월 파종)")
+        loc2 = Location(name="제2구역", desc="개구리밥(2021년 12월 이식)")
+        masterGroup.locations.append(loc)
+        masterGroup.locations.append(loc2)
 
         # add sensor
         sensors = [
@@ -43,11 +43,16 @@ def dump_json():
         ]
         loc.sensors.extend(sensors[:2])
         loc2.sensors.extend(sensors[2:4])
-        group.sensors.extend(sensors)
+        masterGroup.sensors.extend(sensors)
 
-        save_group_json(group, SEED_MASTER_FILE)
-
-        save_group_json(Group(name="GUEST", desc="게스트 그룹"), SEED_GUEST_FILE)
+        groups = [
+            masterGroup,
+            Group(name="GUEST", desc="게스트 그룹"),
+            Group(name="TEST-1", desc="(주)테스트"),
+            Group(name="TEST-2", desc="테스트 그룹2"),
+            Group(name="TEST-3", desc="테스트 그룹3"),
+        ]
+        save_groups_json(groups, SEED_MASTER_FILE)
 
 
 if __name__ == "__main__":

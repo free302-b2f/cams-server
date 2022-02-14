@@ -1,4 +1,5 @@
-{#<!----------------------------------------------------- 
+{#
+<!----------------------------------------------------- 
     + v0.1
     + 사인업 뷰의 템플릿2
     + 2021-09-09 by DrBAE : amadeus.bae@gmail.com
@@ -20,9 +21,9 @@
     <div class="input-group-prepend">
         <span class="input-group-text"><i class="fas fa-key"></i></span>
     </div>
-    <input name="lm-login-password-confirm" id="lm-login-password-confirm" class="form-control" 
-        oninput="validatePassword('lm-login-password', 'lm-login-password-confirm')"
-        maxlength={{max_password}} placeholder="password" required type="password">
+    <input name="lm-login-password-confirm" id="lm-login-password-confirm" class="form-control"
+        oninput="validatePassword('lm-login-password', 'lm-login-password-confirm')" maxlength={{max_password}}
+        placeholder="password" required type="password">
 </div>
 
 <!-- email -->
@@ -30,8 +31,8 @@
     <div class="input-group-prepend">
         <span class="input-group-text"><i class="fas fa-envelope"></i></span>
     </div>
-    <input name="lm-login-email" id="lm-login-email" class="form-control" 
-        maxlength={{max_email}} placeholder="email address" required type="email">
+    <input name="lm-login-email" id="lm-login-email" class="form-control" maxlength={{max_email}}
+        placeholder="email address" required type="email">
 </div>
 
 <!-- realname -->
@@ -42,8 +43,23 @@
             <span class="material-icons-two-tone">badge</span>
         </span>
     </div>
-    <input name="lm-login-realname" id="lm-login-realname" class="form-control" 
-        maxlength={{max_realname}} placeholder="real name" required type="text">
+    <input name="lm-login-realname" id="lm-login-realname" class="form-control" maxlength={{max_realname}}
+        placeholder="real name" required type="text">
+</div>
+
+<!-- GROUP -->
+<div class="input-group form-group">
+    <div class="input-group-prepend">
+        <span class="input-group-text">
+            <span class="material-icons-two-tone">groups</span>
+        </span>
+    </div>
+    <select name="lm-login-group" id="lm-login-group" class="form-control" maxlength={{max_realname}}
+        placeholder="select group" required>
+        {% for group in groups %}
+        <option value={{ group['id'] }}>{{ group['name'] }}</option>
+        {% endfor %}
+    </select>
 </div>
 
 {% endblock %}
@@ -62,4 +78,4 @@
 
 
 {% block page_footer %}
-{% endblock %}   
+{% endblock %}

@@ -33,6 +33,7 @@ def before_request():
     """모든 요청 전에 SQLAlchemy를 fl.g에 추가"""
 
     fl.g.dba = _app.config["SQLALCHEMY_INSTANCE"]
+    fl.g.settings = _app.config["APP_SETTINGS"]
     # debug("db.before_request()")
 
     pass

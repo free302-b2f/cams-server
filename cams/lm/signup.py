@@ -4,6 +4,7 @@ print(f"<{__name__}> loading...")
 
 from lm._imports import *
 from db.user import AppUser
+from db.group import Group
 from app import app, debug
 import json
 
@@ -15,13 +16,17 @@ import json
 def signup():
 
     if fl.request.method == "GET":
-        return fl.render_template("signup.html")
+        # group list
+        groups = Group.query.filter(Group.name != "GUEST")
+        dic = [g.to_dict() for g in groups]
+        return fl.render_template("signup.html", groups=dic)
 
     un = fl.request.form["lm-login-username"].strip()
     pw = fl.request.form["lm-login-password"].strip()
     pwc = fl.request.form["lm-login-password-confirm"].strip()
     em = fl.request.form["lm-login-email"].strip()
     rn = fl.request.form["lm-login-realname"].strip()
+    gn = fl.request.form["lm-login-group"].strip()
 
     response = {"isOK": False, "cause": "", "next": "/"}
 
@@ -42,6 +47,11 @@ def signup():
                 # pwHash = wsec.generate_password_hash(pw, method="sha256")
                 pwHash = util.generate_password_hash(pw)
                 newUser = AppUser(username=un, password=pwHash, email=em, realname=rn)
+                group = Group.query.filter_by(name=gn)
+                if group == None:
+                    response["cause"] = "lm-login-group"
+                    return json.dumps(response)
+                newUser.group = group[0]
                 dba.session.add(newUser)
                 dba.session.commit()
                 response["isOK"] = True
@@ -55,5 +65,7 @@ def set_context():
     """세션 컨텍스트에 추가할 dict을 리턴한다"""
 
     debug("set_context()")
+
+
 
     return AppUser.max_len() #_ctx

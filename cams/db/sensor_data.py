@@ -281,6 +281,11 @@ def _insert_random(cursor: pge.cursor, gid: int, lid: int, sid: int, dt: datetim
 def f3_seed(sensors):
     """기본적인 메타데이터 및 랜덤 센서데이터 추가"""
 
+    if sensors == None:
+        return
+    if len(sensors) == 0:
+        return
+
     try:
         pgc, cursor = connect(True)
 

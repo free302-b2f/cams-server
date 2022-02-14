@@ -1,51 +1,53 @@
-{
-    "name": "PHENO",
-    "desc": "KIST Pheno 그룹",
-    "users": [
-        {
-            "username": "pheno",
-            "email": "kist-pheno@gmail.com",
-            "password": "kist1966!!!",
-            "realname": "Pheno KIST",
-            "level": 1
-        }
-    ],
-    "locations": [
-        {
-            "name": "제1동 제1구역",
-            "desc": "작물1 (2021년 5월 파종)",
-            "sensors": [
-                {
-                    "sn": "B2F_CAMs_1000000000001",
-                    "name": "Sensor 1"
-                },
-                {
-                    "sn": "B2F_CAMs_1000000000002",
-                    "name": "Sensor 2"
-                }
-            ]
-        },
-        {
-            "name": "제1동 제2구역",
-            "desc": "작물2 (2021년 12월 파종)",
-            "sensors": [
-                {
-                    "sn": "B2F_CAMs_1000000000003",
-                    "name": "Sensor 3"
-                },
-                {
-                    "sn": "B2F_CAMs_1000000000004",
-                    "name": "Sensor 4"
-                },
-                {
-                    "sn": "B2F_CAMs_1000000000005",
-                    "name": "Sensor 5"
-                },
-                {
-                    "sn": "B2F_CAMs_1000000000006",
-                    "name": "Sensor 6"
-                }
-            ]
-        }
-    ]
-}
+[
+    {
+        "name": "KIST",
+        "desc": "KIST 과제 그룹",
+        "users": [
+            {
+                "username": "pheno",
+                "email": "kist-pheno@gmail.com",
+                "password": "kist1966!!!",
+                "realname": "Pheno KIST",
+                "level": 1
+            }
+        ],
+        "locations": [
+            {
+                "name": "제1동 제1구역",
+                "desc": "작물1 (2021년 5월 파종)",
+                "sensors": [
+                    {
+                        "sn": "B2F_CAMs_1000000000001",
+                        "name": "Sensor 1"
+                    },
+                    {
+                        "sn": "B2F_CAMs_1000000000002",
+                        "name": "Sensor 2"
+                    }
+                ]
+            },
+            {
+                "name": "제1동 제2구역",
+                "desc": "작물2 (2021년 12월 파종)",
+                "sensors": [
+                    {
+                        "sn": "B2F_CAMs_1000000000003",
+                        "name": "Sensor 3"
+                    },
+                    {
+                        "sn": "B2F_CAMs_1000000000004",
+                        "name": "Sensor 4"
+                    },
+                    {
+                        "sn": "B2F_CAMs_1000000000005",
+                        "name": "Sensor 5"
+                    },
+                    {
+                        "sn": "B2F_CAMs_1000000000006",
+                        "name": "Sensor 6"
+                    }
+                ]
+            }
+        ]
+    }
+]

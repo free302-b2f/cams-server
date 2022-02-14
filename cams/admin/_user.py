@@ -10,7 +10,7 @@ def buildUserSection():
     return html.Section(
         [
             # html.Hr(),
-            buildLabel_Dropdown("User", "user", None, *buildUserOptions(), "badge"),
+            buildLabel_Dropdown("이용자 관리", "user", None, *buildUserOptions(), "badge"),
             # buildLabel_Dropdown("Group", "user", "group", *buildGroupOptions()),
             buildLabel_Input(
                 "Login ID", "user", "username", "", AppUser.max_username, True

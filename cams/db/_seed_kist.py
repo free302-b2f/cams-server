@@ -1,5 +1,6 @@
 """KIST 메타 데이터를 위한 json 파일 생생"""
 
+SEED_FILE = "seed-kist.json"  # 사용자 그룹 추가 - kist
 
 def dump_json():
     """추가할 메타데이터를 json으로 저장"""
@@ -14,10 +15,10 @@ def dump_json():
         from .location import Location
         from .sensor import Sensor
         from .cams_info import Cams
-        from ._seed import save_group_json, SEED_GROUP_FILE
+        from ._seed import save_groups_json
 
         # add group
-        group = Group(name="PHENO", desc="KIST Pheno 그룹")
+        group = Group(name="KIST", desc="KIST 과제 그룹")
 
         # add user
         # pw = util.generate_password_hash("kist1966!!!")
@@ -36,7 +37,8 @@ def dump_json():
 
         # add sensor
         sensors = [
-            Sensor(sn=f"B2F_CAMs_100000000000{i}", name=f"Sensor {i}") for i in range(1, 3)
+            Sensor(sn=f"B2F_CAMs_100000000000{i}", name=f"Sensor {i}")
+            for i in range(1, 3)
         ]
         loc.sensors.extend(sensors)
         group.sensors.extend(sensors)
@@ -47,12 +49,13 @@ def dump_json():
 
         # add sensor
         sensors = [
-            Sensor(sn=f"B2F_CAMs_100000000000{i}", name=f"Sensor {i}") for i in range(3, 7)
+            Sensor(sn=f"B2F_CAMs_100000000000{i}", name=f"Sensor {i}")
+            for i in range(3, 7)
         ]
         loc.sensors.extend(sensors)
         group.sensors.extend(sensors)
 
-        save_group_json(group, SEED_GROUP_FILE)
+        save_groups_json([group], SEED_FILE)
 
 
 if __name__ == "__main__":
@@ -62,5 +65,5 @@ if __name__ == "__main__":
     dir = path.dirname(path.dirname(__file__))
     sys.path.insert(0, dir)
     __package__ = "db"
-    
+
     dump_json()
