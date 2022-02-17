@@ -39,7 +39,7 @@ def seed():
         sd.f3_seed(group.sensors)  # 랜덤 센서 데이터 추가
 
     # ----[ 추가 그룹 ]----
-    fn = fl.g.settings["Cams"]["SEED_FILE"]
+    fn = fl.g.settings["Cams"]["DB_SEED_FILE"]
     seed_group_json(fn)
 
 
@@ -53,8 +53,12 @@ def seed_group_json(filename: str) -> Group:
 
     groups = []
     for dic in dics:
+
         # add group
-        group = Group(name=dic["name"], desc=dic["desc"])
+        if "id" in dic:
+            group = Group(id=dic["id"], name=dic["name"], desc=dic["desc"])
+        else:
+            group = Group(name=dic["name"], desc=dic["desc"])
 
         # add user
         for jUser in dic["users"]:

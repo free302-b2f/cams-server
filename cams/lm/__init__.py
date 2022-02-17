@@ -25,6 +25,7 @@ _lm.init_app(_app)
 _lm.login_view = "/login"
 _lm.signup_view = "/signup"
 _lm.profile_view = "/lm-profile"
+_lm.change_view = "/change"
 
 _app.config.update(
     SECRET_KEY=_set["SECRET_KEY"],
@@ -47,6 +48,7 @@ def load_user(user_id):
 login_view = lambda: _lm.login_view
 signup_view = lambda: _lm.signup_view
 profile_view = lambda: _lm.profile_view
+change_view = lambda: _lm.change_view
 
 
 # 하위 모듈 로딩
@@ -55,3 +57,20 @@ from . import login
 from . import logout
 from . import profile
 from . import status
+from . import change
+
+
+from db.user import AppUser
+from db.group import Group
+
+@_app.context_processor
+def set_context():
+    """세션 컨텍스트에 추가할 dict을 리턴한다"""
+
+    util.debug("set_context()")
+
+    dic = AppUser.max_len()
+    dic.update(Group.max_len())
+    dic["data"] = {}
+
+    return dic  # _ctx

@@ -22,8 +22,8 @@ class Group(dba.Model):
         """각 필드의 최대길이를 리턴"""
 
         return {
-            "max_name": cls.max_name,
-            "max_desc": cls.max_desc,
+            "max_group_name": cls.max_name,
+            "max_group_desc": cls.max_desc,
         }
 
     # endregion
@@ -31,7 +31,7 @@ class Group(dba.Model):
     # 테이블 컬럼 정의
     __tablename__ = "app_group"
     id = dba.Column(dba.Integer, primary_key=True)
-    name = dba.Column(dba.String(max_name), nullable=False)
+    name = dba.Column(dba.String(max_name), nullable=False, unique=True)
     desc = dba.Column(dba.String(max_desc), nullable=False)
 
     def __repr__(self):
@@ -44,9 +44,9 @@ class Group(dba.Model):
         dic = {key: self.__getattribute__(key) for key in keys}
         return dic
 
-    @classmethod
-    def guest(cls):
-        return Group.query.filter_by(name="GUEST")[0]
+    # @classmethod
+    # def guest(cls):
+    #     return Group.query.filter_by(name="GUEST")[0]
 
 
 if getattr(sys, "_test_", None):

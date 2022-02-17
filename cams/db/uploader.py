@@ -144,7 +144,7 @@ def simulate():
 # region ---- [cmd 2 : MongoDB -> Postgres 동기화 ] ----
 
 _set = loadAppSettings("Cams")
-_DB_START_DATI = datetime.fromisoformat(_set["DbmsSyncStartDate"])
+_DB_START_DATI = datetime.fromisoformat(_set["DB_SYNC_START_DATE"])
 _SYNCH_KEY = "db_uploader_last_synch"
 
 

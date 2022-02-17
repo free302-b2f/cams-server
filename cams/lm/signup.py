@@ -5,32 +5,33 @@ print(f"<{__name__}> loading...")
 from lm._imports import *
 from db.user import AppUser
 from db.group import Group
-from app import app, debug
+# from app import app, debug
 import json
 
 
-# _ctx = AppUser.max_len()
-
-
-@app.server.route("/signup", methods=["GET", "POST"])
+@fl.current_app.route("/signup", methods=["GET", "POST"])
 def signup():
+    """signup 결과를 json 문자열로 리턴"""
+
+    settings = fl.g.settings["Cams"]
 
     if fl.request.method == "GET":
         # group list
-        groups = Group.query.filter(Group.name != "GUEST")
-        dic = [g.to_dict() for g in groups]
-        return fl.render_template("signup.html", groups=dic)
+        if not settings["IsStandAlone"]:
+            groups = [g.to_dict() for g in Group.query.all()]
+        else:
+            groups = None
+        return fl.render_template("signup.html", groups=groups)#, data=dic)
 
     un = fl.request.form["lm-login-username"].strip()
     pw = fl.request.form["lm-login-password"].strip()
     pwc = fl.request.form["lm-login-password-confirm"].strip()
     em = fl.request.form["lm-login-email"].strip()
     rn = fl.request.form["lm-login-realname"].strip()
-    gn = fl.request.form["lm-login-group"].strip()
 
     response = {"isOK": False, "cause": "", "next": "/"}
 
-    if not pw == pwc : 
+    if not pw == pwc:
         response["cause"] = "lm-login-password-confirm"
         return json.dumps(response)
 
@@ -44,14 +45,28 @@ def signup():
         else:
             try:
                 dba = fl.g.dba
-                # pwHash = wsec.generate_password_hash(pw, method="sha256")
-                pwHash = util.generate_password_hash(pw)
-                newUser = AppUser(username=un, password=pwHash, email=em, realname=rn)
-                group = Group.query.filter_by(name=gn)
-                if group == None:
-                    response["cause"] = "lm-login-group"
-                    return json.dumps(response)
-                newUser.group = group[0]
+
+                # 새 사용자 생성
+                newUser = AppUser(
+                    username=un,
+                    password=util.generate_password_hash(pw),
+                    email=em,
+                    realname=rn,
+                )
+
+                # group
+                gid = (
+                    settings["DB_SEED_GROUP_ID"]
+                    if settings["IsStandAlone"]
+                    else fl.request.form["lm-login-group"]
+                )               
+                newUser.group_id = gid
+
+                # level
+                group = Group.query.get(gid)
+                if len(group.users) == 0:
+                    newUser.level = 1 # 1st user == group admin
+
                 dba.session.add(newUser)
                 dba.session.commit()
                 response["isOK"] = True
@@ -60,12 +75,14 @@ def signup():
     return json.dumps(response)
 
 
-@app.server.context_processor
-def set_context():
-    """세션 컨텍스트에 추가할 dict을 리턴한다"""
+# @app.server.context_processor
+# def set_context():
+#     """세션 컨텍스트에 추가할 dict을 리턴한다"""
 
-    debug("set_context()")
+#     debug("set_context()")
 
+#     dic = AppUser.max_len()
+#     dic.update(Group.max_len())
+#     dic["data"] = {}
 
-
-    return AppUser.max_len() #_ctx
+#     return dic  # _ctx

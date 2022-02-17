@@ -21,7 +21,7 @@ with app.server.app_context():
     # db, lm 패키지 초기화 & 하위모듈 로딩
     import db
 
-    if getSettings("Postgres", "DropTables"):
+    if getSettings("Cams", "DB_DO_RESET"):
         db.drop_create_seed()
     import lm
 

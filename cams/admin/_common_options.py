@@ -65,9 +65,9 @@ def buildGroupOptions(uid=None):
         # 마스터 계정인 경우 - 모든 그룹
         groups = Group.query.all()
     elif user.level == 1:
-        # 그룹관리자 - 소속그룹과 게스트
+        # 그룹관리자 - 소속그룹
         g1 = AppUser.query.get(uid).group if uid else user.group
-        groups = [g1, Group.guest()]
+        groups = [g1]
     elif user.level == 1 or user.level == 0:
         # 그룹 소속된 경우 - 소속그룹
         g1 = AppUser.query.get(uid).group if uid else user.group

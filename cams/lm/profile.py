@@ -129,12 +129,12 @@ def layout():
     )
     _menu = html.Section(
         [
-            dcc.Link(
+            html.A(  # dcc.Link: 
                 [
                     html.Span("Change"),
                     html.Span("password", className="material-icons-two-tone"),
                 ],
-                href="lm.change",
+                href="/change",
                 className="flex-h mr1",
             ),
             *(lm.logout.layout),

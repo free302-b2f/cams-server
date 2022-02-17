@@ -1,4 +1,13 @@
 {
+    "Cams": {
+        "IsStandAlone": false,
+        "ShowTempUIs": true,
+        "DbmsKey": "Postgres",
+        "DB_SYNC_START_DATE": "2022-01-17T00:00:00.000000+09:00",
+        "DB_DO_RESET": false,
+        "DB_SEED_FILE": "seed-kist.json",
+        "DB_SEED_GROUP_ID": 9998
+    },
     "logging": {
         "Level": "DEBUG",
         "DevUi": true
@@ -17,14 +26,7 @@
         "Port": 25432,
         "Db": "db_cams",
         "User": "cams",
-        "Pw": "best",
-        "DropTables": false
-    },
-    "Cams": {
-        "DbmsKey": "Postgres",
-        "SEED_FILE": "seed-kist.json",
-        "ShowTempUIs": true,
-        "DbmsSyncStartDate": "2022-01-17T00:00:00.000000+09:00"
+        "Pw": "best"
     },
     "LoginManager": {
         "SECRET_KEY": "605feac2f60784caf7126e08f69932b4915b4fc3bf590881"

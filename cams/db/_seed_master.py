@@ -8,6 +8,7 @@ def dump_json():
     import utility as util
 
     app = fl.Flask(__name__)
+    app.config["APP_SETTINGS"] = {}
     with app.app_context():
         import db
         from .group import Group
@@ -18,7 +19,7 @@ def dump_json():
         from ._seed import save_groups_json, SEED_MASTER_FILE
 
         # add group
-        masterGroup = Group(name="비투팜", desc="(주)비투팜")
+        masterGroup = Group(id=9999, name="비투팜", desc="(주)비투팜")
 
         # add user
         user = AppUser(
@@ -47,10 +48,16 @@ def dump_json():
 
         groups = [
             masterGroup,
-            Group(name="GUEST", desc="게스트 그룹"),
-            Group(name="TEST-1", desc="(주)테스트"),
-            Group(name="TEST-2", desc="테스트 그룹2"),
-            Group(name="TEST-3", desc="테스트 그룹3"),
+            # Group(name="GUEST", desc="게스트 그룹"),
+            Group(name="(주)테스트", desc="테스트 그룹1"),
+            Group(name="Apple", desc="테스트 그룹2"),
+            Group(name="Google", desc="테스트 그룹3"),
+            Group(name="TEST-4", desc="테스트 그룹4"),
+            Group(name="TEST-5", desc="테스트 그룹5"),
+            Group(name="TEST-6", desc="테스트 그룹6"),
+            Group(name="TEST-7", desc="테스트 그룹7"),
+            Group(name="TEST-8", desc="테스트 그룹8"),
+            Group(name="TEST-9", desc="테스트 그룹9"),
         ]
         save_groups_json(groups, SEED_MASTER_FILE)
 

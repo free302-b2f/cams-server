@@ -48,19 +48,21 @@
 </div>
 
 <!-- GROUP -->
+{% if groups != None %}
 <div class="input-group form-group">
     <div class="input-group-prepend">
         <span class="input-group-text">
             <span class="material-icons-two-tone">groups</span>
         </span>
     </div>
-    <select name="lm-login-group" id="lm-login-group" class="form-control" maxlength={{max_realname}}
-        placeholder="select group" required>
+    <select name="lm-login-group" class="form-control" required>
         {% for group in groups %}
-        <option value={{ group['id'] }}>{{ group['name'] }}</option>
+        <option value={{ group['id'] }}>{{ group['name'] }} : {{ group['desc'] }}</option>
+        <!-- <option>{{ group['name'] }}</option> -->
         {% endfor %}
     </select>
 </div>
+{% endif %}
 
 {% endblock %}
 
@@ -69,7 +71,7 @@
 {% block form_button_text %}Sign Up{% endblock %}
 
 
-{% block card_footer_1 %}
+{% block card_footer %}
 <!-- Link to Sign Up -->
 <div class="d-flex justify-content-center links">Already have an account?
     <a href="/login">Sign In!</a>

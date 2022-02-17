@@ -1,0 +1,56 @@
+{#
+<!----------------------------------------------------- 
+    + v0.1
+    + 사인업 뷰의 템플릿2
+    + 2021-09-09 by DrBAE : amadeus.bae@gmail.com
+ ----------------------------------------------------->#}
+
+{% extends 'login_base.html' %}
+<!-- extends 이후 block 밖이 있는 것은 무시된다 -->
+
+{% block page_container_class %}class="app-signup"{% endblock %}
+
+{% block card_header_text %}
+{% block title %}Change Password{% endblock %}
+{% endblock %}
+
+
+{% block card_body %}
+
+<br>
+
+<!-- new password -->
+<div class="input-group form-group">
+    <div class="input-group-prepend">
+        <span class="input-group-text"><i class="fas fa-key"></i></span>
+    </div>
+    <input name="lm-login-password-new" id="lm-login-password-new" class="form-control" 
+        maxlength={{max_password}} placeholder="new password" required type="password">
+</div>
+
+<!-- new password confirm -->
+<div class="input-group form-group">
+    <div class="input-group-prepend">
+        <span class="input-group-text"><i class="fas fa-key"></i></span>
+    </div>
+    <input name="lm-login-password-confirm" id="lm-login-password-confirm" class="form-control"
+        oninput="validatePassword('lm-login-password-new', 'lm-login-password-confirm')" maxlength={{max_password}}
+        placeholder="new password" required type="password">
+</div>
+
+
+{% endblock %}
+
+
+{% block form_action_path %}"/change"{% endblock %}
+{% block form_button_text %}Change{% endblock %}
+
+
+{% block card_footer %}
+<!-- Link to Sign Up -->
+
+{% endblock %}
+
+
+{% block page_footer %}
+{% endblock %}

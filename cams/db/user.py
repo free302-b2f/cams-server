@@ -42,7 +42,7 @@ class AppUser(fli.UserMixin, dba.Model):
     email = dba.Column(dba.String(max_email), unique=True)
     password = dba.Column(dba.String(max_password_hash))
     realname = dba.Column(dba.String(max_realname))
-    level = dba.Column(dba.Integer, nullable=False, server_default="-1") # 현재 일반유저 TODO: -1로 변경
+    level = dba.Column(dba.Integer, nullable=False, server_default="-1")
     group_id = dba.Column(dba.Integer, dba.ForeignKey("app_group.id"), nullable=False)
     group = dba.relationship("Group", backref=dba.backref("users", lazy=True))
     # Column('version', Integer, server_default="SELECT MAX(1, MAX(old_versions)) FROM version_table")

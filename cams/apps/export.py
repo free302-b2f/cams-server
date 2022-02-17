@@ -54,7 +54,7 @@ def layout():
     sensors = {s.id: s for s in fli.current_user.group.sensors}  # 그룹의 모든 센서
     sensorOptions = [{"label": "ALL", "value": 0}]
     sensorOptions.extend([{"label": sensors[s].name, "value": s} for s in sensors])
-    locSensors = locs[locDefault].sensors
+    locSensors = locs[locDefault].sensors if len(locs) else []
     sensorDefault = locSensors[0].id if len(locSensors) else 0  # 위치의 첫 센서
     # sensorDefault = sensorOptions[1]["value"] if len(sensorOptions) > 1 else 0
     sensorRow = html.Label(

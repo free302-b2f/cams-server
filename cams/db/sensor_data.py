@@ -299,7 +299,7 @@ def f3_seed(sensors):
             ids = [x["id"] for x in cursor.fetchall()]
 
         start = datetime.combine(datetime.now().date(), datetime.min.time())
-        dates = [start + timedelta(days=x) for x in range(-7, 0)]
+        dates = [start + timedelta(days=x) for x in range(-2, 0)]
 
         # 각 센서에 대해 센서데이터 추가
         for s in sensors:

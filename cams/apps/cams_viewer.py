@@ -88,7 +88,7 @@ def update_graph(sensor_id, date):
 
     debug(update_graph, f"{sensor_id = }, {date = }")
 
-    if date is None:
+    if date is None or not sensor_id:
         return plotAll(None), plotAll(None), plotAll(None), plotAll(None)
 
     sensor = Sensor.query.get(sensor_id)

@@ -1,4 +1,5 @@
-{#<!----------------------------------------------------- 
+{#
+<!----------------------------------------------------- 
     + v0.1
     + 로그인 뷰의 베이스 템플릿
     + 2021-09-09 by DrBAE : amadeus.bae@gmail.com
@@ -36,63 +37,63 @@
                     <span><i class="fab fa-google-plus-square"></i></span>
                     <span><i class="fab fa-twitter-square"></i></span>
                     <span>
-                        <svg id="lm-login-kakao"><use xlink:href="/assets/img/kakao.svg#icon"></use></svg>
+                        <svg id="lm-login-kakao">
+                            <use xlink:href="/assets/img/kakao.svg#icon"></use>
+                        </svg>
                     </span>
                 </div>
             </div>
 
             <!-- card body -->
             <div class="card-body">
-                <form id="lm-form" enctype="multipart/form-data" method="POST"
-                    action={% block form_action_path %}{% endblock %}
-                    onsubmit="lmSubmit(event)">
+                <form id="lm-form" enctype="multipart/form-data" method="POST" action={% block form_action_path %}{%
+                    endblock %} onsubmit="lmSubmit(event)">
 
-                <!-- username -->
-                <div class="input-group form-group">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                    <!-- username -->
+                    <div class="input-group form-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-user"></i></span>
+                        </div>
+                        <input name="lm-login-username" id="lm-login-username" class="form-control"
+                            maxlength={{max_username}} placeholder="login id" required type="text" {% if
+                            data['userIsReadOnly'] %} readonly value="{{data['userValue']}}"
+                            style="background-color:transparent;color:white;font-weight: bold;" {% endif %}>
                     </div>
-                    <input name="lm-login-username" id="lm-login-username" class="form-control" 
-                        maxlength={{max_username}} placeholder="login id" required type="text">
-                </div>
 
-                <!-- password -->
-                <div class="input-group form-group">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text"><i class="fas fa-key"></i></span>
+                    <!-- password -->
+                    <div class="input-group form-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-key"></i></span>
+                        </div>
+                        <input name="lm-login-password" id="lm-login-password" class="form-control"
+                            maxlength={{max_password}} placeholder="password" required type="password">
                     </div>
-                    <input name="lm-login-password" id="lm-login-password" class="form-control" 
-                        maxlength={{max_password}} placeholder="password" required type="password">
-                </div>
-                
-                {% block card_body %}{% endblock %}                
 
-                <!-- status: server side validation result -->
-                <div id="lm-login-status" class="d-flex justify-content-center text-danger"></div>
+                    {% block card_body %}{% endblock %}
 
-                <!-- submit -->
-                <div class="form-group">
-                    <button name="lm-login-button" 
-                    type="submit"
-                    class="btn float-right login_btn btn btn-secondary"
-                    >{% block form_button_text %}{% endblock %}</button>
-                </div>                
-            </form></div>
+                    <!-- status: display validation result -->
+                    <div id="lm-login-status" class="d-flex justify-content-center text-danger"></div>
+
+                    <!-- button : cancel, submit -->
+                    <div class="form-group">
+                        <button name="lm-login-button" id="lm-login-button" type="submit" class="btn login_btn btn-secondary float-right">
+                            {% block form_button_text %}{% endblock %}</button>
+                        <button name="lm-login-cancel" type="button" class="btn btn-primary float-right"
+                            onclick='window.location.href="/"'>Cancel</button>
+                    </div>
+                </form>
+            </div>
             <!-- end of card body -->
 
             <!-- card footer -->
             <div class="card-footer">
-                {% block card_footer_1 %}{% endblock %}                
-                <div class="d-flex justify-content-center">
-                    <a href="#">Forgot your password?</a>
-                </div>
+                {% block card_footer %}{% endblock %}                
             </div>
 
         </div>
         <!-- end of card -->
 
-    </div>    
+    </div>
 </div>
 
 <script src="{{url_for('static', filename='login.js')}}"></script>
-
