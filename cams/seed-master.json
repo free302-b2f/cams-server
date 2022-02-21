@@ -66,35 +66,5 @@
         "desc": "테스트 그룹4",
         "users": [],
         "locations": []
-    },
-    {
-        "name": "TEST-5",
-        "desc": "테스트 그룹5",
-        "users": [],
-        "locations": []
-    },
-    {
-        "name": "TEST-6",
-        "desc": "테스트 그룹6",
-        "users": [],
-        "locations": []
-    },
-    {
-        "name": "TEST-7",
-        "desc": "테스트 그룹7",
-        "users": [],
-        "locations": []
-    },
-    {
-        "name": "TEST-8",
-        "desc": "테스트 그룹8",
-        "users": [],
-        "locations": []
-    },
-    {
-        "name": "TEST-9",
-        "desc": "테스트 그룹9",
-        "users": [],
-        "locations": []
     }
 ]

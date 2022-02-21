@@ -83,6 +83,12 @@ def layout():
 
     sensors, uris, infos = getImageInfos()
 
+    if len(sensors) == 0:
+        return html.Div(
+            html.H3(f"No IR Cameras"),
+            className="apps-camera-title",
+        )
+
     def build_img_container(index: int):
         return html.Div(
             [

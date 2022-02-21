@@ -3,24 +3,28 @@
 from ._common import *
 from dash.dependencies import Input, Output, State
 
-_list = buildLabel_Dropdown(
-    "Location",
-    "location",
-    None,
-    [],
-    None,
-    "yard",
-    [("clear", "clear"), ("delete", "delete")],
-)
 
-_name = buildLabel_Input("Name", "location", "name", "", Location.max_name)
-_desc = buildLabel_Input("Description", "location", "desc", "", Location.max_desc)
-_button = buildButtonRow("Add New Location", "location", True)
+def buildLocationSection():
+    """Location의 빈 목록 및 편집 섹션을 생성"""
 
-locationSection = html.Section(
-    [html.Hr(), _list, _name, _desc, _button],
-    className="admin-manage-edit-section",
-)
+    list = buildLabel_Dropdown(
+        "Location",
+        "location",
+        None,
+        [],
+        None,
+        "yard",
+        [("clear", "clear")],
+    )
+
+    name = buildLabel_Input("Name", "location", "name", "", Location.max_name)
+    desc = buildLabel_Input("Description", "location", "desc", "", Location.max_desc)
+    button = buildButtonRow("Add New Location", "location", True)
+
+    return html.Section(
+        [html.Hr(), list, name, desc, button],
+        className="admin-manage-edit-section",
+    )
 
 
 @app.callback(

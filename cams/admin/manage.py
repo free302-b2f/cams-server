@@ -18,7 +18,7 @@ def layout():
         html.H4(
             [
                 html.Span("settings", className="material-icons-two-tone"),
-                html.Span("Manage Locations & Sensors", className="font-sc"),
+                html.Span("Manage Group Users/Locations/Sensors", className="font-sc"),
             ],
             className="flex-h",
         )
@@ -27,69 +27,75 @@ def layout():
     return html.Div(
         [
             headerSection,
-            buildUserSection(),
             buildGroupSection(),
-            locationSection,
-            sensorSection,
+            buildUserSection(),
+            buildLocationSection(),
+            buildSensorSection(),
         ],
         id="admin-manage-container",
     )
 
 
-# AppUser 선택시 location/sensor 목록 업데이트
 @app.callback(
+    Output("admin-manage-group-name", "value"),
+    Output("admin-manage-group-desc", "value"),
+    Output("admin-manage-user", "options"),
+    Output("admin-manage-user", "value"),
+    Output("admin-manage-location", "options"),
+    Output("admin-manage-location", "value"),
+    Output("admin-manage-sensor", "options"),
+    Output("admin-manage-sensor", "value"),
+    Input("admin-manage-group", "value"),
+)
+def onGroup(gid):
+    """Group 선택시 user/location/sensor 목록 업데이트"""
+
+    if not gid:
+        return no_update
+
+    group = Group.query.get(gid)
+
+    return [
+        group.name,
+        group.desc,
+        *buildUserOptions(gid),
+        *buildLocationOptions(gid),
+        *buildSensorOptions(gid),
+    ]
+
+
+@app.callback(
+    Output("admin-manage-user-group", "options"),
+    Output("admin-manage-user-group", "value"),
     Output("admin-manage-user-username", "value"),
     Output("admin-manage-user-email", "value"),
     Output("admin-manage-user-realname", "value"),
-    Output("admin-manage-user-level", "value"),
-    Output("admin-manage-user-level", "options"),
     Output("admin-manage-user-level-label", "hidden"),
-    Output("admin-manage-group", "options"),
-    Output("admin-manage-group", "value"),
-    Output("admin-manage-sensor", "options"),
-    Output("admin-manage-sensor", "value"),
-    Output("admin-manage-location", "options"),
-    Output("admin-manage-location", "value"),
+    Output("admin-manage-user-level", "options"),
+    Output("admin-manage-user-level", "value"),
     Input("admin-manage-user", "value"),
 )
 def onUser(uid):
-    """AppUser 선택시 location/sensor 목록 업데이트"""
+    """AppUser 선택시  업데이트"""
 
     if not uid:
         return no_update
 
     user: AppUser = AppUser.query.get(uid)
-    showLevel = fli.current_user.level >= 2
+    groupOptions, _ = buildGroupOptions()
+    showLevel = True if len(groupOptions) else False
     options = buildLevelOptions()[0] if showLevel else no_update
 
     return [
+        groupOptions,
+        user.group_id,
         user.username,
         user.email,
         user.realname,
-        user.level,
-        options,
         not showLevel,
-        *buildGroupOptions(uid),
-        *buildSensorOptions(uid),
-        *buildLocationOptions(uid),
+        options,
+        user.level,
     ]
-
-
-@app.callback(
-    Output("admin-manage-group-name", "value"),
-    Output("admin-manage-group-desc", "value"),
-    Input("admin-manage-group", "value"),
-)
-def onGroup(gid):
-    """Location 선택시 업데이트"""
-
-    if not gid:
-        return "", ""
-
-    grp = Group.query.get(gid)
-
-    # return *buildSensorOptions(fid), farm.name
-    return grp.name, grp.desc
 
 
 @app.callback(
@@ -104,25 +110,25 @@ def onLocation(fid):
         return "", ""
 
     loc = Location.query.get(fid)
-
-    # return *buildSensorOptions(fid), farm.name
     return loc.name, loc.desc
 
 
-@app.callback(
+@app.callback(    
     Output("admin-manage-sensor-name", "value"),
     Output("admin-manage-sensor-sn", "value"),
+    Output("admin-manage-sensor-location", "options"),
+    Output("admin-manage-sensor-location", "value"),
     Input("admin-manage-sensor", "value"),
 )
 def onSensor(sid):
     """Sensor 선택시 업데이트"""
 
     if not sid:
-        return "", ""
+        return "", "", ""
 
     sensor = Sensor.query.get(sid)
-
-    return sensor.name, sensor.sn
+    locs, _ = buildLocationOptions(sensor.group_id)
+    return sensor.name, sensor.sn, locs, sensor.location_id
 
 
 addPage(layout, "Admin")

@@ -10,6 +10,7 @@ import werkzeug.security as wsec
 
 dba = fl.g.dba
 
+
 class AppUser(fli.UserMixin, dba.Model):
     """로그인 사용자 DB모델"""
 
@@ -20,6 +21,10 @@ class AppUser(fli.UserMixin, dba.Model):
     max_password = 32
     max_password_hash = 182
     max_realname = 64
+    level_master = 2  # 마스터 계정의 레벨
+    level_group_admin = 1  # 마스터 계정의 레벨
+    levels = {-1: "게스트", 0: "일반사용자", 1: "그룹관리자", 2: "마스터계정", -2: "잠금", -3: "탈퇴(삭제)"}
+    levels_group = {-1: "게스트", 0: "일반사용자", 1: "그룹관리자", -2: "잠금"}
 
     @classmethod
     def max_len(cls):
@@ -47,10 +52,10 @@ class AppUser(fli.UserMixin, dba.Model):
     group = dba.relationship("Group", backref=dba.backref("users", lazy=True))
     # Column('version', Integer, server_default="SELECT MAX(1, MAX(old_versions)) FROM version_table")
     # -3=탈퇴(삭제예정), -2=잠금(로그인 불가), -1=게스트, 0=일반, +1=그룹관리자, +2=마스터
-    # 마스터: 아이디 승인/관리, 모든 데이터 관리 가능
-    # 그룹관리자: 그룹 일반 아이디 승인/관리, 그룹 소속 데이터 관리, 그룹당 1개
-    # 일반: 그룹 데이터 접근(읽기전용)
-    # 게스트: 로그인 가능, 그룹 없음, 그룹 관리자의 가입승인 필요 <-- 최초가입시 상태
+    # 마스터: DB의 모든 데이터 관리 가능
+    # 그룹관리자: 그룹 소속 모든 데이터 관리
+    # 일반: 그룹/사용자 외의 그룹 데이터 관리
+    # 게스트: 읽기 전용
     # 잠금: 로그인 불가
 
     def __repr__(self):
@@ -62,6 +67,26 @@ class AppUser(fli.UserMixin, dba.Model):
         keys = self.__table__.columns.keys()
         dic = {key: self.__getattribute__(key) for key in keys}
         return dic
+
+    def is_master(self):
+        """마스터 계정 여부"""
+
+        return self.level == AppUser.level_master
+
+    def is_gadmin(self):
+        """그룹 관리자 계정 여부"""
+
+        return self.level == AppUser.level_group_admin
+
+    def get_levels(self):
+        """현재 계정이 관리할 수 있는 레벨 목록"""
+
+        if self.level == AppUser.level_master:
+            return AppUser.levels
+        elif self.level == AppUser.level_group_admin:
+            return AppUser.levels_group
+        else:
+            return {}
 
 
 if getattr(sys, "_test_", None):

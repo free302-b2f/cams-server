@@ -3,23 +3,35 @@
 from ._common import *
 from dash.dependencies import Input, Output, State
 
-_list = buildLabel_Dropdown(
-    "CAMs",
-    "sensor",
-    None,
-    [],
-    None,
-    "sensors",
-    [("clear", "clear"), ("delete", "delete")],
-)
-_name = buildLabel_Input("Sensor Name", "sensor", "name", "", Sensor.max_name)
-_sn = buildLabel_Input("Sensor SN", "sensor", "sn", "", Sensor.max_sn)
-_button = buildButtonRow("Add New Sensor", "sensor", True)
 
-sensorSection = html.Section(
-    [html.Hr(), _list, _name, _sn, _button],
-    className="admin-manage-edit-section",
-)
+def buildSensorSection():
+    """Sensor의 빈 목록 및 편집 섹션을 생성"""
+
+    list = buildLabel_Dropdown(
+        "CAMs",
+        "sensor",
+        None,
+        [],
+        None,
+        "sensors",
+        [("clear", "clear")],
+    )
+    name = buildLabel_Input("Sensor Name", "sensor", "name", "", Sensor.max_name)
+    sn = buildLabel_Input("Sensor SN", "sensor", "sn", "", Sensor.max_sn)
+    locs = buildLabel_Dropdown(
+        "Location",
+        "sensor",
+        "location",
+        [],
+        None,
+        "",
+    )
+    button = buildButtonRow("Add New Sensor", "sensor", True)
+
+    return html.Section(
+        [html.Hr(), list, name, sn, locs, button],
+        className="admin-manage-edit-section",
+    )
 
 
 @app.callback(

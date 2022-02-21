@@ -1,7 +1,7 @@
 {
     "Cams": {
         "IsStandAlone": true,
-        "ShowTempUIs": true,
+        "ShowTempUIs": false,
         "DbmsKey": "Postgres",
         "DB_SYNC_START_DATE": "2022-01-17T00:00:00.000000+09:00",
         "DB_DO_RESET": false,

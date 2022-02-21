@@ -91,8 +91,8 @@ def _query_data(
 def _query_data_mongo(sn: str, startDati) -> pd.DataFrame:
     """MongoDB에서 하루동안의 데이터를 불러온다."""
 
-    dics = ReadMongo(sn, startDati, asCursor=True)
-    df = pd.DataFrame(dics)   
+    docs = ReadMongo(sn, startDati, asCursor=True)
+    df = pd.DataFrame(docs)   
 
     if df.shape[0] and df.shape[1]:
         df = df.astype(_types_mongo, copy=False)  # , errors="ignore")
@@ -117,6 +117,8 @@ def parse_and_load(
         group_id = 0 if user.level >= 2 else user.group.id  # master's group_id -> 0
         df = _query_data(group_id, sensor_id, location_id, startDati, endDati, dp)
     elif dbmsKey == "Mongo":
+        if not sensor_id:
+            return None
         sn = Sensor.query.get(sensor_id).sn
         df = _query_data_mongo(sn, startDati)
     return df

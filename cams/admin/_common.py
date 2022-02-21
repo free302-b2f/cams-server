@@ -63,7 +63,14 @@ def buildLabel_Input(
 
 
 def buildLabel_Dropdown(
-    labelText, modelName, colName, options, defaultValue, preIcon=None, postIcons=None
+    labelText,
+    modelName,
+    colName,
+    options,
+    defaultValue,
+    preIcon=None,
+    postIcons=None,
+    hidden=False,
 ):
     """dcc.Dropdown을 포함한 html.Label 생성"""
 
@@ -93,10 +100,12 @@ def buildLabel_Dropdown(
                 )
             )
 
+    hiddenStyle = {"display": "none"}
     return html.Label(
         children,
         className="admin-manage-label",
         id=f"admin-manage-{modelName}-{colName}-label"
         if colName
         else f"admin-manage-{modelName}-label",
+        style=hiddenStyle if hidden else None,
     )

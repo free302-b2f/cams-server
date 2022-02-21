@@ -9,3 +9,6 @@
 
 + 사용자 선택사항을 cookies? db? 에 저장
  - 선택창: dash popup/modal 만들기
+
++ admin
+ - gorup onchange

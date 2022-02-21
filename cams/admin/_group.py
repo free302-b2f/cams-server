@@ -5,15 +5,42 @@ from dash.dependencies import Input, Output, State
 
 
 def buildGroupSection():
-    _list = buildLabel_Dropdown(
-        "Group", "group", None, *buildGroupOptions(), "groups"
+    """그룹 목록과 편집 섹션 생성"""
+
+    user = fli.current_user
+    readOnly = user.level <= 0
+
+    list = buildLabel_Dropdown(
+        "Group",
+        "group",
+        None,
+        *buildGroupOptions(),
+        "groups",
+        [("clear", "clear")] if readOnly else None,
+        # hidden=readOnly
     )
-    _name = buildLabel_Input("Group Name", "group", "name", "", Group.max_name)
-    _desc = buildLabel_Input("Description", "group", "desc", "", Group.max_desc)
-    _button = buildButtonRow("Add New Group", "group", True)
+
+    name = buildLabel_Input(
+        "Group Name", "group", "name", "", Group.max_name, readonly=readOnly
+    )
+    desc = buildLabel_Input(
+        "Description", "group", "desc", "", Group.max_desc, readonly=readOnly
+    )
+
+    button = (
+        buildButtonRow(
+            "Add New Group" if user.level == 2 else "Update Group",
+            "group",
+            user.level == 2,
+        )
+        if not readOnly
+        else None
+    )
+
     return html.Section(
-        [html.Hr(), _list, _name, _desc, _button],
+        [list, name, desc, button],
         className="admin-manage-edit-section",
+        style={"display": "none"} if readOnly else None,
     )
 
 
