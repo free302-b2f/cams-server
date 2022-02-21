@@ -26,7 +26,7 @@ def buildSensorSection():
         None,
         "",
     )
-    button = buildButtonRow("Add New Sensor", "sensor", True)
+    button = buildButtonRow("sensor", True)
 
     return html.Section(
         [html.Hr(), list, name, sn, locs, button],

@@ -17,7 +17,7 @@ def signup():
 
     if fl.request.method == "GET":
         # group list
-        if not settings["IsStandAlone"]:
+        if not settings["IS_PRIVATE_SERVER"]:
             groups = [g.to_dict() for g in Group.query.all()]
         else:
             groups = None
@@ -56,8 +56,8 @@ def signup():
 
                 # group
                 gid = (
-                    settings["DB_SEED_GROUP_ID"]
-                    if settings["IsStandAlone"]
+                    settings["DB_PRIVATE_GROUP_ID"]
+                    if settings["IS_PRIVATE_SERVER"]
                     else fl.request.form["lm-login-group"]
                 )               
                 newUser.group_id = gid

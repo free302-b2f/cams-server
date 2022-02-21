@@ -1,70 +1,17 @@
 [
     {
-        "id": 9999,
-        "name": "비투팜",
-        "desc": "(주)비투팜",
+        "id": 0,
+        "name": "MASTER",
+        "desc": "마스터 그룹",
         "users": [
             {
                 "username": "cams",
                 "email": "amadeus.bae@gmail.com",
-                "password": "pbkdf2:sha512:260000$MaVzmYgyB7h4ikzrId99dqNxEGbPfin7$4e1d7a91586ca255f26fc9eea416dee3f3047d3be2b714a62d9ab9ed2dd8947d316e4cfc822233ca0beb5f6c577047c7b1c63abd8aa6ba8841736cd0c4261466",
-                "realname": "B2F Master",
+                "password": "pbkdf2:sha512:260000$3zFS58wutyvsZUYmU9SNWgokMOgTJ7z9$af5d41045df2a9816972466cbc30ae67a0e21b0c96034c4ad0c27f46ef522f182b5058932299769977525cba4d3a1de37d5b44283e71628032142aef63893805",
+                "realname": "CAMs Master",
                 "level": 2
             }
         ],
-        "locations": [
-            {
-                "name": "제1구역",
-                "desc": "물토란(2022년 2월 파종)",
-                "sensors": [
-                    {
-                        "sn": "B2F_CAMs_2000000000001",
-                        "name": "DrBAE's CAMs #1"
-                    },
-                    {
-                        "sn": "B2F_CAMs_2000000000002",
-                        "name": "DrBAE's CAMs #2"
-                    }
-                ]
-            },
-            {
-                "name": "제2구역",
-                "desc": "개구리밥(2021년 12월 이식)",
-                "sensors": [
-                    {
-                        "sn": "B2F_CAMs_2000000000003",
-                        "name": "DrBAE's CAMs #3"
-                    },
-                    {
-                        "sn": "B2F_CAMs_2000000000004",
-                        "name": "DrBAE's CAMs #4"
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "name": "테스트-1",
-        "desc": "테스트 그룹1",
-        "users": [],
-        "locations": []
-    },
-    {
-        "name": "Apple",
-        "desc": "테스트 그룹2",
-        "users": [],
-        "locations": []
-    },
-    {
-        "name": "Google",
-        "desc": "테스트 그룹3",
-        "users": [],
-        "locations": []
-    },
-    {
-        "name": "TEST-4",
-        "desc": "테스트 그룹4",
-        "users": [],
         "locations": []
     }
 ]

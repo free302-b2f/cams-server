@@ -11,7 +11,7 @@ def buildGroupSection():
 
     user: AppUser = fli.current_user
     isMaster = user.is_master()
-    readOnly = not user.is_master() and not user.is_gadmin()
+    hidden = not user.is_master() and not user.is_gadmin()
 
     list = buildLabel_Dropdown(
         "Group",
@@ -20,30 +20,17 @@ def buildGroupSection():
         *buildGroupOptions(),
         "groups",
         [("clear", "delete")] if isMaster else None,
-        # hidden=readOnly
     )
 
-    name = buildLabel_Input(
-        "Group Name", "group", "name", "", Group.max_name, readonly=readOnly
-    )
-    desc = buildLabel_Input(
-        "Description", "group", "desc", "", Group.max_desc, readonly=readOnly
-    )
-
-    button = (
-        buildButtonRow(
-            "Add New Group" if isMaster else "Update Group",
-            "group",
-            isMaster,
-        )
-        if not readOnly
-        else None
-    )
+    name = buildLabel_Input("Group Name", "group", "name", "", Group.max_name)
+    desc = buildLabel_Input("Description", "group", "desc", "", Group.max_desc)
+    button = buildButtonRow("group", isMaster)
+    hiddenStyle = {"display": "none"} if hidden else None
 
     return html.Section(
         [list, name, desc, button],
         className="admin-manage-edit-section",
-        style={"display": "none"} if readOnly else None,
+        style=hiddenStyle,
     )
 
 

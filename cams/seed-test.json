@@ -1,0 +1,80 @@
+[
+    {
+        "name": "비투팜",
+        "desc": "(주)비투팜",
+        "users": [
+            {
+                "username": "b2f-admin",
+                "email": "b2f-admin@b2f.com",
+                "password": "1q2w",
+                "realname": "B2F 관리자",
+                "level": 1
+            },
+            {
+                "username": "b2f-user1",
+                "email": "user1@b2f.com",
+                "password": "1q2w",
+                "realname": "B2F User #1"
+            }
+        ],
+        "locations": [
+            {
+                "name": "제1구역",
+                "desc": "물토란(2022년 2월 파종)",
+                "sensors": [
+                    {
+                        "sn": "B2F_CAMs_2000000000001",
+                        "name": "DrBAE's CAMs #1"
+                    },
+                    {
+                        "sn": "B2F_CAMs_2000000000002",
+                        "name": "DrBAE's CAMs #2"
+                    }
+                ]
+            },
+            {
+                "name": "제2구역",
+                "desc": "개구리밥(2021년 12월 이식)",
+                "sensors": [
+                    {
+                        "sn": "B2F_CAMs_2000000000003",
+                        "name": "DrBAE's CAMs #3"
+                    },
+                    {
+                        "sn": "B2F_CAMs_2000000000004",
+                        "name": "DrBAE's CAMs #4"
+                    }
+                ]
+            },
+            {
+                "name": "제3구역",
+                "desc": "청경채(2021년 5월 파종)",
+                "sensors": []
+            }
+        ]
+    },
+    {
+        "name": "Apple",
+        "desc": "테스트 그룹1",
+        "users": [],
+        "locations": []
+    },
+    {
+        "name": "Microsoft",
+        "desc": "테스트 그룹2",
+        "users": [],
+        "locations": []
+    },
+    {
+        "name": "Google",
+        "desc": "테스트 그룹3",
+        "users": [],
+        "locations": []
+    },
+    {
+        "name": "Amazon",
+        "desc": "테스트 그룹4",
+        "users": [],
+        "locations": []
+    }
+]

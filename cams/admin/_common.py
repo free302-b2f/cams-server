@@ -3,19 +3,23 @@
 from ._common_options import *
 
 
-def buildButtonRow(buttonText, modelName, showUpdateIcon: bool = False):
-    """추가 항목에 사용할 버튼 생성
+def buildButtonRow(modelName, showAddIcon=False):
+    """html.Div 생성 - Button과 Icon을 포함
     + HTML IDs:
       - admin-manage-{modelName}-save   : save icon
       - admin-manage-{modelName}-button : add new button
       - data-model="{modelName}"        : button data-* property
     """
-
-    icon = html.Span(
-        "save",
-        className="material-icons-outlined",
-        id=f"admin-manage-{modelName}-save",
-        n_clicks=0,
+    
+    addIcon = (
+        html.Span(
+            "add_circle_outline",
+            className="material-icons-outlined",
+            id=f"admin-manage-{modelName}-add",
+            n_clicks=0,
+        )
+        if showAddIcon
+        else None
     )
 
     return html.Div(
@@ -25,15 +29,15 @@ def buildButtonRow(buttonText, modelName, showUpdateIcon: bool = False):
             html.Button(
                 [
                     html.Span(
-                        "add_circle_outline", className="material-icons-outlined"
+                        "save", className="material-icons-outlined"
                     ),
-                    html.Span(buttonText, className="font-sc"),
+                    html.Span(f"Save {modelName.capitalize()}", className="font-sc"),
                 ],
-                id=f"admin-manage-{modelName}-button",
+                id=f"admin-manage-{modelName}-save",
                 n_clicks=0,
                 **{f"data-model": modelName},
             ),
-            icon if showUpdateIcon else "",
+            addIcon,
         ],
         className="admin-manage-label",
     )
@@ -63,27 +67,26 @@ def buildLabel_Input(
 
 
 def buildLabel_Dropdown(
-    labelText,
-    modelName,
-    colName,
-    options,
-    defaultValue,
-    preIcon=None,
-    postIcons=None,
+    labelText, # 라벨 텍스트
+    modelName, # ORM 테이블 클래스 이름
+    colName, # ORM 컬럼 이름
+    options, # dcc.Dropdown에 사용할 모델 목록
+    defaultValue, # dcc.Dropdown의 선택값
+    preIconText=None, # dcc.Dropdown 앞에 올 아이콘
+    postIcons=None, # dcc.Dropdown 뒤에 올 아이콘의 (아이콘텍스트,아이디) 목록
     hidden=False,
 ):
     """dcc.Dropdown을 포함한 html.Label 생성"""
 
     children = [
         html.Span(labelText),
-        html.Span(preIcon if preIcon else "_", className="material-icons-two-tone"),
+        html.Span(preIconText if preIconText else "_", className="material-icons-two-tone"),
         dcc.Dropdown(
             id=f"admin-manage-{modelName}-{colName}"
             if colName
             else f"admin-manage-{modelName}",
             options=options,
             value=defaultValue,
-            # required=True,
             clearable=False,
             searchable=False,
         ),
@@ -100,12 +103,12 @@ def buildLabel_Dropdown(
                 )
             )
 
-    hiddenStyle = {"display": "none"}
+    hiddenStyle = {"display": "none"} if hidden else None
     return html.Label(
         children,
         className="admin-manage-label",
         id=f"admin-manage-{modelName}-{colName}-label"
         if colName
         else f"admin-manage-{modelName}-label",
-        style=hiddenStyle if hidden else None,
+        style=hiddenStyle,
     )

@@ -1,6 +1,6 @@
 """KIST 메타 데이터를 위한 json 파일 생생"""
 
-DB_SEED_FILE = "seed-kist.json"  # 사용자 그룹 추가 - kist
+DB_PRIVATE_SEED_FILE = "seed-kist.json"  # 사용자 그룹 추가 - kist
 
 def dump_json():
     """추가할 메타데이터를 json으로 저장"""
@@ -56,7 +56,7 @@ def dump_json():
         loc.sensors.extend(sensors)
         group.sensors.extend(sensors)
 
-        save_groups_json([group], DB_SEED_FILE)
+        save_groups_json([group], DB_PRIVATE_SEED_FILE)
 
 
 if __name__ == "__main__":

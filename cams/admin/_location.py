@@ -19,7 +19,7 @@ def buildLocationSection():
 
     name = buildLabel_Input("Name", "location", "name", "", Location.max_name)
     desc = buildLabel_Input("Description", "location", "desc", "", Location.max_desc)
-    button = buildButtonRow("Add New Location", "location", True)
+    button = buildButtonRow("location", True)
 
     return html.Section(
         [html.Hr(), list, name, desc, button],

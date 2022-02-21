@@ -7,7 +7,7 @@ from datetime import date, datetime, time, timedelta, timezone
 import flask as fl
 import werkzeug.security as wsec
 from flask_sqlalchemy import SQLAlchemy
-import json
+import json, sys
 
 #! import all models
 from .group import Group
@@ -19,6 +19,7 @@ import utility as util
 
 # seed data files
 SEED_MASTER_FILE = "seed-master.json"  # 마스터 계정과 테스트용 센서 추가
+SEED_TEST_FILE = "seed-test.json"  # 마스터 계정과 테스트용 센서 추가
 
 
 def seed():
@@ -31,17 +32,22 @@ def seed():
     dba.session.add(Cams("cams_start_date", datetime.now().isoformat()))
     dba.session.commit()
 
-    # ----[ 비투팜 그룹 & 마스터 계정 ]----
-    groups = seed_group_json(SEED_MASTER_FILE)
-    from . import sensor_data as sd
-
-    for group in groups:
-        sd.f3_seed(group.sensors)  # 랜덤 센서 데이터 추가
+    # ----[ 마스터 계정 ]----
+    seed_group_json(SEED_MASTER_FILE)
 
     # ----[ 추가 그룹 ]----
-    fn = fl.g.settings["Cams"]["DB_SEED_FILE"]
+    fn = fl.g.settings["Cams"]["DB_PRIVATE_SEED_FILE"]
     seed_group_json(fn)
 
+    # ----[ 테스트 그룹 ]----
+    if getattr(sys, "_test_"):
+        from . import sensor_data as sd
+
+        groups = seed_group_json(SEED_TEST_FILE)
+        for group in groups:
+            sd.f3_seed(group.sensors)  # 랜덤 센서 데이터 추가
+
+    
 
 # json 파일에서 읽어와 DB에 추가
 def seed_group_json(filename: str) -> Group:
@@ -69,8 +75,9 @@ def seed_group_json(filename: str) -> Group:
                 password=pwHash,
                 email=jUser["email"],
                 realname=jUser["realname"],
-                level=jUser["level"],
             )
+            if "level" in jUser:
+                user.level = jUser["level"]
             group.users.append(user)
 
         # add location
