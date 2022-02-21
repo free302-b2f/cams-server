@@ -1,5 +1,6 @@
 {
     "Cams": {
+        "SetTestMode": true,
         "IsStandAlone": false,
         "ShowTempUIs": true,
         "DB_SYNC_START_DATE": "2022-01-17T00:00:00.000000+09:00",

@@ -10,7 +10,7 @@ def buildGroupOptions(gid=None):
 
     # -3=탈퇴(삭제예정), -2=잠금(로그인 불가), -1=게스트, 0=일반, +1=그룹관리자, +2=마스터
 
-    if user == None:
+    if user == None or not user.is_authenticated:
         groups = []
     elif user.is_master():  # 마스터 계정인 경우 - 모든 그룹
         groups = Group.query.all()

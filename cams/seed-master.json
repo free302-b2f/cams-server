@@ -7,7 +7,7 @@
             {
                 "username": "cams",
                 "email": "amadeus.bae@gmail.com",
-                "password": "pbkdf2:sha512:260000$Vke3DmGr1Rw4fWxRELWONI4zDgFUXP74$7cb2236bc9d25ab82a31490fec85eefab1bd4e39ac367a31545cccffdae12e8d756be3b2d040969b55089ec30ce94127be46d7635553fad38a46e2f315a3505f",
+                "password": "pbkdf2:sha512:260000$MaVzmYgyB7h4ikzrId99dqNxEGbPfin7$4e1d7a91586ca255f26fc9eea416dee3f3047d3be2b714a62d9ab9ed2dd8947d316e4cfc822233ca0beb5f6c577047c7b1c63abd8aa6ba8841736cd0c4261466",
                 "realname": "B2F Master",
                 "level": 2
             }
@@ -44,7 +44,7 @@
         ]
     },
     {
-        "name": "(주)테스트",
+        "name": "테스트-1",
         "desc": "테스트 그룹1",
         "users": [],
         "locations": []

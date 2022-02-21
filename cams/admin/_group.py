@@ -1,6 +1,7 @@
 """그룹 관리 화면"""
 
 from ._common import *
+import sys
 from dash.dependencies import Input, Output, State
 from db import sensor_data as sd
 
@@ -119,13 +120,14 @@ def onDeleteClick(n, gid):
             return no_update
 
         user: AppUser = fli.current_user
-        # if model.id == user.group_id:
-        #     return no_update
+
+        if not getattr(sys, "_test_"):
+            if model.id == user.group_id:
+                return no_update
 
         dba = fl.g.dba
         if user.is_master():
             [sd.f1_clear_data(x.id) for x in model.sensors]
-            # dba.session.refresh()
             # Sensor.query.filter_by(group_id = model.id).delete()
             [dba.session.delete(x) for x in model.sensors]
             [dba.session.delete(x) for x in model.locations]

@@ -3,12 +3,11 @@
 print(f"<{__name__}> loading...")
 
 import sys
+from main import app, debug, getSettings
 
-#---- [set TEST mode On/Off] ----
-setattr(sys, "_test_", True)
+# ---- [set TEST mode On/Off] ----
+setattr(sys, "_test_", getSettings("Cams", "SetTestMode"))
 
-
-from main import app, debug
 
 application = app.server
 
