@@ -111,16 +111,10 @@ def parse_and_load(
 
     startDati = datetime.strptime(start_date_str, "%Y-%m-%d")
     endDati = datetime.strptime(end_date_str, "%Y-%m-%d")
-    dbmsKey = getSettings("Cams")["DbmsKey"]
-    if dbmsKey == "Postgres":
-        user: AppUser = fli.current_user
-        group_id = 0 if user.level >= 2 else user.group.id  # master's group_id -> 0
-        df = _query_data(group_id, sensor_id, location_id, startDati, endDati, dp)
-    elif dbmsKey == "Mongo":
-        if not sensor_id:
-            return None
-        sn = Sensor.query.get(sensor_id).sn
-        df = _query_data_mongo(sn, startDati)
+    user: AppUser = fli.current_user
+    group_id = 0 if user.is_master() else user.group.id  # master's group_id -> 0
+    df = _query_data(group_id, sensor_id, location_id, startDati, endDati, dp)
+    
     return df
 
 

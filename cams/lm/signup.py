@@ -65,7 +65,7 @@ def signup():
                 # level
                 group = Group.query.get(gid)
                 if len(group.users) == 0:
-                    newUser.level = 1 # 1st user == group admin
+                    newUser.level = AppUser.level_group_admin # 1st user == group admin
 
                 dba.session.add(newUser)
                 dba.session.commit()
