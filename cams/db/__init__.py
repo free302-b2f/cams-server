@@ -39,7 +39,7 @@ def before_request():
     pass
 
 
-@_app.teardown_appcontext
+# @_app.teardown_appcontext
 def teardown_appcontext(ex):
     """ """
 

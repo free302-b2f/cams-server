@@ -7,8 +7,9 @@ from dash.dependencies import Input, Output, State
 def buildGroupSection():
     """그룹 목록과 편집 섹션 생성"""
 
-    user = fli.current_user
-    readOnly = user.level <= 0
+    user:AppUser = fli.current_user
+    isMaster = user.is_master()
+    readOnly = not user.is_master() and not user.is_gadmin()
 
     list = buildLabel_Dropdown(
         "Group",
@@ -16,7 +17,7 @@ def buildGroupSection():
         None,
         *buildGroupOptions(),
         "groups",
-        [("clear", "clear")] if readOnly else None,
+        [("clear", "clear")] if isMaster else None,
         # hidden=readOnly
     )
 
@@ -29,9 +30,9 @@ def buildGroupSection():
 
     button = (
         buildButtonRow(
-            "Add New Group" if user.level == 2 else "Update Group",
+            "Add New Group" if isMaster else "Update Group",
             "group",
-            user.level == 2,
+            isMaster,
         )
         if not readOnly
         else None
@@ -45,32 +46,30 @@ def buildGroupSection():
 
 
 @app.callback(
-    Output("admin-manage-sensor", "options"),
-    Output("admin-manage-sensor", "value"),
-    Input("admin-manage-button-sensor", "n_clicks"),
-    State("admin-manage-location", "value"),
-    State("admin-manage-sensor-name", "value"),
-    State("admin-manage-sensor-sn", "value"),
+    Output("admin-manage-group", "options"),
+    Output("admin-manage-group", "value"),
+    Input("admin-manage-button-group", "n_clicks"),
+    State("admin-manage-group-name", "value"),
+    State("admin-manage-group-desc", "value"),
     prevent_initial_call=True,
 )
-def onNewClick(n, fid, name, sn):
-    """<Add> 버튼 작업 및 sensor 목록 업데이트"""
+def onNewClick(n, name, desc):
+    """<Add> 버튼 작업 및 Group 목록 업데이트"""
 
     if not n:
         return no_update
 
-    loc = Location.query.get(fid)
-    sensor = Sensor(name=name, sn=sn)
-    loc.sensors.append(sensor)
+    group = Group(name=name, desc=desc)
 
     dba = fl.g.dba
     try:
+        dba.session.add(group)
         dba.session.commit()
     except:
         return no_update
 
     # trigger user change
-    return buildSensorOptions(fid, sensor.id)
+    return buildGroupOptions(group.id)
 
 
 @app.callback(

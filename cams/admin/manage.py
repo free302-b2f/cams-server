@@ -46,6 +46,7 @@ def layout():
     Output("admin-manage-sensor", "options"),
     Output("admin-manage-sensor", "value"),
     Input("admin-manage-group", "value"),
+    prevent_initial_call=True,
 )
 def onGroup(gid):
     """Group 선택시 user/location/sensor 목록 업데이트"""
@@ -74,6 +75,7 @@ def onGroup(gid):
     Output("admin-manage-user-level", "options"),
     Output("admin-manage-user-level", "value"),
     Input("admin-manage-user", "value"),
+    prevent_initial_call=True,
 )
 def onUser(uid):
     """AppUser 선택시  업데이트"""
@@ -102,6 +104,7 @@ def onUser(uid):
     Output("admin-manage-location-name", "value"),
     Output("admin-manage-location-desc", "value"),
     Input("admin-manage-location", "value"),
+    prevent_initial_call=True,
 )
 def onLocation(fid):
     """Location 선택시 업데이트"""
@@ -119,12 +122,13 @@ def onLocation(fid):
     Output("admin-manage-sensor-location", "options"),
     Output("admin-manage-sensor-location", "value"),
     Input("admin-manage-sensor", "value"),
+    prevent_initial_call=True,
 )
 def onSensor(sid):
     """Sensor 선택시 업데이트"""
 
     if not sid:
-        return "", "", ""
+        return "", "", [], ""
 
     sensor = Sensor.query.get(sid)
     locs, _ = buildLocationOptions(sensor.group_id)
