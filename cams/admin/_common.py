@@ -6,15 +6,15 @@ from ._common_options import *
 def buildButtonRow(buttonText, modelName, showUpdateIcon: bool = False):
     """추가 항목에 사용할 버튼 생성
     + HTML IDs:
-      - admin-manage-save-{modelName}   : save icon
-      - admin-manage-button-{modelName} : add new button
+      - admin-manage-{modelName}-save   : save icon
+      - admin-manage-{modelName}-button : add new button
       - data-model="{modelName}"        : button data-* property
     """
 
     icon = html.Span(
         "save",
         className="material-icons-outlined",
-        id=f"admin-manage-save-{modelName}",
+        id=f"admin-manage-{modelName}-save",
         n_clicks=0,
     )
 
@@ -29,7 +29,7 @@ def buildButtonRow(buttonText, modelName, showUpdateIcon: bool = False):
                     ),
                     html.Span(buttonText, className="font-sc"),
                 ],
-                id=f"admin-manage-button-{modelName}",
+                id=f"admin-manage-{modelName}-button",
                 n_clicks=0,
                 **{f"data-model": modelName},
             ),

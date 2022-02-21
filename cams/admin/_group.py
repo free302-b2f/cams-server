@@ -2,12 +2,13 @@
 
 from ._common import *
 from dash.dependencies import Input, Output, State
+from db import sensor_data as sd
 
 
 def buildGroupSection():
     """그룹 목록과 편집 섹션 생성"""
 
-    user:AppUser = fli.current_user
+    user: AppUser = fli.current_user
     isMaster = user.is_master()
     readOnly = not user.is_master() and not user.is_gadmin()
 
@@ -17,7 +18,7 @@ def buildGroupSection():
         None,
         *buildGroupOptions(),
         "groups",
-        [("clear", "clear")] if isMaster else None,
+        [("clear", "delete")] if isMaster else None,
         # hidden=readOnly
     )
 
@@ -48,7 +49,7 @@ def buildGroupSection():
 @app.callback(
     Output("admin-manage-group", "options"),
     Output("admin-manage-group", "value"),
-    Input("admin-manage-button-group", "n_clicks"),
+    Input("admin-manage-group-button", "n_clicks"),
     State("admin-manage-group-name", "value"),
     State("admin-manage-group-desc", "value"),
     prevent_initial_call=True,
@@ -56,72 +57,84 @@ def buildGroupSection():
 def onNewClick(n, name, desc):
     """<Add> 버튼 작업 및 Group 목록 업데이트"""
 
-    if not n:
+    if not n:  # prevent_initial_call=True이더라도 리로드시 n=0로 호출됨
         return no_update
 
-    group = Group(name=name, desc=desc)
-
-    dba = fl.g.dba
     try:
-        dba.session.add(group)
+        dba = fl.g.dba
+        model = Group(name=name, desc=desc)
+        dba.session.add(model)
         dba.session.commit()
     except:
         return no_update
 
-    # trigger user change
-    return buildGroupOptions(group.id)
+    # update model list
+    return buildGroupOptions(model.id)
 
 
 @app.callback(
-    Output("admin-manage-sensor", "options"),
-    Output("admin-manage-sensor", "value"),
-    Input("admin-manage-save-sensor", "n_clicks"),
-    State("admin-manage-location", "value"),
-    State("admin-manage-sensor", "value"),
-    State("admin-manage-sensor-name", "value"),
-    State("admin-manage-sensor-sn", "value"),
+    Output("admin-manage-group", "options"),
+    Output("admin-manage-group", "value"),
+    Input("admin-manage-group-save", "n_clicks"),
+    State("admin-manage-group", "value"),
+    State("admin-manage-group-name", "value"),
+    State("admin-manage-group-desc", "value"),
     prevent_initial_call=True,
 )
-def onSaveClick(n, fid, sid, name, sn):
+def onSaveClick(n, gid, name, desc):
     """<Save> 버튼 작업 및 목록 업데이트"""
 
     if not n:
         return no_update
 
-    dba = fl.g.dba
     try:
-        sensor = Sensor.query.get(fid)
-        sensor.name = name
-        sensor.sn = sn
+        dba = fl.g.dba
+        model = Group.query.get(gid)
+        model.name = name
+        model.desc = desc
         dba.session.commit()
     except:
         return no_update
 
-    # trigger user change
-    return buildSensorOptions(fid, sid)
+    # update model list
+    return buildGroupOptions(model.id)
 
 
-# admin-manage-sensor-clear
 @app.callback(
-    Output("admin-manage-sensor", "options"),
-    Output("admin-manage-sensor", "value"),
-    Input("admin-manage-sensor-clear", "n_clicks"),
-    State("admin-manage-location", "value"),
-    State("admin-manage-sensor", "value"),
+    Output("admin-manage-group", "options"),
+    Output("admin-manage-group", "value"),
+    Input("admin-manage-group-delete", "n_clicks"),
+    State("admin-manage-group", "value"),
     prevent_initial_call=True,
 )
-def onClearClick(n, fid, sid):
-    """<Clear> 버튼 작업 - 센서 삭제, 센서데이터가 있으면 삭제 안함"""
+def onDeleteClick(n, gid):
+    """<Delete> 버튼 작업 - 센서 삭제, 센서데이터가 있으면 삭제 안함"""
 
     if not n:
         return no_update
 
-    dba = fl.g.dba
     try:
-        sensor = Sensor.query.get(sid)
-        dba.session.delete(sensor)
+        model = Group.query.get(gid)
+        if model == None:
+            return no_update
+
+        user: AppUser = fli.current_user
+        # if model.id == user.group_id:
+        #     return no_update
+
+        dba = fl.g.dba
+        if user.is_master():
+            [sd.f1_clear_data(x.id) for x in model.sensors]
+            # dba.session.refresh()
+            # Sensor.query.filter_by(group_id = model.id).delete()
+            [dba.session.delete(x) for x in model.sensors]
+            [dba.session.delete(x) for x in model.locations]
+            [dba.session.delete(x) for x in model.users]
+
+        dba.session.delete(model)
         dba.session.commit()
     except:
         return no_update
 
-    return buildSensorOptions(fid)
+    # update model list
+    return buildGroupOptions()

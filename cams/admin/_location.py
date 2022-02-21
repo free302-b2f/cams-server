@@ -30,7 +30,7 @@ def buildLocationSection():
 @app.callback(
     Output("admin-manage-location", "options"),
     Output("admin-manage-location", "value"),
-    Input("admin-manage-button-location", "n_clicks"),
+    Input("admin-manage-location-button", "n_clicks"),
     State("admin-manage-user", "value"),
     State("admin-manage-location-name", "value"),
     State("admin-manage-location-desc", "value"),
@@ -58,7 +58,7 @@ def onNewClick(n, uid, name, desc):
 @app.callback(
     Output("admin-manage-location", "options"),
     Output("admin-manage-location", "value"),
-    Input("admin-manage-save-location", "n_clicks"),
+    Input("admin-manage-location-save", "n_clicks"),
     State("admin-manage-user", "value"),
     State("admin-manage-location", "value"),
     State("admin-manage-location-name", "value"),

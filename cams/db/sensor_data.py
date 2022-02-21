@@ -88,12 +88,16 @@ def f1_drop_table():
         pgc.close()
 
 
-def f1_clear_data():
+def f1_clear_data(sid):
     """delete all rows from sensor_data"""
 
+    if sid == None:
+        return
     try:
         pgc, cursor = connect()
-        cursor.execute("DELETE FROM sensor_data")
+        sql = cursor.mogrify("DELETE FROM sensor_data WHERE sensor_id = %s", (sid,))
+        rows = cursor.execute(sql)
+        debug(f1_clear_data, f"{sid= } : deleted {rows= }")
         pgc.commit()
     finally:
         cursor.close()

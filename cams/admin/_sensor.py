@@ -37,7 +37,7 @@ def buildSensorSection():
 @app.callback(
     Output("admin-manage-sensor", "options"),
     Output("admin-manage-sensor", "value"),
-    Input("admin-manage-button-sensor", "n_clicks"),
+    Input("admin-manage-sensor-button", "n_clicks"),
     State("admin-manage-location", "value"),
     State("admin-manage-sensor-name", "value"),
     State("admin-manage-sensor-sn", "value"),
@@ -66,7 +66,7 @@ def onNewClick(n, fid, name, sn):
 @app.callback(
     Output("admin-manage-sensor", "options"),
     Output("admin-manage-sensor", "value"),
-    Input("admin-manage-save-sensor", "n_clicks"),
+    Input("admin-manage-sensor-save", "n_clicks"),
     State("admin-manage-location", "value"),
     State("admin-manage-sensor", "value"),
     State("admin-manage-sensor-name", "value"),

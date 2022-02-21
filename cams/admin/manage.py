@@ -51,10 +51,9 @@ def layout():
 def onGroup(gid):
     """Group 선택시 user/location/sensor 목록 업데이트"""
 
-    if not gid:
-        return no_update
-
     group = Group.query.get(gid)
+    if group == None:
+        return no_update
 
     return [
         group.name,
