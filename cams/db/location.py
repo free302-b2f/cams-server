@@ -35,6 +35,7 @@ class Location(dba.Model):
     desc = dba.Column(dba.String(max_desc), nullable=False)
     group_id = dba.Column(dba.Integer, dba.ForeignKey("app_group.id"), nullable=False)
     group = dba.relationship("Group", backref=dba.backref("locations", lazy=True))
+    __table_args__ = (dba.UniqueConstraint(group_id, name),)
 
     def __repr__(self):
         return f"<Location: {self.name}>"
@@ -44,7 +45,7 @@ class Location(dba.Model):
 
         keys = self.__table__.columns.keys()
         dic = {key: self.__getattribute__(key) for key in keys}
-        return dic    
+        return dic
 
 
 if getattr(sys, "_test_", None):

@@ -21,7 +21,7 @@ def dump_json():
         # add group
         group = Group(name="비투팜", desc="(주)비투팜")
 
-        # add user        
+        # add user
         group.users.append(
             AppUser(
                 username="b2f-admin",
@@ -57,10 +57,17 @@ def dump_json():
         loc2.sensors.extend(sensors[2:4])
         group.sensors.extend(sensors)
 
+        # 이름 중복 테스트 - Location, Sensor
+        group2 = Group(name="Apple", desc="테스트 그룹1")
+        loc = Location(name="제1구역", desc="물토란(2022년 2월 파종)")  # same name
+        loc.sensors.append(
+            Sensor(sn=f"B2F_CAMs_2000000000005", name=f"Sensor #1")
+        )
+        group2.locations.append(loc)  # same name
+
         groups = [
             group,
-            # Group(name="GUEST", desc="게스트 그룹"),
-            Group(name="Apple", desc="테스트 그룹1"),
+            group2,
             Group(name="Microsoft", desc="테스트 그룹2"),
             Group(name="Google", desc="테스트 그룹3"),
             Group(name="Amazon", desc="테스트 그룹4"),

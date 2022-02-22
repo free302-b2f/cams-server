@@ -59,7 +59,8 @@ sd_cols = [
 # 메타 컬럼 목록 ~ string type?
 # sd_cols_meta = ["id", "group_id", "location_id", "sensor_id", "time"]
 sd_cols_meta = ["group_id", "location_id", "sensor_id", "time"]
-sd_cols_meta_raw = ["_id", "FarmName", "SN", "Date"]
+sd_cols_meta_join = ["group1", "location", "sensor", "time1"] # 테이블 조인시 컬럼명
+sd_cols_meta_raw = ["_id", "FarmName", "SN", "Date"] # sensor 생성 딕의 키
 
 # endregion
 
@@ -327,36 +328,43 @@ def _build_select(
     - 포맷과 값 튜플 리턴
     """
 
-    # 메타 컬럼: id제외 모든 컬럼
+    # 메타 컬럼: id 제외
     # sd_cols_meta = ["group_id", "location_id", "sensor_id", "time"]
-    metas = list(sd_cols_meta[0:3])
-    fmt = ",".join(metas)
-    colTime = f"time{avgTime}" if avgTime else "time"
-    metas.append(colTime)
+    metaTables = ["g", "l", "s"]
+    metas = sd_cols_meta_join
+
+    tmp = [f"{t}.name AS {c}" for t, c in zip(metaTables, metas)]
+    fmt = ",".join(tmp)
+
+    # timeCol = f"time{avgTime}" if avgTime else "time"
 
     if not avgTime:
-        fmt = f"{fmt}, time"
-        tmp = ",".join(sd_cols)
+        fmt = f"{fmt}, d.time AS {metas[3]}"
+        tmp = ",".join([f"d.{x}" for x in sd_cols])
     else:
-        fmt = f"{fmt}, time_bucket('{avgTime} minutes', time) AS {colTime}"
-        tmp = ",".join([f"AVG({c}) as {c}" for c in sd_cols])
+        fmt = f"{fmt}, time_bucket('{avgTime} minutes', d.time) AS {metas[3]}"
+        tmp = ",".join([f"AVG(d.{c}) as {c}" for c in sd_cols])
     fmt = f"{fmt}, {tmp}"
-    fmt = f"SELECT {fmt} FROM sensor_data"
+
+    fmt = f"SELECT {fmt} FROM sensor_data d, app_group g, location l, sensor s"
 
     # WHERE : date
-    fmt = f"{fmt} WHERE (date(time) BETWEEN %s AND %s)"
+    fmt = f"{fmt} WHERE (date(d.time) BETWEEN %s AND %s)"
     paramValues = [startDati, endDati]
 
     # WHERE : meta
-    def _param(name, value):
+    def _param(col, value):
         if value > 0:
             paramValues.append(value)
-            return f"{fmt} AND ({name} = %s)"
+            return f"{fmt} AND (d.{col} = %s)"
         return fmt
 
     fmt = _param(sd_cols_meta[0], group_id)
     fmt = _param(sd_cols_meta[1], location_id)
     fmt = _param(sd_cols_meta[2], sensor_id)
+
+    # JOIN: group, location, sensor
+    fmt = f"{fmt} AND d.group_id = g.id AND d.location_id = l.id AND d.sensor_id = s.id"
 
     # group by
     if avgTime:
@@ -371,7 +379,7 @@ def _build_select(
 
 
 def Select(group_id, sensor_id, location_id, startDati, endDati, avgTime: int = 0):
-    """select form sensor_data"""
+    """sensor_data에서 데이터 추출하여 dataset과 컬럼이름을 리턴"""
 
     try:
         pgc, cursor = connect()
@@ -381,7 +389,7 @@ def Select(group_id, sensor_id, location_id, startDati, endDati, avgTime: int = 
         )
 
         sql = cursor.mogrify(fmt, values)
-        # debug(str(sql))
+        debug(str(sql))
 
         cursor.execute(sql)
         ds = cursor.fetchall()

@@ -30,11 +30,19 @@ def layout():
     )
 
     # 위치 목록
-    locs = {l.id: l for l in fli.current_user.group.locations}
+    user: AppUser = fli.current_user
+    locs = {
+        l.id: l
+        for l in (Location.query.all() if user.is_master() else user.group.locations)
+    }
     locOptions = [{"label": "ALL", "value": 0}]
-    locOptions.extend([{"label": locs[l].name, "value": l} for l in locs])
+    locOptions.extend(
+        [
+            {"label": f"{l}: {locs[l].group.name} - {locs[l].name}", "value": l}
+            for l in locs
+        ]
+    )
     locDefault = locOptions[1]["value"] if len(locOptions) > 1 else 0
-    # locDefault = sensors[sensorDefault].location.id
     locationRow = html.Label(
         [
             html.Span("Location"),
@@ -51,12 +59,19 @@ def layout():
     )
 
     # 센서 목록
-    sensors = {s.id: s for s in fli.current_user.group.sensors}  # 그룹의 모든 센서
+    sensors = {
+        s.id: s
+        for s in (Sensor.query.all() if user.is_master() else user.group.sensors)
+    }
     sensorOptions = [{"label": "ALL", "value": 0}]
-    sensorOptions.extend([{"label": sensors[s].name, "value": s} for s in sensors])
+    sensorOptions.extend(
+        [
+            {"label": f"{s}: {sensors[s].group.name} - {sensors[s].name}", "value": s}
+            for s in sensors
+        ]
+    )
     locSensors = locs[locDefault].sensors if len(locs) else []
     sensorDefault = locSensors[0].id if len(locSensors) else 0  # 위치의 첫 센서
-    # sensorDefault = sensorOptions[1]["value"] if len(sensorOptions) > 1 else 0
     sensorRow = html.Label(
         [
             html.Span("CAMs Sensor"),
@@ -124,7 +139,7 @@ def layout():
                 id="apps-export-button",
                 n_clicks=0,
             ),
-            dcc.Download(id="apps-export-download"),
+            dcc.Download(id="apps-export-download", base64=True),
         ],
         className="apps-export-label",
     )
@@ -196,20 +211,23 @@ def exportAsCsv(n, sensor_id, location_id, start_date, end_date, dp):
     fn = f"{fn}__{start_date}~{end_date}.csv"
 
     # columns to export
-    meta = ["sn", "date", "time"] if "sn" in df.columns else sd_cols_meta
-    cols = meta + sd_cols
-
-    return (
-        dcc.send_data_frame(
-            df.to_csv,
-            fn,
-            # sep="\t",
-            float_format="%.2f",
-            columns=cols,
-            index=False,
-        ),
-        no_update,
+    # cols = sd_cols_meta + sd_cols
+    # BOM 없으면 Excel에서 한글 깨짐 - 엑셀이 UTF-8 인식 못함
+    csv = df.to_csv(
+        # sep="\t",
+        float_format="%.2f",
+        columns=df.columns,
+        index=False,
+        # encoding="utf-8-sig", # pandas==1.4.1: BOM 적용 안됨-버그?
+        # mode="w",
     )
+    data = dcc.send_string(csv, fn)
+
+    # insert BOM
+    bytes = csv.encode(encoding="utf-8-sig")
+    data = dcc.send_bytes(bytes, fn)
+
+    return data, no_update
 
 
 # 이 페이지를 메인 메뉴바에 등록한다.

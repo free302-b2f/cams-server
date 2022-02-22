@@ -57,7 +57,18 @@
         "name": "Apple",
         "desc": "테스트 그룹1",
         "users": [],
-        "locations": []
+        "locations": [
+            {
+                "name": "제1구역",
+                "desc": "물토란(2022년 2월 파종)",
+                "sensors": [
+                    {
+                        "sn": "B2F_CAMs_2000000000005",
+                        "name": "Sensor #1"
+                    }
+                ]
+            }
+        ]
     },
     {
         "name": "Microsoft",

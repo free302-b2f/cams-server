@@ -37,6 +37,7 @@ class Sensor(dba.Model):
     location = dba.relationship("Location", backref=dba.backref("sensors", lazy=True))
     group_id = dba.Column(dba.Integer, dba.ForeignKey("app_group.id"), nullable=False)
     group = dba.relationship("Group", backref=dba.backref("sensors", lazy=True))
+    __table_args__ = (dba.UniqueConstraint(group_id, name),)
 
     def __repr__(self):
         return f"<Sensor: {self.sn}>"
