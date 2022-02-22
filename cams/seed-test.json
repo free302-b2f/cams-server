@@ -24,11 +24,11 @@
                 "sensors": [
                     {
                         "sn": "B2F_CAMs_2000000000001",
-                        "name": "DrBAE's CAMs #1"
+                        "name": "Sensor #1"
                     },
                     {
                         "sn": "B2F_CAMs_2000000000002",
-                        "name": "DrBAE's CAMs #2"
+                        "name": "Sensor #2"
                     }
                 ]
             },
@@ -38,11 +38,11 @@
                 "sensors": [
                     {
                         "sn": "B2F_CAMs_2000000000003",
-                        "name": "DrBAE's CAMs #3"
+                        "name": "Sensor #3"
                     },
                     {
                         "sn": "B2F_CAMs_2000000000004",
-                        "name": "DrBAE's CAMs #4"
+                        "name": "Sensor #4"
                     }
                 ]
             },

@@ -17,7 +17,7 @@ def buildGroupOptions(gid=None):
     else:  # 기타 - 소속그룹
         groups = [user.group]
     options = [
-        {"label": f"{g.id} : {g.name} : {g.desc}", "value": g.id} for g in groups
+        {"label": f"{g.id}: {g.name} - {g.desc}", "value": g.id} for g in groups
     ]
     default = options[0]["value"] if len(options) > 0 else ""
     return options, default if gid == None else gid
@@ -28,7 +28,7 @@ def buildUserOptions(gid):
 
     group = Group.query.get(gid)
     options = [
-        {"label": f"{u.id} : {u.username}: {u.realname}", "value": u.id}
+        {"label": f"{u.id}: {u.username} - {u.realname}", "value": u.id}
         for u in group.users
     ]
     default = options[0]["value"] if len(options) > 0 else ""
@@ -62,7 +62,7 @@ def buildLocationOptions(gid, selected=None):
 
     group = Group.query.get(gid)
     locations = group.locations
-    options = [{"label": f"{l.id} : {l.name}", "value": l.id} for l in locations]
+    options = [{"label": f"{l.id}: {l.name}", "value": l.id} for l in locations]
     default = options[0]["value"] if len(options) > 0 else ""
     return options, selected if selected else default
 
@@ -72,6 +72,6 @@ def buildSensorOptions(gid, selected=None):
 
     group = Group.query.get(gid)
     sensors = group.sensors
-    options = [{"label": f"{s.id} : {s.name}", "value": s.id} for s in sensors]
+    options = [{"label": f"{s.id}: {s.name}", "value": s.id} for s in sensors]
     default = options[0]["value"] if len(options) > 0 else ""
     return options, selected if selected else default

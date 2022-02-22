@@ -1,5 +1,5 @@
 /*-----------------------------------------------------
-    + v0.1
+    + file: app.less
     + 웹사이트 전체적인 테마를 설정
     + 2021.09.09 by DrBAE : amadeus.bae@gmail.com
 -----------------------------------------------------*/
@@ -8,7 +8,10 @@
 
 // ====[ 기본설정 - dash 설정 덮어쓰기 ]====
 
-html{ font-size: 100%; }    // reset font size set by dash 'bWLwgP.css'
+// html{ font-size: 120%; }    // reset font size set by dash 'bWLwgP.css'
+@import 'html.css';
+
+
 body
 { 
     background-color: @app_back_color; 
@@ -372,18 +375,24 @@ a { text-decoration: none; }
 .app-cams-table label
 {
     margin-left: 1.0rem;
-    width: 100%;
+    width: 25rem;
     display: flex;
     align-items: center;
     justify-content: flex-start;
     cursor: pointer;
 }
+
 .app-cams-table label *{ cursor: pointer; }
-.app-cams-table label>*:nth-child(2n -1)
+
+.app-cams-table label>*:nth-child(3n -2)
 {
-    width: 5rem;
+    width: 7rem;
 }
-.app-cams-table label>*:nth-child(2n)
+.app-cams-table label>*:nth-child(3n -1)
+{
+    width: 2rem;
+}
+.app-cams-table label>*:nth-child(3n)
 {
     width: 16rem;
 }

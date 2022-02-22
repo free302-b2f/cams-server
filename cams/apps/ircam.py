@@ -5,12 +5,9 @@ print(f"<{__name__}> loading...")
 from time import time as ttime, localtime, sleep
 import os
 
-from ._imports import *
+from ._common import *
 from dash import no_update
 from dash_extensions.enrich import Trigger
-
-from db import location, sensor, user
-
 
 # SENSOR_ID = "B2F_CAMs_1000000000001"
 _ircam_path = "/static/ircam"
@@ -61,11 +58,11 @@ def _decodeJpeg(sensors, imgURIs):
 def getImageInfos():
     """글로벌 변수 - 센서목록, IR이미지 경로 등 - 를 초기화 한다"""
 
-    user = fli.current_user
+    user: AppUser = fli.current_user
     if not user:
         return [[], [], []]
 
-    sns = user.group.sensors
+    sns = Sensor.query.all() if user.is_master()  else user.group.sensors
     uris = [(f"{_ircam_path}/{sns[i]}.jpg") for i in range(len(sns))]
     infos = _decodeJpeg(sns, uris)
 
@@ -100,7 +97,7 @@ def layout():
                     src=uris[index],
                 ),
                 html.Div(
-                    html.H3(f"IR Camera: {sensors[index].name}"),
+                    html.H3(f"{sensors[index].group.name} - {sensors[index].name}"),
                     id="apps-camera-title-{index}",
                     className="apps-camera-title",
                 ),
@@ -159,4 +156,4 @@ def pull():
         return no_update
 
 
-addPage(layout, "IR-CAM", 30)
+addPage(layout, "IrCam", 30)

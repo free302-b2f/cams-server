@@ -6,7 +6,8 @@
         "DB_SYNC_START_DATE": "2022-01-17T00:00:00.000000+09:00",
         "IS_PRIVATE_SERVER": false,
         "DB_PRIVATE_SEED_FILE": "seed-kist.json",
-        "DB_PRIVATE_GROUP_ID": 9998
+        "DB_PRIVATE_GROUP_ID": 9998,
+        "CSS_FONT_SIZE_%" : 100
     },
     "logging": {
         "Level": "DEBUG",

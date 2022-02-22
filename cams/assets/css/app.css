@@ -1,16 +1,14 @@
 /*-----------------------------------------------------
-    + v0.1
+    + file: app.less
     + 웹사이트 전체적인 테마를 설정
     + 2021.09.09 by DrBAE : amadeus.bae@gmail.com
 -----------------------------------------------------*/
 /*-----------------------------------------------------
-    + v1
+    + file: app-base.less
     + less 공통 변수 정의
     + 2021.10.08 by DrBAE : amadeus.bae@gmail.com
 -----------------------------------------------------*/
-html {
-  font-size: 100%;
-}
+@import 'html.css';
 body {
   background-color: #F0F1F2;
   font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", system-ui, -apple-system;
@@ -283,7 +281,7 @@ a {
 }
 .app-cams-table label {
   margin-left: 1rem;
-  width: 100%;
+  width: 25rem;
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -292,10 +290,13 @@ a {
 .app-cams-table label * {
   cursor: pointer;
 }
-.app-cams-table label > *:nth-child(2n -1) {
-  width: 5rem;
+.app-cams-table label > *:nth-child(3n -2) {
+  width: 7rem;
 }
-.app-cams-table label > *:nth-child(2n) {
+.app-cams-table label > *:nth-child(3n -1) {
+  width: 2rem;
+}
+.app-cams-table label > *:nth-child(3n) {
   width: 16rem;
 }
 .DateInput_input {

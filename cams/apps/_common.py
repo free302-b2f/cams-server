@@ -93,7 +93,7 @@ def _query_data(
 
 
 def parse_and_load(
-    sensor_id, location_id, start_date_str, end_date_str, dp
+    location_id, sensor_id, start_date_str, end_date_str, dp
 ) -> pd.DataFrame:
     """UI 데이터를 파싱하고 디비에 쿼리하여 DataFrame 리턴"""
 

@@ -35,6 +35,7 @@ pages = [
         active="partial",
         n_clicks=0,
         id=f"app-sidebar-{sb[key][2]}",  # element id
+        className="font-sc",
     )
     for key in sorted(sb)
 ]

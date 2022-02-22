@@ -5,9 +5,6 @@ CAMs 센서데이터의 시각화
 print(f"<{__name__}> loading...")
 
 from ._common import *
-
-# from ._imports import *
-# import pandas as pd
 from dash_extensions.enrich import Trigger
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
@@ -79,23 +76,21 @@ def plotAll(df: pd.DataFrame, cols=[], title: str = "", colsRight=[]) -> dict:
     Output("apps-cams-graph2", "figure"),
     Output("apps-cams-graph3", "figure"),
     Output("apps-cams-graph4", "figure"),
+    Output("apps-cams-loading", "children"),
+    Input("apps-cams-location", "value"),
     Input("apps-cams-sensor", "value"),
     Input("apps-cams-date", "date"),
     Trigger("apps-cams-interval", "n_intervals"),
 )
-def update_graph(sensor_id, date):
+def update_graph(location_id, sensor_id, date):
     """선택된 정보로 그래프를 업데이트 한다"""
 
-    debug(update_graph, f"{sensor_id = }, {date = }")
+    debug(update_graph, f"{location_id= }, {sensor_id = }, {date = }")
 
-    if date is None or not sensor_id:
-        return plotAll(None), plotAll(None), plotAll(None), plotAll(None)
+    if date is None or (not location_id and not sensor_id):
+        return plotAll(None), plotAll(None), plotAll(None), plotAll(None), no_update
 
-    sensor = Sensor.query.get(sensor_id)
-    if sensor is None or sensor.group_id != fli.current_user.group.id:
-        return plotAll(None), plotAll(None), plotAll(None), plotAll(None)
-
-    df = parse_and_load(sensor_id, 0, date, date, 5)
+    df = parse_and_load(location_id, sensor_id, date, date, 5)
 
     # "air_temp", "leaf_temp", "humidity", "light","co2", "dewpoint", "evapotranspiration","hd","vpd",
 
@@ -123,7 +118,7 @@ def update_graph(sensor_id, date):
     fig4.update_xaxes(rangeslider_visible=True)
     fig4.update_layout(legend=dict(yanchor="top", y=1.15, xanchor="left", x=0.95))
 
-    return fig1, fig2, fig3, fig4
+    return fig1, fig2, fig3, fig4, no_update
 
 
 def layout():
@@ -132,48 +127,97 @@ def layout():
     debug(layout, f"entering...")
     app.title = "B2F - CAMs Viewer"  # TODO: 효과없음
 
-    # 센서 ID 추출
-    sensors = {s.id: s for s in fli.current_user.group.sensors}
-    sensorOptions = [{"label": sensors[s].name, "value": s} for s in sensors]
-    snDefalut = sensorOptions[0]["value"] if len(sensorOptions) > 0 else ""
-    sensorTr = html.Tr(
+    # 헤더
+    headerRow = html.H4(
         [
-            html.Td(
-                html.Label(
-                    [
-                        html.Span("Sensor"),
-                        dcc.Dropdown(
-                            id="apps-cams-sensor",
-                            options=sensorOptions,
-                            value=snDefalut,
-                            clearable=False,
-                            searchable=False,
-                        ),
-                    ]
-                ),
+            html.Span("insights", className="material-icons-two-tone"),
+            html.Span(f"CAMs Data Viewer", className="font-sc"),
+            dcc.Loading(
+                type="circle",
+                fullscreen=True,
+                id="apps-cams-loading1",
             ),
-            html.Td(),
-        ]
+            dcc.Loading(
+                type="circle",
+                fullscreen=True,
+                id="apps-cams-loading",
+            ),
+        ],
+        className="flex-h",
     )
 
-    dateValue = datetime.now().date()
-    dateTr = html.Tr(
+    # 위치 목록
+    user: AppUser = fli.current_user
+    locs = {
+        l.id: l
+        for l in (Location.query.all() if user.is_master() else user.group.locations)
+    }
+    locOptions = [{"label": "ALL", "value": 0}]
+    locOptions.extend(
         [
-            html.Td(
-                html.Label(
-                    [
-                        html.Span("Date"),
-                        dcc.DatePickerSingle(
-                            id="apps-cams-date",
-                            display_format="YYYY-MM-DD",
-                            date=dateValue,
-                        ),
-                    ],
-                ),
+            {"label": f"{l}: {locs[l].group.name} - {locs[l].name}", "value": l}
+            for l in locs
+        ]
+    )
+    locDefault = locOptions[1]["value"] if len(locOptions) > 1 else 0
+    locLabel = html.Label(
+        [
+            html.Span("Location"),
+            html.Span("yard", className="material-icons-two-tone"),
+            dcc.Dropdown(
+                id="apps-cams-location",
+                options=locOptions,
+                value=locDefault,
+                clearable=False,
+                searchable=False,
             ),
-            html.Td(),
+        ],
+        className="apps-cams-label",
+    )
+    locTr = html.Tr([html.Td(locLabel), html.Td()])
+
+    # 센서 ID 추출
+    sensors = {
+        s.id: s
+        for s in (Sensor.query.all() if user.is_master() else user.group.sensors)
+    }
+    sensorOptions = []#[{"label": "ALL", "value": 0}]
+    sensorOptions.extend(
+        [
+            {"label": f"{s}: {sensors[s].group.name} - {sensors[s].name}", "value": s}
+            for s in sensors
+        ]
+    )
+    snDefalut = sensorOptions[0]["value"] if len(sensorOptions) > 0 else ""
+    sensorLabel = html.Label(
+        [
+            html.Span("Sensor"),
+            html.Span("sensors", className="material-icons-two-tone"),
+            dcc.Dropdown(
+                id="apps-cams-sensor",
+                options=sensorOptions,
+                value=snDefalut,
+                clearable=False,
+                searchable=False,
+            ),
+        ]
+    )
+    sensorTr = html.Tr([html.Td(sensorLabel), html.Td()])
+
+    # 기간 선택 목록
+    dateValue = datetime.now().date()
+    dateLabel = html.Label(
+        [
+            html.Span("Date"),
+            html.Span("date_range", className="material-icons-two-tone"),
+            dcc.DatePickerSingle(
+                id="apps-cams-date",
+                display_format="YYYY-MM-DD",
+                date=dateValue,
+            ),
         ],
     )
+    dateTr = html.Tr([html.Td(dateLabel), html.Td()])
 
     def buildGraph(gId: int):
         return html.Div(
@@ -208,13 +252,10 @@ def layout():
 
     return html.Div(
         [
-            html.H4(
-                f"{fli.current_user.realname}'s CAMs",
-                className="font-sc",
-            ),
-            # html.Hr(),
+            headerRow,
             html.Table(
                 [
+                    locTr,
                     sensorTr,
                     dateTr,
                     *graphTr,
@@ -232,7 +273,7 @@ def layout():
 
 
 # 이 페이지를 메인 메뉴바에 등록한다.
-addPage(layout, "CAMs Viewer", 20)
+addPage(layout, "Cams-Viewer", 20)
 
 
 if __name__ == "__main__":

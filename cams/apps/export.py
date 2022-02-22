@@ -10,7 +10,7 @@ def layout():
 
     debug(layout, f"entering...")
 
-    # 헤더
+    # 헤더 
     headerRow = html.H4(
         [
             html.Span("cloud_download", className="material-icons-two-tone"),
@@ -105,7 +105,7 @@ def layout():
         className="apps-export-label",
     )
 
-    # 옵션 버튼
+    # 데이터 포인트 목록
     dpOptions = [
         {"label": "평균 데이터 (5분 간격)", "value": 5},
         {"label": "전체 데이터 (30초 간격)", "value": 0},
@@ -162,16 +162,16 @@ def layout():
     Output("apps-export-dt-section", "children"),
     Output("apps-export-rows", "children"),
     Output("apps-export-loading1", "children"),
-    Input("apps-export-sensor", "value"),
     Input("apps-export-location", "value"),
+    Input("apps-export-sensor", "value"),
     Input("apps-export-date", "start_date"),
     Input("apps-export-date", "end_date"),
     Input("apps-export-dp", "value"),
 )
-def update_ui(sensor_id, location_id, start_date, end_date, dp):
+def update_ui(location_id, sensor_id, start_date, end_date, dp):
     """UI 변경에 따른 업데이트 수행"""
 
-    df = parse_and_load(sensor_id, location_id, start_date, end_date, dp)
+    df = parse_and_load(location_id, sensor_id, start_date, end_date, dp)
     if df is None:
         return no_update
     dt = build_data_table(df)
@@ -183,17 +183,17 @@ def update_ui(sensor_id, location_id, start_date, end_date, dp):
     Output("apps-export-download", "data"),
     Output("apps-export-loading2", "children"),
     Input("apps-export-button", "n_clicks"),
-    State("apps-export-sensor", "value"),
     State("apps-export-location", "value"),
+    State("apps-export-sensor", "value"),
     State("apps-export-date", "start_date"),
     State("apps-export-date", "end_date"),
     State("apps-export-dp", "value"),
     prevent_initial_call=True,
 )
-def exportAsCsv(n, sensor_id, location_id, start_date, end_date, dp):
+def exportAsCsv(n, location_id, sensor_id, start_date, end_date, dp):
     """export data as csv"""
 
-    df = parse_and_load(sensor_id, location_id, start_date, end_date, dp)
+    df = parse_and_load(location_id, sensor_id, start_date, end_date, dp)
     if df is None:
         return no_update
     if not df.shape[0] or not df.shape[1]:
@@ -231,4 +231,4 @@ def exportAsCsv(n, sensor_id, location_id, start_date, end_date, dp):
 
 
 # 이 페이지를 메인 메뉴바에 등록한다.
-addPage(layout, "DataExport", 40)
+addPage(layout, "Export", 40)

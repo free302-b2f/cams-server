@@ -6,16 +6,19 @@
    - display_page(): 메인 콜백함수
 """
 
-
 from dash.dependencies import Input, Output, State
 from dash import no_update
-
 # import flask as fl
 import flask_login as fli
+from utility import error, debug, info, loadAppSettings
 
+# apply style from app_settings
+with open("assets/css/html.css", "w") as fp:
+    size = loadAppSettings("Cams")["CSS_FONT_SIZE_%"]
+    fp.write(f"html{{ font-size: {size}%; }}")
+
+# init app
 from app import app, router, getSettings
-from utility import error, debug, info
-
 with app.server.app_context():
 
     # db, lm 패키지 초기화 & 하위모듈 로딩
