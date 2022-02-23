@@ -19,10 +19,10 @@ def dump_json():
         from ._seed import save_groups_json, SEED_MASTER_FILE
 
         # add group
-        masterGroup = Group(id=0, name="MASTER", desc="마스터 그룹")
+        group = Group(id=0, name="MASTER", desc="마스터 그룹", storage_id=0)
 
         # add user
-        masterGroup.users.append(
+        group.users.append(
             AppUser(
                 username="cams",
                 password=util.generate_password_hash("1q2w#E$R"),
@@ -32,7 +32,10 @@ def dump_json():
             )
         )
 
-        groups = [masterGroup]
+        # 센서보관소 위치
+        group.locations.append(Location(id=0, name="보관소", desc="유휴센서보관소"))
+
+        groups = [group]
         save_groups_json(groups, SEED_MASTER_FILE)
 
 

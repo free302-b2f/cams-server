@@ -2,16 +2,17 @@
 
 from ._common import *
 from dash.dependencies import Input, Output, State
+from db import sensor_data as sd
 
 
 def buildLocationSection():
     """Location의 빈 목록 및 편집 섹션을 생성"""
 
     user: AppUser = fli.current_user
-    isMaster = user.is_master()
-    isGAdmin = user.is_gadmin()
-    isNormal = user.is_narmal()
-    hidden = not isMaster and not isGAdmin and not isNormal
+    isMaster, isGAdmin, isNormal = user.is_levels()
+    canDelete = isMaster
+    canUpdate = isMaster or isGAdmin or isNormal
+    canAdd = isMaster or isGAdmin or isNormal
 
     list = buildLabel_Dropdown(
         "Location",
@@ -20,13 +21,15 @@ def buildLocationSection():
         [],
         None,
         "yard",
-        [("clear", "delete")] if not hidden else None,
+        [("clear", "delete")] if canDelete else None,
     )
-    name = buildLabel_Input("Name", "location", "name", "", Location.max_name, hidden)
+    name = buildLabel_Input(
+        "Name", "location", "name", "", Location.max_name, not canUpdate
+    )
     desc = buildLabel_Input(
-        "Description", "location", "desc", "", Location.max_desc, hidden
+        "Description", "location", "desc", "", Location.max_desc, not canUpdate
     )
-    button = buildButtonRow("location", not hidden, hidden)
+    button = buildButtonRow("location", canAdd, not canUpdate)
 
     return html.Section(
         [html.Hr(), list, name, desc, button],
@@ -130,16 +133,20 @@ def onDeleteConfirmed(n, src, id):
         if model == None:
             return no_update
 
-        gid = model.group_id
+        group: Group = model.group
         user: AppUser = fli.current_user
 
+        # 센서를 현재 위치에서 보관소로 이동
         for s in model.sensors:
-            s.location_id = 0 # location id from where?
+            s.location_id = group.storage_id
+
+        # 데이터 삭제
+        if user.is_master():
+            sd.f1_clear_location_data(model.id)
 
         db = fl.g.dba.session
         db.delete(model)
         db.commit()
-        return buildLocationOptions(gid)
+        return buildLocationOptions(group.id)
     except:
         return no_update
-

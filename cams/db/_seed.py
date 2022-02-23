@@ -47,7 +47,6 @@ def seed():
         for group in groups:
             sd.f3_seed(group.sensors)  # 랜덤 센서 데이터 추가
 
-    
 
 # json 파일에서 읽어와 DB에 추가
 def seed_group_json(filename: str) -> Group:
@@ -58,16 +57,19 @@ def seed_group_json(filename: str) -> Group:
         dics = json.load(fp)
 
     groups = []
-    for dic in dics:
+    dba: SQLAlchemy = fl.g.dba
+    for jG in dics:
 
         # add group
-        if "id" in dic:
-            group = Group(id=dic["id"], name=dic["name"], desc=dic["desc"])
+        if "id" in jG:
+            gid = jG["id"]
+            group = Group(id=gid, name=jG["name"], desc=jG["desc"])
+            reset_id(Group.__tablename__, gid)
         else:
-            group = Group(name=dic["name"], desc=dic["desc"])
+            group = Group(name=jG["name"], desc=jG["desc"])
 
         # add user
-        for jUser in dic["users"]:
+        for jUser in jG["users"]:
             pw = jUser["password"]
             pwHash = pw if pw.startswith("pbkdf2:") else util.generate_password_hash(pw)
             user = AppUser(
@@ -81,14 +83,19 @@ def seed_group_json(filename: str) -> Group:
             group.users.append(user)
 
         # add location
-        for jLoc in dic["locations"]:
-            loc = Location(name=jLoc["name"], desc=jLoc["desc"])
+        for jLoc in jG["locations"]:
+            if "id" in jLoc:
+                lid = jLoc["id"]
+                loc = Location(id=lid, name=jLoc["name"], desc=jLoc["desc"])
+                reset_id(Location.__tablename__, lid)
+            else:
+                loc = Location(name=jLoc["name"], desc=jLoc["desc"])
+                
             for jS in jLoc["sensors"]:
                 loc.sensors.append(Sensor(sn=jS["sn"], name=jS["name"]))
             group.locations.append(loc)
             group.sensors.extend(loc.sensors)
 
-        dba: SQLAlchemy = fl.g.dba
         dba.session.add(group)
         dba.session.commit()
 
@@ -145,3 +152,8 @@ def _clean_nones(value):
     # 그외값
     else:
         return value
+
+
+def reset_id(modelName, id):
+    dba: SQLAlchemy = fl.g.dba
+    dba.session.execute(f"ALTER SEQUENCE {modelName}_id_seq RESTART WITH {id + 1}")

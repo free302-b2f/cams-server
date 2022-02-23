@@ -33,6 +33,9 @@ class Group(dba.Model):
     id = dba.Column(dba.Integer, primary_key=True)
     name = dba.Column(dba.String(max_name), nullable=False, unique=True)
     desc = dba.Column(dba.String(max_desc), nullable=False)
+    storage_id = dba.Column(dba.Integer, server_default="0")
+    # location_id: 그룹의 유휴센서보관소 Location의 id 
+    # 각 그룹은 고유의 유휴센서보관소 Location을 갖는다
 
     def __repr__(self):
         return f"<Group: {self.name}>"

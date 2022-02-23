@@ -105,6 +105,23 @@ def f1_clear_data(sid):
         pgc.close()
 
 
+def f1_clear_location_data(locId):
+    """delete rows from sensor_data"""
+
+    if locId == None:
+        return
+    try:
+        pgc, cursor = connect()
+        sql = cursor.mogrify("DELETE FROM sensor_data WHERE location_id = %s", (locId,))
+        rows = cursor.execute(sql)
+        debug(f1_clear_location_data, f"{locId= } : deleted {rows= }")
+        pgc.commit()
+    finally:
+        cursor.close()
+        pgc.close()
+
+
+
 def f2_create_table():
     """메타데이터, 센서테이터 테이블 추가"""
 

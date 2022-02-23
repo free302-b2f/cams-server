@@ -2,6 +2,7 @@
 
 DB_PRIVATE_SEED_FILE = "seed-kist.json"  # 사용자 그룹 추가 - kist
 
+
 def dump_json():
     """추가할 메타데이터를 json으로 저장"""
 
@@ -19,10 +20,9 @@ def dump_json():
         from ._seed import save_groups_json
 
         # add group
-        group = Group(id=9998, name="KIST", desc="KIST 과제 그룹")
+        group = Group(id=1, name="KIST", desc="KIST 과제 그룹", storage_id=1)
 
         # add user
-        # pw = util.generate_password_hash("kist1966!!!")
         user = AppUser(
             username="pheno",
             password="kist1966!!!",
@@ -31,6 +31,10 @@ def dump_json():
             level=1,  # group admin
         )
         group.users.append(user)
+
+        # 센서보관소 위치
+        loc = Location(id=1, name="보관소", desc="유휴센서보관소")
+        group.locations.append(loc)
 
         # add location #1
         loc = Location(name="제1동 제1구역", desc="작물1 (2021년 5월 파종)")

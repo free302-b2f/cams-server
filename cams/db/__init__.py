@@ -63,9 +63,10 @@ from . import location
 from . import sensor
 from . import cams_info
 
+
 def drop_create_seed():
     """모든 모델의 테이블 생성 & 시딩"""
-    
+
     from . import sensor_data as sd
 
     sd.f1_drop_table()
@@ -88,3 +89,5 @@ def drop_create_seed():
     from . import _seed
 
     _seed.seed()
+
+

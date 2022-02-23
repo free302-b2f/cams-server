@@ -18,8 +18,8 @@ def dump_json():
         from .cams_info import Cams
         from ._seed import save_groups_json, SEED_TEST_FILE
 
-        # add group
-        group = Group(name="비투팜", desc="(주)비투팜")
+        # -------- B2F 그룹 --------
+        group = Group(name="비투팜", desc="(주)비투팜", storage_id=2)
 
         # add user
         group.users.append(
@@ -48,16 +48,11 @@ def dump_json():
                 realname="B2F User #2",
             )
         )
-        group.users.append(
-            AppUser(
-                username="b2f-user3",
-                password="1q2w",
-                email="user3@b2f.com",
-                realname="B2F User #3",
-            )
-        )
 
-        # TEST: add location
+        # add location
+        # 센서보관소 위치
+        loc = Location(id=2, name="보관소", desc="유휴센서보관소")
+        group.locations.append(loc)
         loc = Location(name="제1구역", desc="물토란(2022년 2월 파종)")
         loc2 = Location(name="제2구역", desc="개구리밥(2021년 12월 이식)")
         loc3 = Location(name="제3구역", desc="청경채(2021년 5월 파종)")
@@ -74,21 +69,16 @@ def dump_json():
         loc2.sensors.extend(sensors[2:4])
         group.sensors.extend(sensors)
 
-        # 이름 중복 테스트 - Location, Sensor
-        group2 = Group(name="Apple", desc="테스트 그룹1")
-        loc = Location(name="제1구역", desc="물토란(2022년 2월 파종)")  # same name
-        loc.sensors.append(
-            Sensor(sn=f"B2F_CAMs_2000000000005", name=f"Sensor #1")
-        )
-        group2.locations.append(loc)  # same name
+        groups = [group]
 
-        groups = [
-            group,
-            group2,
-            Group(name="Microsoft", desc="테스트 그룹2"),
-            Group(name="Google", desc="테스트 그룹3"),
-            Group(name="Amazon", desc="테스트 그룹4"),
-        ]
+        # -------- 기타 그룹 --------
+        names = ["Apple", "Microsoft", "Google", "Amazon"]
+        for i in range(0, 4):
+            g = Group(name=names[i], desc=f"테스트 그룹{i+1}", storage_id=i + 3)
+            l = Location(name="보관소", desc="유휴센서보관소", id=i + 3)
+            g.locations.append(l)
+            groups.append(g)
+
         save_groups_json(groups, SEED_TEST_FILE)
 
 

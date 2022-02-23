@@ -2,6 +2,7 @@
     {
         "name": "비투팜",
         "desc": "(주)비투팜",
+        "storage_id": 2,
         "users": [
             {
                 "username": "b2f-admin",
@@ -22,15 +23,15 @@
                 "email": "user2@b2f.com",
                 "password": "1q2w",
                 "realname": "B2F User #2"
-            },
-            {
-                "username": "b2f-user3",
-                "email": "user3@b2f.com",
-                "password": "1q2w",
-                "realname": "B2F User #3"
             }
         ],
         "locations": [
+            {
+                "id": 2,
+                "name": "보관소",
+                "desc": "유휴센서보관소",
+                "sensors": []
+            },
             {
                 "name": "제1구역",
                 "desc": "물토란(2022년 2월 파종)",
@@ -69,36 +70,57 @@
     {
         "name": "Apple",
         "desc": "테스트 그룹1",
+        "storage_id": 3,
         "users": [],
         "locations": [
             {
-                "name": "제1구역",
-                "desc": "물토란(2022년 2월 파종)",
-                "sensors": [
-                    {
-                        "sn": "B2F_CAMs_2000000000005",
-                        "name": "Sensor #1"
-                    }
-                ]
+                "id": 3,
+                "name": "보관소",
+                "desc": "유휴센서보관소",
+                "sensors": []
             }
         ]
     },
     {
         "name": "Microsoft",
         "desc": "테스트 그룹2",
+        "storage_id": 4,
         "users": [],
-        "locations": []
+        "locations": [
+            {
+                "id": 4,
+                "name": "보관소",
+                "desc": "유휴센서보관소",
+                "sensors": []
+            }
+        ]
     },
     {
         "name": "Google",
         "desc": "테스트 그룹3",
+        "storage_id": 5,
         "users": [],
-        "locations": []
+        "locations": [
+            {
+                "id": 5,
+                "name": "보관소",
+                "desc": "유휴센서보관소",
+                "sensors": []
+            }
+        ]
     },
     {
         "name": "Amazon",
         "desc": "테스트 그룹4",
+        "storage_id": 6,
         "users": [],
-        "locations": []
+        "locations": [
+            {
+                "id": 6,
+                "name": "보관소",
+                "desc": "유휴센서보관소",
+                "sensors": []
+            }
+        ]
     }
 ]

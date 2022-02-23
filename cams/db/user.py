@@ -84,11 +84,18 @@ class AppUser(fli.UserMixin, dba.Model):
 
         return self.level == AppUser.level_group_admin
 
-    def is_narmal(self):
+    def is_normal(self):
         """그룹 관리자 계정 여부"""
 
         return self.level == AppUser.level_normal
 
+    def is_levels(self):
+        return [
+            self.level == AppUser.level_master,
+            self.level == AppUser.level_group_admin,
+            self.level == AppUser.level_normal,
+        ]
+        
 
     def get_levels(self):
         """현재 계정이 관리할 수 있는 레벨 목록"""
@@ -99,7 +106,7 @@ class AppUser(fli.UserMixin, dba.Model):
             return AppUser.levels_group
         else:
             return {}
-    
+
     def set_level(self, newLevel):
         """레벨 처리"""
 
@@ -112,7 +119,6 @@ class AppUser(fli.UserMixin, dba.Model):
         """삭제 처리 - 그룹에서 제외"""
 
         self.set_level(AppUser.level_deleted)
-
 
 
 if getattr(sys, "_test_", None):
