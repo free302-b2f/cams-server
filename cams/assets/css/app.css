@@ -81,7 +81,7 @@ a {
 }
 /* ----[ app-sidebar ]---- */
 #app-sidebar {
-  font-size: 1.1rem;
+  font-size: 1.25rem;
 }
 #app-sidebar.li {
   margin-bottom: 0rem;
@@ -281,7 +281,7 @@ a {
 }
 .app-cams-table label {
   margin-left: 1rem;
-  width: 25rem;
+  width: 90%;
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -294,10 +294,10 @@ a {
   width: 7rem;
 }
 .app-cams-table label > *:nth-child(3n -1) {
-  width: 2rem;
+  width: auto;
 }
 .app-cams-table label > *:nth-child(3n) {
-  width: 16rem;
+  width: 20rem;
 }
 .DateInput_input {
   font-weight: inherit;

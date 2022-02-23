@@ -6,13 +6,8 @@
 
 @import "app-base.less";
 
-//
-// ====[ 페이지: export ]====
-//
-
 #app-export-container
 {
-    // width:100%;
     min-width: 800px;
     max-width: 1900px;
     height: 100%;
@@ -48,16 +43,16 @@
 //label
 #app-export-container .apps-export-label
 {
-    width: 27rem;
-    // width:max-content;
-    // margin-left: 1.0rem;
+    // width: 30rem;
+    width: 60%;
     display: flex;
     align-items: center;
     justify-content: flex-start;
 }
 #app-export-container .apps-export-label>*:nth-child(3n-2) 
 { 
-    width: 7rem; 
+    width: 10rem; 
+    // width: 30%; 
     display: flex;
     justify-content: flex-start;
     // padding-right: 1rem;
@@ -68,7 +63,8 @@
 }
 #app-export-container .apps-export-label>*:nth-child(3n) 
 { 
-    width: 17.8rem; 
+    // width: 20.8rem; 
+    width: -webkit-fill-available; 
 }
 
 //button
