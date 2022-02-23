@@ -37,6 +37,23 @@ def dump_json():
                 password="1q2w",
                 email="user1@b2f.com",
                 realname="B2F User #1",
+                level=0,
+            )
+        )
+        group.users.append(
+            AppUser(
+                username="b2f-user2",
+                password="1q2w",
+                email="user2@b2f.com",
+                realname="B2F User #2",
+            )
+        )
+        group.users.append(
+            AppUser(
+                username="b2f-user3",
+                password="1q2w",
+                email="user3@b2f.com",
+                realname="B2F User #3",
             )
         )
 

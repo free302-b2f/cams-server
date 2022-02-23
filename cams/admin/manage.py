@@ -24,6 +24,13 @@ def layout():
         )
     )
 
+    confirm = dcc.ConfirmDialog(
+        id="admin-manage-confirm",
+        # message="그룹삭제...\n그룹 소속 모든 데이터가 삭제됩니다!\n삭제할까요?",
+        displayed=False,
+    )
+    confirm.trigger = ""  # 확인창을 호출한 소스
+
     return html.Div(
         [
             headerSection,
@@ -31,9 +38,22 @@ def layout():
             buildUserSection(),
             buildLocationSection(),
             buildSensorSection(),
+            confirm,
         ],
         id="admin-manage-container",
     )
+
+
+@app.callback(
+    Input("admin-manage-confirm", "trigger"),
+    Input("admin-manage-confirm", "message"),
+    Output("admin-manage-confirm", "displayed"),
+    prevent_initial_call=True,
+)
+def onDeleteClick(src, msg):
+    """확인 대화상자"""
+
+    return True if src and msg else no_update
 
 
 @app.callback(
@@ -50,6 +70,9 @@ def layout():
 )
 def onGroup(gid):
     """Group 선택시 user/location/sensor 목록 업데이트"""
+
+    # if not gid:
+    #     return no_update
 
     group = Group.query.get(gid)
     if group == None:
@@ -115,7 +138,7 @@ def onLocation(fid):
     return loc.name, loc.desc
 
 
-@app.callback(    
+@app.callback(
     Output("admin-manage-sensor-name", "value"),
     Output("admin-manage-sensor-sn", "value"),
     Output("admin-manage-sensor-location", "options"),

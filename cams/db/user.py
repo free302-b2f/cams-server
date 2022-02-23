@@ -21,8 +21,14 @@ class AppUser(fli.UserMixin, dba.Model):
     max_password = 32
     max_password_hash = 182
     max_realname = 64
+
     level_master = 2  # 마스터 계정의 레벨
     level_group_admin = 1  # 마스터 계정의 레벨
+    level_normal = 0  # 일반 계정의 레벨
+    level_guest = -1  # 게스트 계정의 레벨
+    level_locked = -2  # 잠긴 계정의 레벨
+    level_deleted = -3  # 탈퇴처리된 계정의 레벨
+
     levels = {-1: "게스트", 0: "일반사용자", 1: "그룹관리자", 2: "마스터계정", -2: "잠금", -3: "탈퇴(삭제)"}
     levels_group = {-1: "게스트", 0: "일반사용자", 1: "그룹관리자", -2: "잠금"}
 
@@ -78,6 +84,12 @@ class AppUser(fli.UserMixin, dba.Model):
 
         return self.level == AppUser.level_group_admin
 
+    def is_narmal(self):
+        """그룹 관리자 계정 여부"""
+
+        return self.level == AppUser.level_normal
+
+
     def get_levels(self):
         """현재 계정이 관리할 수 있는 레벨 목록"""
 
@@ -87,6 +99,20 @@ class AppUser(fli.UserMixin, dba.Model):
             return AppUser.levels_group
         else:
             return {}
+    
+    def set_level(self, newLevel):
+        """레벨 처리"""
+
+        self.level = newLevel
+        if newLevel == AppUser.level_deleted:
+            # 삭제 처리 - 그룹에서 제외
+            self.group_id = 0
+
+    def set_deleted(self):
+        """삭제 처리 - 그룹에서 제외"""
+
+        self.set_level(AppUser.level_deleted)
+
 
 
 if getattr(sys, "_test_", None):

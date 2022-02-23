@@ -2,3 +2,8 @@
 {
     font-variant: small-caps;
 }
+
+.Select-value-label, input
+{
+    font-family:Consolas!important;
+}
