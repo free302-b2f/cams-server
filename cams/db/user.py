@@ -65,7 +65,7 @@ class AppUser(fli.UserMixin, dba.Model):
     # 잠금: 로그인 불가
 
     def __repr__(self):
-        return f"<User: {self.username}>"
+        return f"<User: [{self.id}] {self.username}>"
 
     def to_dict(self):
         """인스턴스 객체의 dict 표현을 구한다"""

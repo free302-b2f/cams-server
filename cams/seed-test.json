@@ -2,7 +2,6 @@
     {
         "name": "비투팜",
         "desc": "(주)비투팜",
-        "storage_id": 2,
         "users": [
             {
                 "username": "b2f-admin",
@@ -27,7 +26,6 @@
         ],
         "locations": [
             {
-                "id": 2,
                 "name": "보관소",
                 "desc": "유휴센서보관소",
                 "sensors": []
@@ -70,11 +68,9 @@
     {
         "name": "Apple",
         "desc": "테스트 그룹1",
-        "storage_id": 3,
         "users": [],
         "locations": [
             {
-                "id": 3,
                 "name": "보관소",
                 "desc": "유휴센서보관소",
                 "sensors": []
@@ -84,11 +80,9 @@
     {
         "name": "Microsoft",
         "desc": "테스트 그룹2",
-        "storage_id": 4,
         "users": [],
         "locations": [
             {
-                "id": 4,
                 "name": "보관소",
                 "desc": "유휴센서보관소",
                 "sensors": []
@@ -98,11 +92,9 @@
     {
         "name": "Google",
         "desc": "테스트 그룹3",
-        "storage_id": 5,
         "users": [],
         "locations": [
             {
-                "id": 5,
                 "name": "보관소",
                 "desc": "유휴센서보관소",
                 "sensors": []
@@ -112,11 +104,9 @@
     {
         "name": "Amazon",
         "desc": "테스트 그룹4",
-        "storage_id": 6,
         "users": [],
         "locations": [
             {
-                "id": 6,
                 "name": "보관소",
                 "desc": "유휴센서보관소",
                 "sensors": []

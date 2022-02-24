@@ -10,7 +10,7 @@ def buildLocationSection():
 
     user: AppUser = fli.current_user
     isMaster, isGAdmin, isNormal = user.is_levels()
-    canDelete = isMaster
+    canDelete = isMaster or isGAdmin
     canUpdate = isMaster or isGAdmin or isNormal
     canAdd = isMaster or isGAdmin or isNormal
 
@@ -106,11 +106,11 @@ def onDeleteClick(n, id):
         return no_update
 
     model: Location = Location.query.get(id)
-    if model != None:
+    if model == None:
         return no_update
 
     msg = f"위치를 삭제하면 위치에 연관된 센서데이터도 모두 삭제됩니다."
-    msg = f"{msg}\n\n위치 <{model.id}:{model}>를 삭제할까요?"
+    msg = f"{msg}\n\n위치 {model}를 삭제할까요?"
     return "location", msg
 
 
@@ -136,16 +136,21 @@ def onDeleteConfirmed(n, src, id):
         group: Group = model.group
         user: AppUser = fli.current_user
 
+        # 스토리지 위치는 삭제 불가
+        if model.id == group.storage_id:
+            return no_update
+
         # 센서를 현재 위치에서 보관소로 이동
+        db = fl.g.dba.session
         for s in model.sensors:
             s.location_id = group.storage_id
+        db.commit()#db.flush()
 
         # 데이터 삭제
-        if user.is_master():
+        if user.is_master() or user.is_gadmin():
             sd.f1_clear_location_data(model.id)
-
-        db = fl.g.dba.session
         db.delete(model)
+
         db.commit()
         return buildLocationOptions(group.id)
     except:

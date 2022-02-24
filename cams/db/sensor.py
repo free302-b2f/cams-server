@@ -40,7 +40,7 @@ class Sensor(dba.Model):
     __table_args__ = (dba.UniqueConstraint(group_id, name),)
 
     def __repr__(self):
-        return f"<Sensor: {self.sn}>"
+        return f"<Sensor: [{self.id}] {self.name}>"
 
     def to_dict(self):
         """인스턴스 객체의 dict 표현을 구한다"""

@@ -3,19 +3,17 @@
         "id": 0,
         "name": "MASTER",
         "desc": "마스터 그룹",
-        "storage_id": 0,
         "users": [
             {
                 "username": "cams",
                 "email": "amadeus.bae@gmail.com",
-                "password": "pbkdf2:sha512:260000$2JpgaX2p7zrmdXfEI8WsUxIsaMM2uHoF$1bd14be205de580a2683cabbbb3278ea52e3b0b4a4cf33dd66b1bfca6ab50fc5ece4f2180a6c43a1e1b9876e148539fd321b9f28644a7fa1489f070473c76e59",
+                "password": "pbkdf2:sha512:260000$zIt0Yh1PhzthnbWgyb29AZgi78dOclps$694c20ae2a18a692609a9a1db1f00d15881abf9bac53411ddd23cfee006f89a0212409e4ccb7189ba9cc665146cc727a79c0c0b21d795bb9ff1bede59f21166e",
                 "realname": "CAMs Master",
                 "level": 2
             }
         ],
         "locations": [
             {
-                "id": 0,
                 "name": "보관소",
                 "desc": "유휴센서보관소",
                 "sensors": []

@@ -20,7 +20,7 @@ def dump_json():
         from ._seed import save_groups_json
 
         # add group
-        group = Group(id=1, name="KIST", desc="KIST 과제 그룹", storage_id=1)
+        group = Group(id=1, name="KIST", desc="KIST 과제 그룹")
 
         # add user
         user = AppUser(
@@ -33,7 +33,7 @@ def dump_json():
         group.users.append(user)
 
         # 센서보관소 위치
-        loc = Location(id=1, name="보관소", desc="유휴센서보관소")
+        loc = Location(name="보관소", desc="유휴센서보관소")
         group.locations.append(loc)
 
         # add location #1

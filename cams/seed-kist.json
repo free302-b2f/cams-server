@@ -3,7 +3,6 @@
         "id": 1,
         "name": "KIST",
         "desc": "KIST 과제 그룹",
-        "storage_id": 1,
         "users": [
             {
                 "username": "pheno",
@@ -15,7 +14,6 @@
         ],
         "locations": [
             {
-                "id": 1,
                 "name": "보관소",
                 "desc": "유휴센서보관소",
                 "sensors": []
