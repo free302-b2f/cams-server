@@ -63,6 +63,7 @@ def onDeleteClick(src, msg):
     Output("admin-manage-user", "value"),
     Output("admin-manage-location", "options"),
     Output("admin-manage-location", "value"),
+    Output("admin-manage-sensor-location", "options"),
     Output("admin-manage-sensor", "options"),
     Output("admin-manage-sensor", "value"),
     Input("admin-manage-group", "value"),
@@ -71,18 +72,21 @@ def onDeleteClick(src, msg):
 def onGroup(gid):
     """Group 선택시 user/location/sensor 목록 업데이트"""
 
-    # if not gid:
-    #     return no_update
+    if gid == None or gid == "":
+        return no_update
 
     group = Group.query.get(gid)
     if group == None:
         return no_update
 
+    locOpt = buildLocationOptions(gid)
+
     return [
         group.name,
         group.desc,
         *buildUserOptions(gid),
-        *buildLocationOptions(gid),
+        *locOpt,
+        locOpt[0],
         *buildSensorOptions(gid),
     ]
 
@@ -139,22 +143,25 @@ def onLocation(fid):
 
 
 @app.callback(
+    Output("admin-manage-sensor-group", "value"),
     Output("admin-manage-sensor-name", "value"),
     Output("admin-manage-sensor-sn", "value"),
-    Output("admin-manage-sensor-location", "options"),
     Output("admin-manage-sensor-location", "value"),
     Input("admin-manage-sensor", "value"),
     prevent_initial_call=True,
 )
-def onSensor(sid):
+def onSensor(id):
     """Sensor 선택시 업데이트"""
 
-    if not sid:
-        return "", "", [], ""
+    # admin-manage-sensor-location은 그룹 변경시 한번만 갱신하면 되지만
+    # 그럴경우
 
-    sensor = Sensor.query.get(sid)
-    locs, _ = buildLocationOptions(sensor.group_id)
-    return sensor.name, sensor.sn, locs, sensor.location_id
+    if not id:
+        return no_update
+
+    sensor: Sensor = Sensor.query.get(id)
+
+    return sensor.group_id, sensor.name, sensor.sn, sensor.location_id
 
 
 addPage(layout, "Admin")

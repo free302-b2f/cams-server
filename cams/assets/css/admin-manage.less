@@ -52,12 +52,36 @@
 {
     // width:max-content;
     width:80%;
-    margin-top: 0.2rem;
-    margin-bottom: 0.2rem;
+    margin-top: 0.1rem;
+    margin-bottom: 0.1rem;
     display: flex;
     align-items: center;
     justify-content: flex-start;
 }
+//각 섹션 첫번째 라벨을 헤더로 꾸미기
+.admin-manage-edit-section > label:first-child //of-type
+{
+    width:calc(100% + 2rem);
+    padding-right: calc(20% + 1rem);
+    background: linear-gradient(rgba( @sidebar_color, 0.3), rgba( @sidebar_color, 0.1));
+    margin-top: 1rem;
+    margin-left: -1rem;
+    padding-left:1rem;
+    height: 2.6rem;
+    // align-items:flex-end;
+    // padding-bottom: 0.2rem;
+}
+.admin-manage-edit-section:first-of-type
+{
+    margin-top: -1rem;
+}
+.admin-manage-edit-section > label:first-of-type > *:first-child
+{
+    font-family: "Noto Sans KR";
+    // font-family: "Nanum Gothic";
+    // font-family: "새굴림";
+}
+
 .admin-manage-label>*:nth-child(5n-4) 
 { 
     width: 10rem; 
@@ -131,4 +155,11 @@
     margin-left: 0rem;
     margin-right: 0.5rem;
 }
+
+//dash dropdown - option window
+// .admin-manage-label .VirtualizedSelectOption
+// {
+//     // line-height: 300%!important;
+//     height: 20px!important;
+// }
 

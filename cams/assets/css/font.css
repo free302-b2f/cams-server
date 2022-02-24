@@ -1,9 +1,18 @@
-.font-small-caps
-{
-    font-variant: small-caps;
+/*-----------------------------------------------------
+    + file: font.less
+    + 폰트 설정
+    + 2022.02.24 by DrBAE : amadeus.bae@gmail.com
+-----------------------------------------------------*/
+@font-face {
+  font-family: 'Noto Sans KR';
+  font-style: normal;
+  font-weight: 400;
+  src: url(https://fonts.gstatic.com/s/notosanskr/v25/PbykFmXiEBPT4ITbgNA5CgmG0X7u.otf) format('opentype');
 }
-
-.Select-value-label, input
-{
-    font-family:Consolas!important;
+.font-small-caps {
+  font-variant: small-caps;
+}
+.Select-value-label,
+input {
+  font-family: Consolas!important;
 }

@@ -7,7 +7,7 @@
         "IS_PRIVATE_SERVER": false,
         "DB_PRIVATE_SEED_FILE": ["seed-kist.json"],
         "DB_PRIVATE_GROUP_ID": 1,
-        "CSS_FONT_SIZE_%" : 100
+        "CSS_FONT_SIZE_%" : 90
     },
     "logging": {
         "Level": "DEBUG",

@@ -14,6 +14,7 @@ def buildSensorSection():
     canAdd = isMaster or isGAdmin
     canUpdate = isMaster or isGAdmin or isNormal
     canDelete = isMaster or isGAdmin
+    showGroup = isMaster
 
     list = buildLabel_Dropdown(
         "센서 관리",
@@ -24,6 +25,10 @@ def buildSensorSection():
         "sensors",
         [("clear", "delete")] if canDelete else None,
     )
+    group = buildLabel_Dropdown(
+        "Group", "sensor", "group", *buildGroupOptions(), hidden=not showGroup
+    )
+
     name = buildLabel_Input(
         "Sensor Name", "sensor", "name", "", Sensor.max_name, not canUpdate
     )
@@ -34,7 +39,15 @@ def buildSensorSection():
     button = buildButtonRow("sensor", canAdd, not canUpdate)
 
     return html.Section(
-        [html.Hr(), list, name, sn, locs, button],
+        [
+            # html.Hr(),
+            list,
+            group,
+            name,
+            sn,
+            locs,
+            button,
+        ],
         className="admin-manage-edit-section",
     )
 
@@ -66,17 +79,49 @@ def onAddClick(n, gid, name, sn, locId):
         return no_update
 
 
+
+@app.callback(
+    Output("admin-manage-confirm", "trigger"),
+    Output("admin-manage-confirm", "message"),
+    Output("admin-manage-confirm", "submit_n_clicks"),
+    Input("admin-manage-sensor-save", "n_clicks"),
+    State("admin-manage-sensor-group", "value"),
+    State("admin-manage-sensor", "value"),
+    State("admin-manage-confirm", "submit_n_clicks"),
+    prevent_initial_call=True,
+)
+def onUpdateClick(n, gid, id, nSubmit):
+    """<Update> 버튼 작업 및 목록 업데이트"""
+
+    if not n or not id or gid == None or gid == "":
+        return no_update
+
+    model: Sensor = Sensor.query.get(id)
+    if model == None:
+        return no_update
+
+    if model.group_id != gid:
+        # 소유 그룹이 바뀌는 경우 -> 확인 후 진행
+        group: Group = Group.query.get()
+        msg = f"센서 {model}의 소유자를 {group}으로 바꾸겠습니까까?"
+        return "sensor-update", msg, no_update
+    else:
+        # 소유 그룹이 바뀌지 않는 경우 -> 확인없이 업데이트 진행
+        return no_update, no_update, 1 + 0 if not nSubmit else nSubmit
+
+
 @app.callback(
     Output("admin-manage-sensor", "options"),
     Output("admin-manage-sensor", "value"),
-    Input("admin-manage-sensor-save", "n_clicks"),
+    Input("admin-manage-confirm", "submit_n_clicks"),
     State("admin-manage-sensor", "value"),
+    State("admin-manage-sensor-group", "value"),
     State("admin-manage-sensor-name", "value"),
     State("admin-manage-sensor-sn", "value"),
     State("admin-manage-sensor-location", "value"),
     prevent_initial_call=True,
 )
-def onUpdateClick(n, id, name, sn, locId):
+def onUpdateConfirmed(n, id, gidDest, name, sn, locId):
     """<Update> 버튼 작업 및 목록 업데이트"""
 
     if not n:
@@ -88,9 +133,15 @@ def onUpdateClick(n, id, name, sn, locId):
         model.sn = sn
         model.location_id = locId
 
+        gidSrc = model.group_id
+        if gidDest != gidSrc: # 센서 이전 작업: 새 그룹의 보관소로 이동
+            group = Group.query.get(gidDest)
+            model.location_id = group.storage_id
+            model.group_id = gidDest        
+
         dba = fl.g.dba
         dba.session.commit()
-        return buildSensorOptions(model.group_id, id)
+        return buildSensorOptions(gidSrc, id if gidSrc == gidDest else None)
     except:
         return no_update
 

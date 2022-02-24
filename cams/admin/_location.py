@@ -33,7 +33,13 @@ def buildLocationSection():
     button = buildButtonRow("location", canAdd, not canUpdate)
 
     return html.Section(
-        [html.Hr(), list, name, desc, button],
+        [
+            # html.Hr(),
+            list,
+            name,
+            desc,
+            button,
+        ],
         className="admin-manage-edit-section",
     )
 

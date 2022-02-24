@@ -29,9 +29,8 @@ def buildUserSection():
 
     return html.Section(
         [
-            html.Hr(),
+            # html.Hr(),
             list,
-            # buildLabel_Dropdown("Group", "user", "group", *buildGroupOptions()),
             buildLabel_Dropdown(
                 "Group", "user", "group", [], None, hidden=not showGroup
             ),
