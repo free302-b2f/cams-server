@@ -36,8 +36,8 @@ def seed():
     seed_group_json(SEED_MASTER_FILE)
 
     # ----[ 추가 그룹 ]---- TODO: 파일목록을 셋팅스에
-    fn = fl.g.settings["Cams"]["DB_PRIVATE_SEED_FILE"]
-    seed_group_json(fn)
+    files = fl.g.settings["Cams"]["DB_PRIVATE_SEED_FILE"]
+    [seed_group_json(fn) for fn in files]
 
     # ----[ 테스트 그룹 ]----
     if getattr(sys, "_test_"):
