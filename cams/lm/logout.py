@@ -56,7 +56,7 @@ layout = [
         _logout_button,
         n_clicks=0,
         id="lm-logout-button",
-        href="#",  # "javascript:void()",
+        href="javascript:void()",
         className="flex-h mr1",
     ),
     # dcc.Link(_logout_button, id="lm-logout-button", href=""),

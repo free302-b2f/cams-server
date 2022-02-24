@@ -74,53 +74,58 @@ def buildPersonalLabel(labelText, userName, colName):
     )
 
 
-def buildFarmLabel(id: int, name: str) -> html.Label:
+def buildLocationLabel(index, location: Location):
     return html.Label(
         [
-            html.Span(f"Farm {id}"),
+            html.Span(f"Location {index}"),
             dcc.Input(
                 # id=f"lm-profile-farms-{id}",
-                id={"model": "farm", "id": id},
+                id={"model": "farm", "id": location.id},
                 type="text",
-                value=name,
+                value=f"{location.id}: {location.name}",
                 maxLength=Location.max_name,
                 required=True,
                 readOnly=True,
             ),
-            _action_icon("farm", id, True),
+            # _action_icon("farm", id, True),
         ]
     )
 
 
-def buildSensorLabel(id: int, name: str) -> html.Label:
+def buildSensorLabel(index, sensor: Sensor):
     return html.Label(
         [
-            html.Span(f"Sensor {id}"),
+            html.Span(f"Sensor {index}"),
             dcc.Input(
                 id=f"lm-profile-sensors-{id}",
                 type="text",
-                value=name,
+                value=f"{sensor.id}: {sensor.name}",
                 maxLength=Sensor.max_sn + 5,
                 required=True,
                 readOnly=True,
             ),
-            _action_icon("sensor", id, False),
+            # _action_icon("sensor", id, False),
         ]
     )
 
 
 def layout():
 
-    user = fli.current_user
-    farms = user.group.locations
-    sensors = {s.id: s for s in user.group.sensors}
+    user: AppUser = fli.current_user
+    if user == None or not user.is_authenticated:
+        return html.Div()
+
+    locations = user.group.locations
+    sensors = user.group.sensors
 
     _header = html.Header(
         [
-            html.H4(
+            html.H5(
                 [
                     html.Span("manage_accounts", className="material-icons-two-tone"),
-                    html.Span(user.realname, className="font-sc"),  # "User Account",
+                    html.Span(
+                        f"{user.username} : {user.realname}", className="font-sc"
+                    ),  # "User Account",
                 ],
                 className="flex-h",
             ),
@@ -129,7 +134,7 @@ def layout():
     )
     _menu = html.Section(
         [
-            html.A(  # dcc.Link: 
+            html.A(  # dcc.Link:
                 [
                     html.Span("Change"),
                     html.Span("password", className="material-icons-two-tone"),
@@ -149,8 +154,13 @@ def layout():
                 [
                     html.Span("badge", className="material-icons-two-tone"),
                     "Personal Profile",
-                    html.Span("edit", className="material-icons-outlined"),
-                    # html.Span("save", className="material-icons-outlined"),
+                    dcc.Link(
+                        html.Span(
+                            "edit",
+                            className="material-icons-outlined",
+                        ),
+                        href="/admin-manage",
+                    ),
                 ],
                 className="flex-h",
             ),
@@ -162,22 +172,23 @@ def layout():
         className="flex-v",
     )
 
-    _farms = html.Section(
+    _locations = html.Section(
         [
             html.H5(
                 [
                     html.Span("yard", className="material-icons-two-tone"),
-                    "Farm List",
-                    html.Span(
-                        "add_box",
-                        className="material-icons-outlined",
-                        # id="lm-profile-farms-add",
-                        n_clicks=0,
+                    "Location List",
+                    dcc.Link(
+                        html.Span(
+                            "edit",
+                            className="material-icons-outlined",
+                        ),
+                        href="/admin-manage",
                     ),
                 ],
                 className="flex-h",
             ),
-            *[buildFarmLabel(f.id, f.name) for f in farms],
+            *[buildLocationLabel(i, f) for i, f in enumerate(locations, 1)],
         ],
         id="lm-profile-farms",
         className="flex-v",
@@ -189,11 +200,17 @@ def layout():
                 [
                     html.Span("sensors", className="material-icons-two-tone"),
                     "Sensor List",
-                    html.Span("add_box", className="material-icons-outlined"),
+                    dcc.Link(
+                        html.Span(
+                            "edit",
+                            className="material-icons-outlined",
+                        ),
+                        href="/admin-manage",
+                    ),
                 ],
                 className="flex-h",
             ),
-            *[buildSensorLabel(s, sensors[s].name) for s in sensors],
+            *[buildSensorLabel(i, s) for i, s in enumerate(sensors, 1)],
         ],
         id="lm-profile-sensors",
         className="flex-v",
@@ -235,7 +252,7 @@ def layout():
             _menu,
             _profile,
             _sensors,
-            _farms,
+            _locations,
             _settings,
             _security,
             dcc.Location(id="lm-profile-url", refresh=True),
@@ -246,114 +263,20 @@ def layout():
     )
 
 
-# Farm : add
-# @app.callback(Input("lm-profile-farms-add", "n_clicks"))
-def addFarm(n: int):
-    """add new farm to current user"""
-
-    # TODO: 나중에 활성화
-
-    if not n:
-        return no_update
-
-    user = fli.current_user
-    farm = Location(name="--new farm--")
-    user.farms.append(farm)
-
-    dba = fl.g.dba
-    local_object = dba.session.merge(farm)
-    dba.session.add(local_object)
-    dba.session.commit()
-
-    return 0
-
-
-# Farm : delete
 # @app.callback(
-#     Output({"model": "delete-farm", "id": MATCH}, "n_clicks"),  # 더미
-#     Trigger({"model": "delete-farm", "id": MATCH}, "n_clicks"),  # 이벤트 발생
-#     State({"model": "delete-farm", "id": MATCH}, "data-farm_id"),  # 이벤트 소스의 팜 아이디
+#     Output("lm-profile-url", "pathname"),
+#     Input("lm-profile-personal-edit", "n_clicks"),
+#     Input("lm-profile-location-edit", "n_clicks"),
+#     Input("lm-profile-sensor-edit", "n_clicks"),
+#     prevent_initial_call=True,
 # )
-def deleteFarm(fid):
+# def onEditClick(n1, n2, n3):
 
-    if not cbc.triggered[0]["value"]:
-        return no_update
+#     # if n1 or n2 or n3:
+#     #     return "/admin-manage"
 
-    farm = Location.query.get(fid)
-    from db import _dba
-
-    try:
-        local_object = _dba.session.merge(farm)
-        _dba.session.delete(local_object)
-        _dba.session.commit()
-    except:
-        pass
-
-    return 1
-
-
-# Farm : enter edit mode
-# @app.callback(
-#     Output({"model": "farm", "id": MATCH}, "readonly"),  # farm_name input
-#     # Output({"model": "save-farm", "id": MATCH}, "n_clicks"),  # 더미
-#     Trigger({"model": "edit-farm", "id": MATCH}, "n_clicks"),  # 이벤트 발생
-#     State({"model": "edit-farm", "id": MATCH}, "data-farm_id"),  # 이벤트 소스의 팜 아이디
-# )
-def editFarm(fid: int):
-    """변경된 Farm 이름을 DB에 저장한다"""
-
-    if not cbc.triggered[0]["value"]:
-        return no_update
-
-    return False
-
-
-# Farm : save
-# @app.callback(
-#     Output({"model": "save-farm", "id": MATCH}, "n_clicks"),  # 더미
-#     Trigger({"model": "save-farm", "id": MATCH}, "n_clicks"),  # 이벤트 발생
-#     State({"model": "save-farm", "id": MATCH}, "data-farm_id"),  # 이벤트 소스의 팜 아이디
-#     State({"model": "farm", "id": MATCH}, "value"),  # farm_name input
-# )
-def saveFarm(fid, newName: str):
-    """변경된 Farm 이름을 DB에 저장한다"""
-
-    if not cbc.triggered[0]["value"]:
-        return no_update
-
-    farm = Location.query.get(fid)
-    farm.name = newName
-
-    from db import _dba
-
-    local_object = _dba.session.merge(farm)
-    # db.session.update(local_object)
-    _dba.session.commit()
-
-    return 1
-
-
-# page reload callback
-_receive_func = """
-function(n, n2) 
-{ 
-    if (n > 0) setTimeout(() => location.reload(), 300); 
-    for(let i = 0; i < n2.length; i++)
-    {
-        if(n2[i] > 0)
-        {
-            setTimeout(() => location.reload(), 300); 
-            break;
-        }
-    }
-}"""
-# app.clientside_callback(
-#     _receive_func,
-#     Input("lm-profile-farms-add", "n_clicks"),
-#     Input({"model": "delete-farm", "id": ALL}, "n_clicks"),  # 이벤트 발생
-# )
+#     return no_update
 
 
 # 이 페이지를 메인 라우터에 등록한다.
-# add_page(layout, "Log In")  # test
-addPage(layout)  # test
+addPage(layout)

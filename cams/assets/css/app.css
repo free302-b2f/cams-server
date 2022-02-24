@@ -77,7 +77,7 @@ a {
   background-repeat: no-repeat;
 }
 .content-pad {
-  padding: 1rem 0 0 1rem;
+  padding: 0 0 0 1rem;
 }
 /* ----[ app-sidebar ]---- */
 #app-sidebar {
@@ -175,6 +175,9 @@ a {
   border: yellowgreen solid 1px;
   background-color: #F5F6F7;
 }
+#lm-profile-container h5 {
+  align-items: stretch;
+}
 #lm-profile-header {
   display: flex;
   width: 100%;
@@ -189,7 +192,7 @@ a {
   margin-top: 1rem;
   margin-bottom: 1rem;
 }
-#lm-profile-container h5 > span.material-icons-outlined {
+#lm-profile-container h5 span.material-icons-outlined {
   margin-left: 1rem;
 }
 #lm-profile-container span.material-icons-outlined {

@@ -23,6 +23,7 @@ with app.server.app_context():
 
     # db, lm 패키지 초기화 & 하위모듈 로딩
     import db
+    from db.user import AppUser
 
     settings = getSettings("Cams")
     if settings["DB_DO_RESET"]:
@@ -69,7 +70,8 @@ def display_page(appPath: str):
     debug(display_page, f"{appPath = }")
 
     # 사용자 인증 상태 체크
-    if not fli.current_user or not fli.current_user.is_authenticated:
+    user: AppUser = fli.current_user
+    if user == None or not user.is_authenticated:
         debug(display_page, f"redirecting: {appPath} -> {lm.login_view()}")
         return no_update, lm.login_view()
 
