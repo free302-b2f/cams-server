@@ -10,9 +10,9 @@ def buildLocationSection():
 
     user: AppUser = fli.current_user
     isMaster, isGAdmin, isNormal = user.is_levels()
-    canDelete = isMaster or isGAdmin
-    canUpdate = isMaster or isGAdmin or isNormal
     canAdd = isMaster or isGAdmin or isNormal
+    canUpdate = isMaster or isGAdmin or isNormal
+    canDelete = isMaster or isGAdmin
 
     list = buildLabel_Dropdown(
         "Location",
@@ -52,9 +52,8 @@ def onAddClick(n, gid, name, desc):
     if not n:
         return no_update
 
-    location: Location = Location(name=name, desc=desc, group_id=gid)
-
     try:
+        location: Location = Location(name=name, desc=desc, group_id=gid)
         db = fl.g.dba.session
         db.add(location)
         db.commit()
@@ -109,7 +108,8 @@ def onDeleteClick(n, id):
     if model == None:
         return no_update
 
-    msg = f"위치를 삭제하면 위치에 연관된 센서데이터도 모두 삭제됩니다."
+    numRows = sd.Count(location_id=id)
+    msg = f"위치를 삭제하면 위치에 연관된 센서데이터 <{numRows}>개도 모두 삭제됩니다."
     msg = f"{msg}\n\n위치 {model}를 삭제할까요?"
     return "location", msg
 
@@ -133,10 +133,8 @@ def onDeleteConfirmed(n, src, id):
         if model == None:
             return no_update
 
-        group: Group = model.group
-        user: AppUser = fli.current_user
-
         # 스토리지 위치는 삭제 불가
+        group: Group = model.group
         if model.id == group.storage_id:
             return no_update
 
@@ -144,14 +142,15 @@ def onDeleteConfirmed(n, src, id):
         db = fl.g.dba.session
         for s in model.sensors:
             s.location_id = group.storage_id
-        db.commit()#db.flush()
+        db.commit()  # db.flush()
 
         # 데이터 삭제
+        user: AppUser = fli.current_user
         if user.is_master() or user.is_gadmin():
-            sd.f1_clear_location_data(model.id)
-        db.delete(model)
+            sd.f1_clear_data_location(model.id)
 
+        db.delete(model)
         db.commit()
-        return buildLocationOptions(group.id)
+        return buildLocationOptions(model.group_id)
     except:
         return no_update

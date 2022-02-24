@@ -30,7 +30,9 @@ import psycopg2.extras as pga
 # endregion
 
 
-# region ---- column names ----
+# region ---- table/column names ----
+
+_tn = "sensor_data"  # table name
 
 # 측정값 컬럼 목록
 # mongodb는 대소문자를 구별한다.. dict라서?
@@ -59,8 +61,8 @@ sd_cols = [
 # 메타 컬럼 목록 ~ string type?
 # sd_cols_meta = ["id", "group_id", "location_id", "sensor_id", "time"]
 sd_cols_meta = ["group_id", "location_id", "sensor_id", "time"]
-sd_cols_meta_join = ["group1", "location", "sensor", "time1"] # 테이블 조인시 컬럼명
-sd_cols_meta_raw = ["_id", "FarmName", "SN", "Date"] # sensor 생성 딕의 키
+sd_cols_meta_join = ["group1", "location", "sensor", "time1"]  # 테이블 조인시 컬럼명
+sd_cols_meta_raw = ["_id", "FarmName", "SN", "Date"]  # sensor 생성 딕의 키
 
 # endregion
 
@@ -82,7 +84,7 @@ def f1_drop_table():
 
     try:
         pgc, cursor = connect()
-        cursor.execute("DROP TABLE IF EXISTS sensor_data")
+        cursor.execute(f"DROP TABLE IF EXISTS {_tn}")
         pgc.commit()
     finally:
         cursor.close()
@@ -96,30 +98,29 @@ def f1_clear_data(sid):
         return
     try:
         pgc, cursor = connect()
-        sql = cursor.mogrify("DELETE FROM sensor_data WHERE sensor_id = %s", (sid,))
-        rows = cursor.execute(sql)
-        debug(f1_clear_data, f"{sid= } : deleted {rows= }")
+        sql = cursor.mogrify(f"DELETE FROM {_tn} WHERE sensor_id = %s", (sid,))
+        cursor.execute(sql)
+        debug(f1_clear_data, f"{sid= } : deleted {cursor.rowcount} rows")
         pgc.commit()
     finally:
         cursor.close()
         pgc.close()
 
 
-def f1_clear_location_data(locId):
+def f1_clear_data_location(locId):
     """delete rows from sensor_data"""
 
     if locId == None:
         return
     try:
         pgc, cursor = connect()
-        sql = cursor.mogrify("DELETE FROM sensor_data WHERE location_id = %s", (locId,))
-        rows = cursor.execute(sql)
-        debug(f1_clear_location_data, f"{locId= } : deleted {rows= }")
+        sql = cursor.mogrify(f"DELETE FROM {_tn} WHERE location_id = %s", (locId,))
+        cursor.execute(sql)
+        debug(f1_clear_data_location, f"{locId= } : deleted {cursor.rowcount} rows")
         pgc.commit()
     finally:
         cursor.close()
         pgc.close()
-
 
 
 def f2_create_table():
@@ -129,8 +130,8 @@ def f2_create_table():
     # group location sensor app-user
 
     # 센서데이터 테이블
-    create_sensordata_table = """
-    CREATE TABLE IF NOT EXISTS sensor_data (
+    create_table = f"""
+    CREATE TABLE IF NOT EXISTS {_tn} (
         id SERIAL, 
         group_id INTEGER NOT NULL,
         location_id INTEGER NOT NULL,
@@ -151,15 +152,15 @@ def f2_create_table():
         UNIQUE (time, sensor_id),
         UNIQUE (id, time, sensor_id)
     );
-    CREATE INDEX ON sensor_data (id);"""
+    CREATE INDEX ON {_tn} (id);"""
 
     # 센서테이터에 대한 하이퍼테이블 생성
-    create_sensordata_hypertable = """
-    SELECT create_hypertable('sensor_data', 'time', 
+    create_hypertable = f"""
+    SELECT create_hypertable('{_tn}', 'time', 
         partitioning_column => 'sensor_id',
         number_partitions => 100, 
         if_not_exists => TRUE);
-    SELECT set_chunk_time_interval('sensor_data', INTERVAL '7 days');
+    SELECT set_chunk_time_interval('{_tn}', INTERVAL '7 days');
     """
 
     # 하이퍼테이블 정보 출력
@@ -169,8 +170,8 @@ def f2_create_table():
 
     try:
         pgc, cursor = connect(True)
-        cursor.execute(create_sensordata_table)
-        cursor.execute(create_sensordata_hypertable)
+        cursor.execute(create_table)
+        cursor.execute(create_hypertable)
         pgc.commit()
 
         cursor.execute(query_table_info)
@@ -187,7 +188,7 @@ def _build_insert() -> str:
 
     # 메타 컬럼과 측정값 컬럼
     cols = sd_cols_meta + sd_cols
-    format = "INSERT INTO sensor_data AS sd ("
+    format = f"INSERT INTO {_tn} AS sd ("
     tmp = ",".join(cols)
     format = f"{format} {tmp} ) VALUES ("
     tmp = ",".join(["%s" for c in cols])
@@ -363,7 +364,7 @@ def _build_select(
         tmp = ",".join([f"AVG(d.{c}) as {c}" for c in sd_cols])
     fmt = f"{fmt}, {tmp}"
 
-    fmt = f"SELECT {fmt} FROM sensor_data d, app_group g, location l, sensor s"
+    fmt = f"SELECT {fmt} FROM {_tn} d, app_group g, location l, sensor s"
 
     # WHERE : date
     fmt = f"{fmt} WHERE (date(d.time) BETWEEN %s AND %s)"
@@ -416,6 +417,33 @@ def Select(group_id, sensor_id, location_id, startDati, endDati, avgTime: int = 
     finally:
         cursor.close()
         pgc.close()
+
+
+def Count(group_id=None, location_id=None, sensor_id=None):
+    """주어진 조건의 행 갯수를 리턴"""
+
+    try:
+        pgc, cursor = connect()
+        fmt = f"SELECT COUNT(*) FROM {_tn} WHERE true"
+        if group_id != None:
+            fmt = f"{fmt} AND group_id=%(gid)s"
+        if location_id != None:
+            fmt = f"{fmt} AND location_id=%(lid)s"
+        if sensor_id != None:
+            fmt = f"{fmt} AND sensor_id=%(sid)s"
+
+        sql = cursor.mogrify(fmt, {"gid": group_id, "lid": location_id, "sid": sensor_id})
+        debug(str(sql))
+
+        cursor.execute(sql)
+        # numRows = next(iter(cursor.fetchone() or []), None)
+        numRows = cursor.fetchone()[0]
+
+        return numRows
+    finally:
+        cursor.close()
+        pgc.close()
+
 
 
 if __name__ == "__main__":
