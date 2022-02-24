@@ -185,6 +185,10 @@ a {
 #lm-profile-menu a:hover {
   color: coral;
 }
+#lm-profile-menu {
+  font-size: 1.1rem;
+  font-weight: 500;
+}
 #lm-profile-container section {
   margin-bottom: 0rem;
 }

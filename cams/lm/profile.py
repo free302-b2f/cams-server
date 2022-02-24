@@ -132,7 +132,7 @@ def layout():
         ],
         id="lm-profile-header",
     )
-    _menu = html.Section(
+    _menu = html.Section( #html.H6(
         [
             html.A(  # dcc.Link:
                 [
