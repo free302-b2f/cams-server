@@ -128,7 +128,7 @@ def layout():
     app.title = "B2F - CAMs Viewer"  # TODO: 효과없음
 
     # 헤더
-    headerRow = html.H4(
+    headerRow = html.H5(
         [
             html.Span("insights", className="material-icons-two-tone"),
             html.Span(f"CAMs Data Viewer", className="font-sc"),

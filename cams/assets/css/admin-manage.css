@@ -42,17 +42,15 @@
 .admin-manage-edit-section > label:first-child {
   width: calc(100% + 2rem);
   padding-right: calc(20% + 1rem);
-  background: linear-gradient(rgba(13, 110, 253, 0.3), rgba(13, 110, 253, 0.1));
+  background: linear-gradient(rgba(124, 252, 0, 0.3), rgba(255, 255, 255, 0));
   margin-top: 1rem;
   margin-left: -1rem;
   padding-left: 1rem;
-  height: 2.6rem;
+  height: 40px;
+  font-family: App-Header-Korean, App-Header-English;
 }
 .admin-manage-edit-section:first-of-type {
   margin-top: -1rem;
-}
-.admin-manage-edit-section > label:first-of-type > *:first-child {
-  font-family: "Noto Sans KR";
 }
 .admin-manage-label > *:nth-child(5n-4) {
   width: 10rem;

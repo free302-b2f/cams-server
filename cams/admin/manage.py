@@ -15,7 +15,7 @@ def layout():
     debug(layout, f"entering...")
 
     headerSection = html.Header(
-        html.H4(
+        html.H5(
             [
                 html.Span("settings", className="material-icons-two-tone"),
                 html.Span("Manage Group Users/Locations/Sensors", className="font-sc"),
