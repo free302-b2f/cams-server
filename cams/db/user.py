@@ -85,17 +85,22 @@ class AppUser(fli.UserMixin, dba.Model):
         return self.level == AppUser.level_group_admin
 
     def is_normal(self):
-        """그룹 관리자 계정 여부"""
+        """일반사용자 계정 여부"""
 
         return self.level == AppUser.level_normal
 
+    def is_guest(self):
+        """게스트 계정 여부"""
+
+        return self.level == AppUser.level_guest
+
     def is_levels(self):
-        return [
+        return (
             self.level == AppUser.level_master,
             self.level == AppUser.level_group_admin,
             self.level == AppUser.level_normal,
-        ]
-        
+            self.level == AppUser.level_guest,
+        )
 
     def get_levels(self):
         """현재 계정이 관리할 수 있는 레벨 목록"""

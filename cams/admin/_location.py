@@ -8,14 +8,15 @@ from db import sensor_data as sd
 def buildLocationSection():
     """Location의 빈 목록 및 편집 섹션을 생성"""
 
+    # calc permissions
     user: AppUser = fli.current_user
-    isMaster, isGAdmin, isNormal = user.is_levels()
+    isMaster, isGAdmin, isNormal, _ = user.is_levels()
     canAdd = isMaster or isGAdmin or isNormal
     canUpdate = isMaster or isGAdmin or isNormal
     canDelete = isMaster or isGAdmin
 
     list = buildLabel_Dropdown(
-        "Location",
+        "위치 관리",
         "location",
         None,
         [],

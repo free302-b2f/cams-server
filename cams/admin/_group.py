@@ -9,24 +9,31 @@ from db import sensor_data as sd
 def buildGroupSection():
     """그룹 목록과 편집 섹션 생성"""
 
+    # calc permissions
     user: AppUser = fli.current_user
-    isMaster = user.is_master()
-    isGAdmin = user.is_gadmin()
-    hidden = not isMaster and not isGAdmin
+    isMaster, isGAdmin, _, _ = user.is_levels()
+    canAdd = isMaster
+    canUpdate = isMaster or isGAdmin
+    canDelete = isMaster
+    hideSection = not isMaster and not isGAdmin
 
     list = buildLabel_Dropdown(
-        "Group",
+        "그룹 관리",
         "group",
         None,
         *buildGroupOptions(),
         "groups",
-        [("clear", "delete")] if isMaster else None,
+        [("clear", "delete")] if canDelete else None,
     )
 
-    name = buildLabel_Input("Group Name", "group", "name", "", Group.max_name)
-    desc = buildLabel_Input("Description", "group", "desc", "", Group.max_desc)
-    button = buildButtonRow("group", isMaster)
-    hiddenStyle = {"display": "none"} if hidden else {}
+    name = buildLabel_Input(
+        "Group Name", "group", "name", "", Group.max_name, not canUpdate
+    )
+    desc = buildLabel_Input(
+        "Description", "group", "desc", "", Group.max_desc, not canUpdate
+    )
+    button = buildButtonRow("group", canAdd, not canUpdate)
+    hiddenStyle = {"display": "none"} if hideSection else {}
 
     return html.Section(
         [list, name, desc, button],
@@ -51,7 +58,7 @@ def onAddClick(n, name, desc):
 
     try:
         dba = fl.g.dba
-        model = Group(name=name, desc=desc)        
+        model = Group(name=name, desc=desc)
         dba.session.add(model)
         dba.session.commit()
         return buildGroupOptions(model.id)
@@ -105,7 +112,6 @@ def onDeleteClick(n, gid):
     msg = f"그룹을 삭제하면 그룹소속 모든 사용자/위치/센서/측정데이터가 삭제됩니다."
     msg = f"{msg}\n\n그룹 <{model}>을 삭제할까요?"
     return "group", msg
-
 
 
 @app.callback(

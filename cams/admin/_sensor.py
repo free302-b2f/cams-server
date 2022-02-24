@@ -8,15 +8,15 @@ from db import sensor_data as sd
 def buildSensorSection():
     """Sensor의 빈 목록 및 편집 섹션을 생성"""
 
-    # isPrivate = getSettings("Cams", "IS_PRIVATE_SERVER")
+    # calc permissions
     user: AppUser = fli.current_user
-    isMaster, isGAdmin, isNormal = user.is_levels()
+    isMaster, isGAdmin, isNormal, _ = user.is_levels()
     canAdd = isMaster or isGAdmin
     canUpdate = isMaster or isGAdmin or isNormal
     canDelete = isMaster or isGAdmin
 
     list = buildLabel_Dropdown(
-        "CAMs",
+        "센서 관리",
         "sensor",
         None,
         [],

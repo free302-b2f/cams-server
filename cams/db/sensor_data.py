@@ -149,10 +149,11 @@ def f2_create_table():
         FOREIGN KEY (group_id) REFERENCES app_group (id),
         FOREIGN KEY (location_id) REFERENCES location (id),
         FOREIGN KEY (sensor_id) REFERENCES sensor (id),
-        UNIQUE (time, sensor_id),
-        UNIQUE (id, time, sensor_id)
+        UNIQUE (time, sensor_id)        
     );
-    CREATE INDEX ON {_tn} (id);"""
+    CREATE INDEX ON {_tn} (group_id) INCLUDE (location_id, sensor_id);"""
+ 
+    # UNIQUE (id, time, sensor_id)
 
     # 센서테이터에 대한 하이퍼테이블 생성
     create_hypertable = f"""

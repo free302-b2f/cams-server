@@ -1,6 +1,5 @@
 """사용자 정보 변경 화면"""
 
-from sqlalchemy import false
 from ._common import *
 from dash.dependencies import Input, Output, State
 
@@ -8,10 +7,14 @@ from dash.dependencies import Input, Output, State
 def buildUserSection():
     """AppUser의 빈 목록 및 편집 섹션 생성"""
 
+    # calc permissions
     user: AppUser = fli.current_user
-    isMaster = user.is_master()
-    isGAdmin = user.is_gadmin()
-    hidden = not isMaster and not isGAdmin
+    isMaster, isGAdmin, isNormal, isGuest = user.is_levels()
+    canAdd = False
+    canUpdate = isMaster or isGAdmin or isNormal or isGuest
+    canDelete = isMaster or isGAdmin
+    showGroup = isMaster
+    showLevel = isMaster or isGAdmin
 
     list = buildLabel_Dropdown(
         "이용자 관리",
@@ -21,7 +24,7 @@ def buildUserSection():
         [],
         None,
         "badge",
-        [("clear", "delete")] if not hidden else None,
+        [("clear", "delete")] if canDelete else None,
     )
 
     return html.Section(
@@ -29,14 +32,22 @@ def buildUserSection():
             html.Hr(),
             list,
             # buildLabel_Dropdown("Group", "user", "group", *buildGroupOptions()),
-            buildLabel_Dropdown("Group", "user", "group", [], None),
+            buildLabel_Dropdown(
+                "Group", "user", "group", [], None, hidden=not showGroup
+            ),
             buildLabel_Input(
                 "Login ID", "user", "username", "", AppUser.max_username, True
             ),
-            buildLabel_Input("Email", "user", "email", "", AppUser.max_email),
-            buildLabel_Input("Real Name", "user", "realname", "", AppUser.max_realname),
-            buildLabel_Dropdown("Level", "user", "level", [], None, hidden=hidden),
-            buildButtonRow("user", False),
+            buildLabel_Input(
+                "Email", "user", "email", "", AppUser.max_email, not canUpdate
+            ),
+            buildLabel_Input(
+                "Real Name", "user", "realname", "", AppUser.max_realname, not canUpdate
+            ),
+            buildLabel_Dropdown(
+                "Level", "user", "level", [], None, hidden=not showLevel
+            ),
+            buildButtonRow("user", canAdd, hidden=not canUpdate),
         ],
         className="admin-manage-edit-section",
     )
@@ -74,6 +85,10 @@ def onUpdateClick(n, uid, gid, email, realname, level):
         # level
         if model.is_master() and level != AppUser.level_master:
             num = AppUser.query.filter_by(level=AppUser.level_master).count()
+            if num >= 2:
+                model.set_level(level)
+        elif model.is_gadmin() and level != AppUser.level_group_admin:
+            num = AppUser.query.filter_by(level=AppUser.level_group_admin).count()
             if num >= 2:
                 model.set_level(level)
         else:
