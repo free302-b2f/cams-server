@@ -67,6 +67,32 @@ def buildLabel_Input(
     )
 
 
+def buildLabel_Check(labelText, modelName, colName, value, readonly: bool = False):
+    """dcc.Input checkbox type을 포함한 html.Label 생성"""
+
+    return html.Label(
+        [
+            html.Span(labelText),
+            html.Span("_", className="material-icons-two-tone"),
+            dcc.Checklist(
+                options={1: "Active"},
+                value=0,
+                id=f"admin-manage-{modelName}-{colName}",
+                # readOnly=readonly,
+            ),
+            # dcc.Input(
+            #     id=f"admin-manage-{modelName}-{colName}",
+            #     type="check",
+            #     value=value,
+            #     required=True,
+            #     readOnly=readonly,
+            # ),
+        ],
+        className="admin-manage-label",
+        id=f"admin-manage-{modelName}-{colName}-label",
+    )
+
+
 def buildLabel_Dropdown(
     labelText,  # 라벨 텍스트
     modelName,  # ORM 테이블 클래스 이름

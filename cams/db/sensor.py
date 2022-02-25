@@ -33,14 +33,19 @@ class Sensor(dba.Model):
     id = dba.Column(dba.Integer, primary_key=True)
     sn = dba.Column(dba.String(max_sn), nullable=False, unique=True)
     name = dba.Column(dba.String(max_name), nullable=False)
+    active = dba.Column(dba.Boolean(), server_default="false")  # 활성=데이터 수신
     location_id = dba.Column(dba.Integer, dba.ForeignKey("location.id"), nullable=False)
     location = dba.relationship("Location", backref=dba.backref("sensors", lazy=True))
     group_id = dba.Column(dba.Integer, dba.ForeignKey("app_group.id"), nullable=False)
     group = dba.relationship("Group", backref=dba.backref("sensors", lazy=True))
-    __table_args__ = (dba.UniqueConstraint(group_id, name),)
+    __table_args__ = (
+        dba.UniqueConstraint(group_id, name),
+        dba.UniqueConstraint(active, sn),  # active 센서는 유일
+        dba.UniqueConstraint(group_id, sn),  # 그룹내 센서는 유일
+    )
 
     def __repr__(self):
-        return f"<Sensor: [{self.id}] {self.name}>"
+        return f"<Sensor: [{self.id}][{'O' if self.active else 'X'}] {self.name}>"
 
     def to_dict(self):
         """인스턴스 객체의 dict 표현을 구한다"""

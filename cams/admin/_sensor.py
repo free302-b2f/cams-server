@@ -10,11 +10,14 @@ def buildSensorSection():
 
     # calc permissions
     user: AppUser = fli.current_user
+    isPrivate = getSettings("Cams", "IS_PRIVATE_SERVER")
     isMaster, isGAdmin, isNormal, _ = user.is_levels()
     canAdd = isMaster or isGAdmin
     canUpdate = isMaster or isGAdmin or isNormal
     canDelete = isMaster or isGAdmin
-    showGroup = isMaster
+    canUpdateSn = isMaster or isGAdmin
+    canUpdateActive = isMaster or isGAdmin
+    showGroup = isMaster  # == canUpdateGroup
 
     list = buildLabel_Dropdown(
         "센서 관리",
@@ -32,10 +35,16 @@ def buildSensorSection():
     name = buildLabel_Input(
         "Sensor Name", "sensor", "name", "", Sensor.max_name, not canUpdate
     )
-    sn = buildLabel_Input("Sensor SN", "sensor", "sn", "", Sensor.max_sn, not canDelete)
+    sn = buildLabel_Input(
+        "Sensor SN", "sensor", "sn", "", Sensor.max_sn, not canUpdateSn
+    )
     locs = buildLabel_Dropdown(
         "Location", "sensor", "location", [], None, "", hidden=not canUpdate
     )
+    active = buildLabel_Check(
+        "Active(Receive Data)", "sensor", "active", not canUpdateActive
+    )
+
     button = buildButtonRow("sensor", canAdd, not canUpdate)
 
     return html.Section(
@@ -46,6 +55,7 @@ def buildSensorSection():
             name,
             sn,
             locs,
+            active,
             button,
         ],
         className="admin-manage-edit-section",
@@ -79,7 +89,6 @@ def onAddClick(n, gid, name, sn, locId):
         return no_update
 
 
-
 @app.callback(
     Output("admin-manage-confirm", "trigger"),
     Output("admin-manage-confirm", "message"),
@@ -91,7 +100,7 @@ def onAddClick(n, gid, name, sn, locId):
     prevent_initial_call=True,
 )
 def onUpdateClick(n, gid, id, nSubmit):
-    """<Update> 버튼 작업 및 목록 업데이트"""
+    """<Update> 확인"""
 
     if not n or not id or gid == None or gid == "":
         return no_update
@@ -121,8 +130,8 @@ def onUpdateClick(n, gid, id, nSubmit):
     State("admin-manage-sensor-location", "value"),
     prevent_initial_call=True,
 )
-def onUpdateConfirmed(n, id, gidDest, name, sn, locId):
-    """<Update> 버튼 작업 및 목록 업데이트"""
+def onUpdateConfirmed(n, id, gid, name, sn, locId):
+    """<Update> 작업 및 목록 업데이트"""
 
     if not n:
         return no_update
@@ -131,17 +140,25 @@ def onUpdateConfirmed(n, id, gidDest, name, sn, locId):
         model: Sensor = Sensor.query.get(id)
         model.name = name
         model.sn = sn
-        model.location_id = locId
 
         gidSrc = model.group_id
-        if gidDest != gidSrc: # 센서 이전 작업: 새 그룹의 보관소로 이동
-            group = Group.query.get(gidDest)
+        changingGroup = gid != gidSrc
+        if changingGroup:  # 센서 이전 작업: 새 그룹의 보관소로 이동
+            group: Group = Group.query.get(gid)
+            sensor = Sensor.query.filter_by(group_id=gid, sn=sn).first()
+            if sensor is None:  # 새 센서 만들고 보관소로 이동
+                sensor = Sensor(group_id=gid, sn=sn, name=name)
+            else:
+                pass
+
             model.location_id = group.storage_id
-            model.group_id = gidDest        
+            # model.group_id = gidDest
+        else:
+            model.location_id = locId
 
         dba = fl.g.dba
         dba.session.commit()
-        return buildSensorOptions(gidSrc, id if gidSrc == gidDest else None)
+        return buildSensorOptions(gidSrc, id if not changingGroup else None)
     except:
         return no_update
 
