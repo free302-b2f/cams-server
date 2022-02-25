@@ -41,7 +41,7 @@ class Sensor(dba.Model):
     __table_args__ = (
         dba.UniqueConstraint(group_id, name),
         dba.UniqueConstraint(group_id, sn),  # 그룹내 센서는 유일
-        dba.UniqueConstraint(active, sn),  # active 센서는 유일
+        # dba.UniqueConstraint(active, sn),  # active 센서는 유일
     )
 
     def __repr__(self):
@@ -53,6 +53,20 @@ class Sensor(dba.Model):
         keys = self.__table__.columns.keys()
         dic = {key: self.__getattribute__(key) for key in keys}
         return dic
+
+    def activate(self, active=True):
+        """active 설정을 시도한다"""
+
+        if self.active == active:
+            return
+
+        if active:  # 활성화 작업
+            numActive = Sensor.query.filter(
+                Sensor.sn == self.sn, Sensor.active == True
+            ).count()
+            self.active = numActive == 0
+        else:  # 비활성화 작업
+            self.active = active
 
 
 if getattr(sys, "_test_", None):

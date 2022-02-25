@@ -81,6 +81,7 @@ def onAddClick(n, gid, name, sn, locId):
 
     try:
         model = Sensor(name=name, sn=sn, group_id=gid, location_id=locId)
+        model.activate()
 
         db = fl.g.dba.session
         db.add(model)
@@ -136,8 +137,8 @@ def onUpdateClick(n, id, active, nSubmit):
             msg = f"{msg}\n SN= {model.sn}"
         else:
             msg = f"{msg} 비활성화 - 소유권 포기 하겠습니까?"
-            msg = f"{msg}\n 비활성화 하면 활성화를 못할 수 있습니다."
             msg = f"{msg}\n SN= {model.sn}"
+            msg = f"{msg}\n 비활성화 하면 활성화를 못할 수 있습니다."
         return "sensor-update", msg, no_update
     else:
         # 소유 그룹이 바뀌지 않는 경우 -> 확인없이 업데이트 진행
@@ -168,14 +169,7 @@ def onUpdateConfirmed(n, id, name, sn, locId, active):
         model.location_id = locId
 
         newActive = len(active) > 0
-        if model.active != newActive:
-            if newActive:  # 활성화 작업
-                numActive = Sensor.query.filter(
-                    Sensor.sn == sn, Sensor.active == True
-                ).count()
-                model.active = numActive == 0
-            else:  # 비활성화 작업
-                model.active = newActive
+        model.activate(newActive)
 
         dba = fl.g.dba
         dba.session.commit()
