@@ -62,7 +62,7 @@ def dump_json():
 
         # add sensor
         sensors = [
-            Sensor(sn=f"B2F_CAMs_200000000000{i}", name=f"Sensor #{i}")
+            Sensor(sn=f"B2F_CAMs_200000000000{i}", name=f"Sensor #{i}", active=True)
             for i in range(1, 5)
         ]
         loc.sensors.extend(sensors[:2])

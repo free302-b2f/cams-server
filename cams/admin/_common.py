@@ -75,18 +75,17 @@ def buildLabel_Check(labelText, modelName, colName, value, readonly: bool = Fals
             html.Span(labelText),
             html.Span("_", className="material-icons-two-tone"),
             dcc.Checklist(
-                options={1: "Active"},
-                value=0,
+                options=[
+                    {
+                        "value": True,
+                        "label": " 소유하지 않음 - 데이터 수신하지 않음",
+                        "disabled": readonly,
+                    }
+                ],
+                value=[],
                 id=f"admin-manage-{modelName}-{colName}",
-                # readOnly=readonly,
+                inline=True,
             ),
-            # dcc.Input(
-            #     id=f"admin-manage-{modelName}-{colName}",
-            #     type="check",
-            #     value=value,
-            #     required=True,
-            #     readOnly=readonly,
-            # ),
         ],
         className="admin-manage-label",
         id=f"admin-manage-{modelName}-{colName}-label",

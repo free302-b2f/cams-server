@@ -60,7 +60,7 @@ def seed_group_json(filename: str) -> Group:
     db: SQLAlchemy = fl.g.dba.session
     for jG in dics:
 
-        # add group
+        # Group 생성
         if "id" in jG:
             gid = jG["id"]
             group = Group(id=gid, name=jG["name"], desc=jG["desc"])
@@ -69,7 +69,7 @@ def seed_group_json(filename: str) -> Group:
         else:
             group = Group(name=jG["name"], desc=jG["desc"])
 
-        # add user
+        # AppUser 생성
         for jUser in jG["users"]:
             pw = jUser["password"]
             pwHash = pw if pw.startswith("pbkdf2:") else util.generate_password_hash(pw)
@@ -83,13 +83,16 @@ def seed_group_json(filename: str) -> Group:
                 user.level = jUser["level"]
             group.users.append(user)
 
-        # add location
+        # Location 생성
         for jLoc in jG["locations"]:
             loc = Location(name=jLoc["name"], desc=jLoc["desc"])
             group.locations.append(loc)
 
+            # Sensor 생성
             for jS in jLoc["sensors"]:
-                loc.sensors.append(Sensor(sn=jS["sn"], name=jS["name"]))
+                loc.sensors.append(
+                    Sensor(sn=jS["sn"], name=jS["name"], active=jS["active"])
+                )
             group.sensors.extend(loc.sensors)
 
         db.add(group)

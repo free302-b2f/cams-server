@@ -5,7 +5,8 @@
 -----------------------------------------------------*/
 @font-face {
   font-family: App-Header-Korean;
-  src: local('Noto Sans KR'), url('https://fonts.googleapis.com/css?family=Noto%20Sans%20KR');
+  font-weight: 400;
+  src: local('Noto Sans KR'), url(https://fonts.gstatic.com/s/notosanskr/v25/PbykFmXiEBPT4ITbgNA5Cgm20xz64px_1hVWr0wuPNGmlQNMEfD4.0.woff2) format('woff2');
   unicode-range: U+AC00-D7AF;
 }
 @font-face {

@@ -31,7 +31,7 @@ class Sensor(dba.Model):
     # 테이블 컬럼 정의
     __tablename__ = "sensor"
     id = dba.Column(dba.Integer, primary_key=True)
-    sn = dba.Column(dba.String(max_sn), nullable=False, unique=True)
+    sn = dba.Column(dba.String(max_sn), nullable=False)
     name = dba.Column(dba.String(max_name), nullable=False)
     active = dba.Column(dba.Boolean(), server_default="false")  # 활성=데이터 수신
     location_id = dba.Column(dba.Integer, dba.ForeignKey("location.id"), nullable=False)
@@ -40,8 +40,8 @@ class Sensor(dba.Model):
     group = dba.relationship("Group", backref=dba.backref("sensors", lazy=True))
     __table_args__ = (
         dba.UniqueConstraint(group_id, name),
-        dba.UniqueConstraint(active, sn),  # active 센서는 유일
         dba.UniqueConstraint(group_id, sn),  # 그룹내 센서는 유일
+        dba.UniqueConstraint(active, sn),  # active 센서는 유일
     )
 
     def __repr__(self):

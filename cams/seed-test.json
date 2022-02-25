@@ -36,11 +36,13 @@
                 "sensors": [
                     {
                         "sn": "B2F_CAMs_2000000000001",
-                        "name": "Sensor #1"
+                        "name": "Sensor #1",
+                        "active": true
                     },
                     {
                         "sn": "B2F_CAMs_2000000000002",
-                        "name": "Sensor #2"
+                        "name": "Sensor #2",
+                        "active": true
                     }
                 ]
             },
@@ -50,11 +52,13 @@
                 "sensors": [
                     {
                         "sn": "B2F_CAMs_2000000000003",
-                        "name": "Sensor #3"
+                        "name": "Sensor #3",
+                        "active": true
                     },
                     {
                         "sn": "B2F_CAMs_2000000000004",
-                        "name": "Sensor #4"
+                        "name": "Sensor #4",
+                        "active": true
                     }
                 ]
             },

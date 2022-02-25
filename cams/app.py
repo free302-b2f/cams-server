@@ -54,7 +54,7 @@ app.config["external_stylesheets"] = ext_css
 # Ubunut에서 os.chdir(server.root_path) 필요
 os.chdir(app.server.root_path)
 _set = loadAppSettings()
-app.config.update(APP_SETTINGS=_set)
+# app.config["APP_SETTINGS"] =_set # dash 2.1에서 에러
 app.server.config.update(APP_SETTINGS=_set)
 
 _logging = _set["logging"]

@@ -1,5 +1,6 @@
 """센서 추가 화면"""
 
+from argparse import ArgumentError
 from ._common import *
 from dash.dependencies import Input, Output, State
 from db import sensor_data as sd
@@ -17,7 +18,7 @@ def buildSensorSection():
     canDelete = isMaster or isGAdmin
     canUpdateSn = isMaster or isGAdmin
     canUpdateActive = isMaster or isGAdmin
-    showGroup = isMaster  # == canUpdateGroup
+    showGroup = False  # 소유그룹 변경 불가 -> 새그룹에서 생성해야 함
 
     list = buildLabel_Dropdown(
         "센서 관리",
@@ -42,7 +43,7 @@ def buildSensorSection():
         "Location", "sensor", "location", [], None, "", hidden=not canUpdate
     )
     active = buildLabel_Check(
-        "Active(Receive Data)", "sensor", "active", not canUpdateActive
+        "Active(Receive Data)", "sensor", "active", None, not canUpdateActive
     )
 
     button = buildButtonRow("sensor", canAdd, not canUpdate)
@@ -90,29 +91,53 @@ def onAddClick(n, gid, name, sn, locId):
 
 
 @app.callback(
+    Output("admin-manage-sensor-active", "options"),
+    Input("admin-manage-sensor-active", "value"),
+    prevent_initial_call=True,
+)
+def onActiveChanged(active):
+    """<Active> 체크박스 변경시 라벨을 선택에 맞게 변경"""
+
+    if active is None:
+        return no_update
+
+    label = " 소유함 - 데이터 수신함" if True in active else " 소유하지 않음 - 데이터 수신하지 않음"
+    options = [{"value": True, "label": label}]
+    # debug(onActiveChanged, f"{active= }, {options= }")
+
+    return options
+
+
+@app.callback(
     Output("admin-manage-confirm", "trigger"),
     Output("admin-manage-confirm", "message"),
     Output("admin-manage-confirm", "submit_n_clicks"),
     Input("admin-manage-sensor-save", "n_clicks"),
-    State("admin-manage-sensor-group", "value"),
+    # State("admin-manage-sensor-group", "value"),
     State("admin-manage-sensor", "value"),
+    State("admin-manage-sensor-active", "value"),
     State("admin-manage-confirm", "submit_n_clicks"),
     prevent_initial_call=True,
 )
-def onUpdateClick(n, gid, id, nSubmit):
+def onUpdateClick(n, id, active, nSubmit):
     """<Update> 확인"""
 
-    if not n or not id or gid == None or gid == "":
+    if not n or not id or active is None:
         return no_update
 
     model: Sensor = Sensor.query.get(id)
     if model == None:
         return no_update
 
-    if model.group_id != gid:
-        # 소유 그룹이 바뀌는 경우 -> 확인 후 진행
-        group: Group = Group.query.get()
-        msg = f"센서 {model}의 소유자를 {group}으로 바꾸겠습니까까?"
+    if model.active != (len(active) > 0):  # 소유권이 바뀌는 경우 -> 확인 후 진행
+        msg = f"센서 <{model.id}: {model.name}>를"
+        if active:  # 소유권 가져오기
+            msg = f"{msg} 활성화 - 소유권 주장 하겠습니까?"
+            msg = f"{msg}\n SN= {model.sn}"
+        else:
+            msg = f"{msg} 비활성화 - 소유권 포기 하겠습니까?"
+            msg = f"{msg}\n 비활성화 하면 활성화를 못할 수 있습니다."
+            msg = f"{msg}\n SN= {model.sn}"
         return "sensor-update", msg, no_update
     else:
         # 소유 그룹이 바뀌지 않는 경우 -> 확인없이 업데이트 진행
@@ -124,13 +149,13 @@ def onUpdateClick(n, gid, id, nSubmit):
     Output("admin-manage-sensor", "value"),
     Input("admin-manage-confirm", "submit_n_clicks"),
     State("admin-manage-sensor", "value"),
-    State("admin-manage-sensor-group", "value"),
     State("admin-manage-sensor-name", "value"),
     State("admin-manage-sensor-sn", "value"),
     State("admin-manage-sensor-location", "value"),
+    State("admin-manage-sensor-active", "value"),
     prevent_initial_call=True,
 )
-def onUpdateConfirmed(n, id, gid, name, sn, locId):
+def onUpdateConfirmed(n, id, name, sn, locId, active):
     """<Update> 작업 및 목록 업데이트"""
 
     if not n:
@@ -140,25 +165,21 @@ def onUpdateConfirmed(n, id, gid, name, sn, locId):
         model: Sensor = Sensor.query.get(id)
         model.name = name
         model.sn = sn
+        model.location_id = locId
 
-        gidSrc = model.group_id
-        changingGroup = gid != gidSrc
-        if changingGroup:  # 센서 이전 작업: 새 그룹의 보관소로 이동
-            group: Group = Group.query.get(gid)
-            sensor = Sensor.query.filter_by(group_id=gid, sn=sn).first()
-            if sensor is None:  # 새 센서 만들고 보관소로 이동
-                sensor = Sensor(group_id=gid, sn=sn, name=name)
-            else:
-                pass
-
-            model.location_id = group.storage_id
-            # model.group_id = gidDest
-        else:
-            model.location_id = locId
+        newActive = len(active) > 0
+        if model.active != newActive:
+            if newActive:  # 활성화 작업
+                numActive = Sensor.query.filter(
+                    Sensor.sn == sn, Sensor.active == True
+                ).count()
+                model.active = numActive == 0
+            else:  # 비활성화 작업
+                model.active = newActive
 
         dba = fl.g.dba
         dba.session.commit()
-        return buildSensorOptions(gidSrc, id if not changingGroup else None)
+        return buildSensorOptions(model.group_id, id)
     except:
         return no_update
 

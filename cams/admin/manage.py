@@ -143,10 +143,11 @@ def onLocation(fid):
 
 
 @app.callback(
-    Output("admin-manage-sensor-group", "value"),
+    # Output("admin-manage-sensor-group", "value"),
     Output("admin-manage-sensor-name", "value"),
     Output("admin-manage-sensor-sn", "value"),
     Output("admin-manage-sensor-location", "value"),
+    Output("admin-manage-sensor-active", "value"),
     Input("admin-manage-sensor", "value"),
     prevent_initial_call=True,
 )
@@ -161,7 +162,8 @@ def onSensor(id):
 
     sensor: Sensor = Sensor.query.get(id)
 
-    return sensor.group_id, sensor.name, sensor.sn, sensor.location_id
+    # return sensor.group_id, sensor.name, sensor.sn, sensor.location_id
+    return sensor.name, sensor.sn, sensor.location_id, [True] if sensor.active else []
 
 
 addPage(layout, "Admin")

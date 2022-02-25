@@ -100,3 +100,8 @@
   margin-left: 0rem;
   margin-right: 0.5rem;
 }
+#admin-manage-sensor-active {
+  height: 35px;
+  display: flex;
+  align-items: center;
+}
