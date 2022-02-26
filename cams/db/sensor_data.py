@@ -152,7 +152,7 @@ def f2_create_table():
         UNIQUE (time, sensor_id)        
     );
     CREATE INDEX ON {_tn} (group_id) INCLUDE (location_id, sensor_id);"""
- 
+
     # UNIQUE (id, time, sensor_id)
 
     # 센서테이터에 대한 하이퍼테이블 생성
@@ -232,7 +232,7 @@ def InsertRawDic(rawDic):
         pgc.close()
 
 
-def InsertRawDics(rawDics, sameSn=None, sameDate=None):
+def InsertRawDics(rawDics, sameSn=None, sameDate: datetime = None):
     """센서 sn에서 생성된 rawDics을 DB에서 그룹/장소/센서 id를 구해서 DB에 추가
     - sameSn : None이 아니면 모든 레코드의 sn이 같은 것으로 간주
     - sameDate : None이 아니면 모든 레코드의 date가 같은 것으로 간주
@@ -244,25 +244,37 @@ def InsertRawDics(rawDics, sameSn=None, sameDate=None):
         # 주어진 SN의 센서에 관한 메타 데이터 조회
         def queryMeta(sn):
             cursor.execute(
-                f"SELECT group_id, location_id, id FROM sensor WHERE sn = '{sn}'"
+                f"SELECT group_id, location_id, id FROM sensor WHERE sn = '{sn}' AND active"
             )
             return cursor.fetchone()
 
         # 공통 메타 데이터
-        meta = queryMeta(sameSn) if sameSn else None
-        dbDate = sameDate.strftime("%Y%m%d") if sameDate else None
+        if sameSn:
+            meta0 = queryMeta(sameSn)
+            if meta0 is None:
+                return
+
+        if sameDate:
+            dbDate0 = sameDate.strftime("%Y%m%d")
 
         # DB에 추가
         sql = cursor.mogrify(_build_insert())
 
         for dic in rawDics:
-            values = (
-                *(meta if sameSn else queryMeta(dic["SN"])),
-                util.parseDate(dbDate if sameDate else dic["Date"], dic["Time"]),
-                *[dic[x] for x in sd_cols_raw],
-            )
-            cursor.execute(sql, values)
+            try:
+                meta = meta0 if sameSn else queryMeta(dic["SN"])
+                if meta is None:
+                    break
 
+                dbDate = (
+                    dbDate0 if sameDate else util.parseDate(dic["Date"], dic["Time"])
+                )
+
+                values = (*meta, dbDate, *[dic[x] for x in sd_cols_raw])
+                cursor.execute(sql, values)
+            except:
+                error(InsertRawDics, f"failed to insert: {dic['SN']}")
+                continue
         pgc.commit()
 
     finally:
@@ -433,7 +445,9 @@ def Count(group_id=None, location_id=None, sensor_id=None):
         if sensor_id != None:
             fmt = f"{fmt} AND sensor_id=%(sid)s"
 
-        sql = cursor.mogrify(fmt, {"gid": group_id, "lid": location_id, "sid": sensor_id})
+        sql = cursor.mogrify(
+            fmt, {"gid": group_id, "lid": location_id, "sid": sensor_id}
+        )
         # debug(str(sql))
 
         cursor.execute(sql)
@@ -444,7 +458,6 @@ def Count(group_id=None, location_id=None, sensor_id=None):
     finally:
         cursor.close()
         pgc.close()
-
 
 
 if __name__ == "__main__":
