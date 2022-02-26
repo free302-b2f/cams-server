@@ -47,6 +47,7 @@ def buildUserSection():
                 "Level", "user", "level", [], None, hidden=not showLevel
             ),
             buildButtonRow("user", canAdd, hidden=not canUpdate),
+            buildStatusRow("user"),
         ],
         className="admin-manage-edit-section",
     )
@@ -55,6 +56,7 @@ def buildUserSection():
 @app.callback(
     Output("admin-manage-user", "options"),
     Output("admin-manage-user", "value"),
+    Output({"admin-manage-status-label": "user"}, "data"),
     Input("admin-manage-user-save", "n_clicks"),
     State("admin-manage-user", "value"),
     State("admin-manage-user-group", "value"),
@@ -73,35 +75,47 @@ def onUpdateClick(n, uid, gid, email, realname, level):
         dba = fl.g.dba
         model: AppUser = AppUser.query.get(uid)
         if model == None:
-            return no_update
-
-        gidOld = model.group_id
-        model.group_id = gid
+            raise AdminError("삭제됨 - 존재하지 않는 레코드")
 
         model.email = email
         model.realname = realname
 
-        # level
+        gidOld = model.group_id
+        if model.is_gadmin() and gidOld != gid:
+            num = AppUser.query.filter_by(
+                level=AppUser.level_group_admin, group_id=gidOld
+            ).count()
+            if num <= 1:
+                raise AdminError("마지막 그룹관리자 계정은 다른 그룹으로 변경할 수 없습니다.")
+        model.group_id = gid
+
+        # 마스터 계정 변경
         if model.is_master() and level != AppUser.level_master:
             num = AppUser.query.filter_by(level=AppUser.level_master).count()
-            if num >= 2:
-                model.set_level(level)
+            if num <= 1:
+                raise AdminError("마지막 마스터 계정은 다른 계정으로 변경할 수 없습니다.")
+        # 그룹관리자 변경
         elif model.is_gadmin() and level != AppUser.level_group_admin:
-            num = AppUser.query.filter_by(level=AppUser.level_group_admin).count()
-            if num >= 2:
-                model.set_level(level)
-        else:
-            model.set_level(level)
+            num = AppUser.query.filter_by(
+                level=AppUser.level_group_admin, group_id=gidOld
+            ).count()
+            if num <= 1:
+                raise AdminError("마지막 그룹관리자 계정은 다른 계정으로 변경할 수 없습니다.")
+        model.set_level(level)
 
         dba.session.commit()
-        return buildUserOptions(gidOld, uid)  # update model list
+        return *buildUserOptions(gidOld, uid), ["업데이트 완료", cnOk]
+
+    except AdminError as ex:
+        return *buildUserOptions(gidOld, uid), [f"에러:{ex}", cnError]
     except:
-        return no_update
+        return no_update, no_update, [f"unknown error", cnError]
 
 
 @app.callback(
     Output("admin-manage-confirm", "trigger"),
     Output("admin-manage-confirm", "message"),
+    Output({"admin-manage-status-label": "user"}, "data"),
     Input("admin-manage-user-delete", "n_clicks"),
     State("admin-manage-user", "value"),
     prevent_initial_call=True,
@@ -112,24 +126,37 @@ def onDeleteClick(n, uid):
     if not n or not uid:
         return no_update
 
-    masters = AppUser.query.filter_by(level=AppUser.level_master)
-    if uid in [u.id for u in masters]:
-        return no_update
+    try:
+        # 모델 존재 체크
+        model: AppUser = AppUser.query.get(uid)
+        if model == None:
+            raise AdminError("삭제됨 - 존재하지 않는 레코드")
 
-    model: AppUser = AppUser.query.get(uid)
-    msg = f"사용자 <{model}> 계정을 삭제할까요?"
-    return "user", msg
+        if model.is_master():
+            runRows = AppUser.query.filter_by(level=AppUser.level_master).count()
+            if runRows < 2:
+                raise AdminError("마지막 마스터 계정은 삭제할 수 없습니다.")
 
+        model: AppUser = AppUser.query.get(uid)
+        msg = f"사용자 <{model}> 계정을 삭제할까요?"
+        return "user", msg, no_update
+
+    except AdminError as ex:
+        return no_update, no_update, [f"에러: {ex}", cnError]
+    except:
+        return no_update, no_update, [f"unknown error", cnError]
 
 @app.callback(
     Output("admin-manage-user", "options"),
     Output("admin-manage-user", "value"),
+    Output({"admin-manage-status-label": "user"}, "data"),
     Input("admin-manage-confirm", "submit_n_clicks"),
     State("admin-manage-confirm", "trigger"),
     State("admin-manage-user", "value"),
+    State("admin-manage-group", "value"),
     prevent_initial_call=True,
 )
-def onDeleteConfirmed(n, src, uid):
+def onDeleteConfirmed(n, src, uid, gid):
     """<Delete> 버튼 작업 - 마스터만 삭제 가능"""
 
     if not n or src != "user":
@@ -139,14 +166,21 @@ def onDeleteConfirmed(n, src, uid):
         # 모델 존재 체크
         model: AppUser = AppUser.query.get(uid)
         if model == None:
-            return no_update
+            return *buildUserOptions(gid), ["삭제됨 - 존재하지 않는 레코드", cnError]
 
-        # 현재 로그인 사용자 삭제 불가
+        # 현재 로그인 사용자 - 삭제 불가
         user: AppUser = fli.current_user
         if model.id == user.id:
-            return no_update
+            return no_update, no_update, ["에러발생 - ", cnError]
 
-        gid = model.group_id
+        # 마지막 그룹 관리자 - 삭제 불가
+        if model.is_gadmin():
+            numRows = AppUser.query.filter_by(
+                level=AppUser.level_group_admin, group_id=gid
+            ).count()
+            if numRows < 2:
+                return no_update, no_update, ["마지막 마스터 계정은 삭제할 수 없습니다.", cnError]
+
         dba = fl.g.dba
         if user.is_master():
             dba.session.delete(model)
@@ -154,6 +188,9 @@ def onDeleteConfirmed(n, src, uid):
             model.set_deleted()
 
         dba.session.commit()
-        return buildUserOptions(gid)
+        return *buildUserOptions(gid), [f"삭제완료: {model}", cnOk]
+
+    except AdminError as ex:
+        return *buildUserOptions(gid), [f"에러: {ex}", cnError]
     except:
-        return no_update
+        return no_update, no_update, [f"unknown error", cnError]

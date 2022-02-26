@@ -434,7 +434,7 @@ def Count(group_id=None, location_id=None, sensor_id=None):
             fmt = f"{fmt} AND sensor_id=%(sid)s"
 
         sql = cursor.mogrify(fmt, {"gid": group_id, "lid": location_id, "sid": sensor_id})
-        debug(str(sql))
+        # debug(str(sql))
 
         cursor.execute(sql)
         # numRows = next(iter(cursor.fetchone() or []), None)

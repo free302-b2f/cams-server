@@ -2,6 +2,26 @@
 
 from ._common_options import *
 
+# className 
+cnError = "admin-manage-error-span text-danger"
+cnOk = "admin-manage-error-span text-primary"
+
+def buildStatusRow(modelName: str):
+    """라벨 생성 - 상태 메시지 표시"""
+
+    label = html.Label(
+        [
+            html.Span("_", className="material-icons-two-tone"),
+            html.Span("_", className="material-icons-outlined"),
+            html.Span(),
+        ],
+        className="admin-manage-label",
+        hidden=True,
+        id={"admin-manage-status-label": modelName},  # hidden 속성 변경을 위해 필요
+    )
+    label.data = [] # 상태 데이터 홀더
+    return label
+
 
 def buildButtonRow(modelName, showAddIcon=False, hidden=False):
     """html.Div 생성 - Button과 Icon을 포함
@@ -140,3 +160,7 @@ def buildLabel_Dropdown(
         else f"admin-manage-{modelName}-label",
         style=hiddenStyle,
     )
+
+
+class AdminError(Exception):
+    pass

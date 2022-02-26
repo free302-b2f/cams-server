@@ -24,9 +24,9 @@ def layout():
         )
     )
 
+    # 확인 대화상자
     confirm = dcc.ConfirmDialog(
         id="admin-manage-confirm",
-        # message="그룹삭제...\n그룹 소속 모든 데이터가 삭제됩니다!\n삭제할까요?",
         displayed=False,
     )
     confirm.trigger = ""  # 확인창을 호출한 소스
@@ -45,15 +45,37 @@ def layout():
 
 
 @app.callback(
+    Output({"admin-manage-status-label": MATCH}, "children"),
+    Output({"admin-manage-status-label": MATCH}, "hidden"),
+    Input({"admin-manage-status-label": MATCH}, "data"),
+    State({"admin-manage-status-label": MATCH}, "children"),
+    prevent_initial_call=True,
+)
+def updateStatus(data, spans):
+    """상태 메시지 표시"""
+
+    if data is None:
+        return no_update
+
+    debug(updateStatus, f"{data= }")
+
+    span = spans[2]["props"]
+    span["children"] = data[0]
+    span["className"] = data[1]
+
+    return spans, False
+
+
+@app.callback(
     Input("admin-manage-confirm", "trigger"),
     Input("admin-manage-confirm", "message"),
     Output("admin-manage-confirm", "displayed"),
     prevent_initial_call=True,
 )
-def onDeleteClick(src, msg):
+def onConfirm(src, msg):
     """확인 대화상자"""
 
-    return True if src and msg else no_update
+    return True if src and msg else False
 
 
 @app.callback(
@@ -161,6 +183,8 @@ def onSensor(id):
         return no_update
 
     sensor: Sensor = Sensor.query.get(id)
+    if sensor is None:
+        return no_update
 
     # return sensor.group_id, sensor.name, sensor.sn, sensor.location_id
     return sensor.name, sensor.sn, sensor.location_id, [True] if sensor.active else []

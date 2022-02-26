@@ -58,15 +58,40 @@ class Sensor(dba.Model):
         """active 설정을 시도한다"""
 
         if self.active == active:
-            return
+            return 0
 
         if active:  # 활성화 작업
             numActive = Sensor.query.filter(
                 Sensor.sn == self.sn, Sensor.active == True
             ).count()
             self.active = numActive == 0
+
+            if numActive:
+                return "이미 같은 SN의 활성화된 센서가 있으므로 활성화 불가"
+
         else:  # 비활성화 작업
             self.active = active
+
+        return 0
+
+    def setSN(self, sn: str):
+        """sn을 변경 - sensor_data, active 여부 체크하여 반영한다"""
+
+        if self.sn == sn.strip():
+            return 0, ""
+
+        # sn의 측정 데이터가 있는지 체크
+        import sensor_data as sd
+
+        numRows = sd.Count(self.group_id, self.location_id, self.id)
+        if numRows:
+            return 1, f"측정데이터 {numRows}개 존재하므로 SN변경 불가"
+
+        # active 체크
+        numActive = Sensor.query.filter(Sensor.sn == sn, Sensor.active == True).count()
+        self.active = numActive == 0
+        self.sn = sn
+        return 0, ""
 
 
 if getattr(sys, "_test_", None):

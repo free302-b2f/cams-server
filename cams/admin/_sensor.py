@@ -58,6 +58,7 @@ def buildSensorSection():
             locs,
             active,
             button,
+            buildStatusRow("sensor"),
         ],
         className="admin-manage-edit-section",
     )
@@ -66,6 +67,7 @@ def buildSensorSection():
 @app.callback(
     Output("admin-manage-sensor", "options"),
     Output("admin-manage-sensor", "value"),
+    Output({"admin-manage-status-label": "sensor"}, "data"),
     Input("admin-manage-sensor-add", "n_clicks"),
     State("admin-manage-group", "value"),
     State("admin-manage-sensor-name", "value"),
@@ -86,9 +88,12 @@ def onAddClick(n, gid, name, sn, locId):
         db = fl.g.dba.session
         db.add(model)
         db.commit()
-        return buildSensorOptions(gid, model.id)
+        return *buildSensorOptions(gid, model.id), [f"{model} 추가완료", cnOk]
+    
+    except AdminError as ex:
+        return no_update, no_update, [f"에러: {ex}", cnError]
     except:
-        return no_update
+        return no_update, no_update, [f"unknown error", cnError]
 
 
 @app.callback(
@@ -113,8 +118,8 @@ def onActiveChanged(active):
     Output("admin-manage-confirm", "trigger"),
     Output("admin-manage-confirm", "message"),
     Output("admin-manage-confirm", "submit_n_clicks"),
+    Output({"admin-manage-status-label": "sensor"}, "data"),
     Input("admin-manage-sensor-save", "n_clicks"),
-    # State("admin-manage-sensor-group", "value"),
     State("admin-manage-sensor", "value"),
     State("admin-manage-sensor-active", "value"),
     State("admin-manage-confirm", "submit_n_clicks"),
@@ -126,29 +131,37 @@ def onUpdateClick(n, id, active, nSubmit):
     if not n or not id or active is None:
         return no_update
 
-    model: Sensor = Sensor.query.get(id)
-    if model == None:
-        return no_update
+    try:
+        model: Sensor = Sensor.query.get(id)
+        if model == None:
+            raise AdminError("삭제됨 - 존재하지 않는 레코드")
 
-    if model.active != (len(active) > 0):  # 소유권이 바뀌는 경우 -> 확인 후 진행
-        msg = f"센서 <{model.id}: {model.name}>를"
-        if active:  # 소유권 가져오기
-            msg = f"{msg} 활성화 - 소유권 주장 하겠습니까?"
-            msg = f"{msg}\n SN= {model.sn}"
+        if model.active != (len(active) > 0):  # 소유권이 바뀌는 경우 -> 확인 후 진행
+            msg = f"센서 <{model.id}: {model.name}>를"
+            if active:  # 소유권 가져오기
+                msg = f"{msg} 활성화 -소유권 주장- 하겠습니까?"
+                msg = f"{msg}\n SN= {model.sn}"
+            else:
+                msg = f"{msg} 비활성화 -소유권 포기- 하겠습니까?"
+                msg = f"{msg}\n SN= {model.sn}"
+                msg = f"{msg}\n 비활성화 하면 활성화를 못할 수 있습니다."
+            return "sensor-update", msg, no_update, no_update
         else:
-            msg = f"{msg} 비활성화 - 소유권 포기 하겠습니까?"
-            msg = f"{msg}\n SN= {model.sn}"
-            msg = f"{msg}\n 비활성화 하면 활성화를 못할 수 있습니다."
-        return "sensor-update", msg, no_update
-    else:
-        # 소유 그룹이 바뀌지 않는 경우 -> 확인없이 업데이트 진행
-        return no_update, no_update, 1 + 0 if not nSubmit else nSubmit
+            # 소유 그룹이 바뀌지 않는 경우 -> 확인없이 업데이트 진행
+            return "sensor-update", "", 1 + (0 if not nSubmit else nSubmit), no_update
+            
+    except AdminError as ex:
+        return no_update, no_update, no_update, [f"에러: {ex}", cnError]
+    except:
+        return no_update, no_update, no_update, [f"unknown error", cnError]
 
 
 @app.callback(
     Output("admin-manage-sensor", "options"),
     Output("admin-manage-sensor", "value"),
+    Output({"admin-manage-status-label": "sensor"}, "data"),
     Input("admin-manage-confirm", "submit_n_clicks"),
+    State("admin-manage-confirm", "trigger"),
     State("admin-manage-sensor", "value"),
     State("admin-manage-sensor-name", "value"),
     State("admin-manage-sensor-sn", "value"),
@@ -156,31 +169,39 @@ def onUpdateClick(n, id, active, nSubmit):
     State("admin-manage-sensor-active", "value"),
     prevent_initial_call=True,
 )
-def onUpdateConfirmed(n, id, name, sn, locId, active):
+def onUpdateConfirmed(n, src, id, name, sn, locId, active):
     """<Update> 작업 및 목록 업데이트"""
 
-    if not n:
+    if not n or src != "sensor-update":
         return no_update
 
     try:
         model: Sensor = Sensor.query.get(id)
+        if model == None:
+            raise AdminError("삭제됨 - 존재하지 않는 레코드")
         model.name = name
-        model.sn = sn
         model.location_id = locId
+        model.sn = sn
 
         newActive = len(active) > 0
-        model.activate(newActive)
+        err = model.activate(newActive)
+        if err:
+            raise AdminError(err)
 
         dba = fl.g.dba
         dba.session.commit()
-        return buildSensorOptions(model.group_id, id)
+        return *buildSensorOptions(model.group_id, id), ["업데이트 완료", cnOk]
+
+    except AdminError as ex:
+        return *buildSensorOptions(model.group_id, id), [f"에러: {ex}", cnError]
     except:
-        return no_update
+        return no_update, no_update, [f"unknown error", cnError]
 
 
 @app.callback(
     Output("admin-manage-confirm", "trigger"),
     Output("admin-manage-confirm", "message"),
+    Output({"admin-manage-status-label": "sensor"}, "data"),
     Input("admin-manage-sensor-delete", "n_clicks"),
     State("admin-manage-sensor", "value"),
     prevent_initial_call=True,
@@ -191,21 +212,28 @@ def onDeleteClick(n, id):
     if not n or not id:
         return no_update
 
-    model: Sensor = Sensor.query.get(id)
-    if model == None:
-        return no_update
+    try:
+        model: Sensor = Sensor.query.get(id)
+        if model == None:
+            raise AdminError("삭제됨 - 존재하지 않는 레코드")
 
-    numRows = sd.Count(sensor_id=id)
-    # numRows = db.execute(sql).fetchone()[0]
-    # numRows = next(iter(numRows.fetchone() or []), None)
-    msg = f"센서를 삭제하면 센서의 측정데이터 <{numRows}>개도 모두 삭제됩니다."
-    msg = f"{msg}\n\n센서 {model}를 삭제할까요?"
-    return "sensor", msg
+        numRows = sd.Count(sensor_id=id)
+        # numRows = db.execute(sql).fetchone()[0]
+        # numRows = next(iter(numRows.fetchone() or []), None)
+        msg = f"센서를 삭제하면 센서의 측정데이터 <{numRows}>개도 모두 삭제됩니다."
+        msg = f"{msg}\n\n센서 {model}를 삭제할까요?"
+        return "sensor-delete", msg, no_update
+
+    except AdminError as ex:
+        return no_update, no_update, [f"에러: {ex}", cnError]
+    except:
+        return no_update, no_update, [f"unknown error", cnError]
 
 
 @app.callback(
     Output("admin-manage-sensor", "options"),
     Output("admin-manage-sensor", "value"),
+    Output({"admin-manage-status-label": "sensor"}, "data"),
     Input("admin-manage-confirm", "submit_n_clicks"),
     State("admin-manage-confirm", "trigger"),
     State("admin-manage-sensor", "value"),
@@ -214,13 +242,13 @@ def onDeleteClick(n, id):
 def onDeleteConfirmed(n, src, id):
     """<Delete> 버튼 작업 - 센서 삭제, 센서데이터가 있으면 삭제 안함"""
 
-    if not n or src != "sensor":
+    if not n or src != "sensor-delete":
         return no_update
 
     try:
         model: Sensor = Sensor.query.get(id)
         if model == None:
-            return no_update
+            raise AdminError("삭제됨 - 존재하지 않는 레코드")
 
         # 데이터 삭제
         user: AppUser = fli.current_user
@@ -231,6 +259,9 @@ def onDeleteConfirmed(n, src, id):
         db = fl.g.dba.session
         db.delete(model)
         db.commit()
-        return buildSensorOptions(model.group_id)
+        return *buildSensorOptions(model.group_id), [f"{model} 삭제 완료", cnOk]
+
+    except AdminError as ex:
+        return no_update, no_update, [f"에러: {ex}", cnError]
     except:
-        return no_update
+        return no_update, no_update, [f"unknown error", cnError]

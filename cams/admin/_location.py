@@ -24,21 +24,18 @@ def buildLocationSection():
         "yard",
         [("clear", "delete")] if canDelete else None,
     )
-    name = buildLabel_Input(
-        "Name", "location", "name", "", Location.max_name, not canUpdate
-    )
-    desc = buildLabel_Input(
-        "Description", "location", "desc", "", Location.max_desc, not canUpdate
-    )
-    button = buildButtonRow("location", canAdd, not canUpdate)
 
     return html.Section(
         [
-            # html.Hr(),
             list,
-            name,
-            desc,
-            button,
+            buildLabel_Input(
+                "Name", "location", "name", "", Location.max_name, not canUpdate
+            ),
+            buildLabel_Input(
+                "Description", "location", "desc", "", Location.max_desc, not canUpdate
+            ),
+            buildButtonRow("location", canAdd, not canUpdate),
+            buildStatusRow("location"),
         ],
         className="admin-manage-edit-section",
     )
@@ -47,6 +44,7 @@ def buildLocationSection():
 @app.callback(
     Output("admin-manage-location", "options"),
     Output("admin-manage-location", "value"),
+    Output({"admin-manage-status-label": "location"}, "data"),
     Input("admin-manage-location-add", "n_clicks"),
     State("admin-manage-group", "value"),
     State("admin-manage-location-name", "value"),
@@ -60,18 +58,21 @@ def onAddClick(n, gid, name, desc):
         return no_update
 
     try:
-        location: Location = Location(name=name, desc=desc, group_id=gid)
+        model: Location = Location(name=name, desc=desc, group_id=gid)
         db = fl.g.dba.session
-        db.add(location)
+        db.add(model)
         db.commit()
-        return buildLocationOptions(gid, location.id)
+        return *buildLocationOptions(gid, model.id), [f"{model} 추가완료", cnOk]
+    except Exception as ex:
+        return no_update, no_update, [f"에러: {ex}", cnError]
     except:
-        return no_update
+        return no_update, no_update, [f"unknown error", cnError]
 
 
 @app.callback(
     Output("admin-manage-location", "options"),
     Output("admin-manage-location", "value"),
+    Output({"admin-manage-status-label": "location"}, "data"),
     Input("admin-manage-location-save", "n_clicks"),
     State("admin-manage-group", "value"),
     State("admin-manage-location", "value"),
@@ -88,19 +89,23 @@ def onUpdateClick(n, gid, id, name, desc):
     try:
         model: Location = Location.query.get(id)
         if model == None:
-            return no_update
+            raise AdminError("삭제됨 - 존재하지 않는 레코드")
 
         model.name = name
         model.desc = desc
         fl.g.dba.session.commit()
-        return buildLocationOptions(gid, id)
+        return *buildLocationOptions(gid, id), ["업데이트 완료", cnOk]
+
+    except AdminError as ex:
+        return *buildLocationOptions(gid, id), [f"에러: {ex}", cnError]
     except:
-        return no_update
+        return no_update, no_update, [f"unknown error", cnError]
 
 
 @app.callback(
     Output("admin-manage-confirm", "trigger"),
     Output("admin-manage-confirm", "message"),
+    Output({"admin-manage-status-label": "location"}, "data"),
     Input("admin-manage-location-delete", "n_clicks"),
     State("admin-manage-location", "value"),
     prevent_initial_call=True,
@@ -111,19 +116,30 @@ def onDeleteClick(n, id):
     if not n or not id:
         return no_update
 
-    model: Location = Location.query.get(id)
-    if model == None:
-        return no_update
+    try:
+        model: Location = Location.query.get(id)
+        if model == None:
+            raise AdminError("삭제됨 - 존재하지 않는 레코드")
 
-    numRows = sd.Count(location_id=id)
-    msg = f"위치를 삭제하면 위치에 연관된 센서데이터 <{numRows}>개도 모두 삭제됩니다."
-    msg = f"{msg}\n\n위치 {model}를 삭제할까요?"
-    return "location", msg
+        # 스토리지 위치는 삭제 불가
+        if model.id == model.group.storage_id:
+            raise AdminError("보관소 위치는 삭제할 수 없습니다")
+
+        numRows = sd.Count(location_id=id)
+        msg = f"위치를 삭제하면 위치에 연관된 센서데이터 <{numRows}>개도 모두 삭제됩니다."
+        msg = f"{msg}\n\n위치 {model}를 삭제할까요?"
+        return "location", msg, no_update
+
+    except AdminError as ex:
+        return no_update, no_update, [f"에러: {ex}", cnError]
+    except:
+        return no_update, no_update, [f"unknown error", cnError]
 
 
 @app.callback(
     Output("admin-manage-location", "options"),
     Output("admin-manage-location", "value"),
+    Output({"admin-manage-status-label": "location"}, "data"),
     Input("admin-manage-confirm", "submit_n_clicks"),
     State("admin-manage-confirm", "trigger"),
     State("admin-manage-location", "value"),
@@ -138,17 +154,12 @@ def onDeleteConfirmed(n, src, id):
     try:
         model: Location = Location.query.get(id)
         if model == None:
-            return no_update
-
-        # 스토리지 위치는 삭제 불가
-        group: Group = model.group
-        if model.id == group.storage_id:
-            return no_update
-
+            raise AdminError("삭제됨 - 존재하지 않는 레코드")
+        
         # 센서를 현재 위치에서 보관소로 이동
         db = fl.g.dba.session
         for s in model.sensors:
-            s.location_id = group.storage_id
+            s.location_id = model.group.storage_id
         db.commit()  # db.flush()
 
         # 데이터 삭제
@@ -158,6 +169,9 @@ def onDeleteConfirmed(n, src, id):
 
         db.delete(model)
         db.commit()
-        return buildLocationOptions(model.group_id)
+        return *buildLocationOptions(model.group_id), [f"{model} 삭제 완료", cnOk]
+
+    except AdminError as ex:
+        return no_update, no_update, [f"에러: {ex}", cnError]
     except:
-        return no_update
+        return no_update, no_update, [f"unknown error", cnError]
