@@ -243,9 +243,11 @@ def InsertRawDics(rawDics, sameSn=None, sameDate: datetime = None):
 
         # 주어진 SN의 센서에 관한 메타 데이터 조회
         def queryMeta(sn):
-            cursor.execute(
-                f"SELECT group_id, location_id, id FROM sensor WHERE sn = '{sn}' AND active"
+            sql = cursor.mogrify(
+                "SELECT group_id, location_id, id FROM sensor WHERE sn = %s AND active",
+                (sn,),
             )
+            cursor.execute(sql)
             return cursor.fetchone()
 
         # 공통 메타 데이터
@@ -254,12 +256,8 @@ def InsertRawDics(rawDics, sameSn=None, sameDate: datetime = None):
             if meta0 is None:
                 return
 
-        if sameDate:
-            dbDate0 = sameDate.strftime("%Y%m%d")
-
         # DB에 추가
-        sql = cursor.mogrify(_build_insert())
-
+        format = _build_insert()
         for dic in rawDics:
             try:
                 meta = meta0 if sameSn else queryMeta(dic["SN"])
@@ -267,11 +265,12 @@ def InsertRawDics(rawDics, sameSn=None, sameDate: datetime = None):
                     break
 
                 dbDate = (
-                    dbDate0 if sameDate else util.parseDate(dic["Date"], dic["Time"])
+                    sameDate if sameDate else util.parseDate(dic["Date"], dic["Time"])
                 )
 
                 values = (*meta, dbDate, *[dic[x] for x in sd_cols_raw])
-                cursor.execute(sql, values)
+                sql = cursor.mogrify(format, values)
+                cursor.execute(sql)
             except:
                 error(InsertRawDics, f"failed to insert: {dic['SN']}")
                 continue
@@ -420,7 +419,7 @@ def Select(group_id, sensor_id, location_id, startDati, endDati, avgTime: int = 
         )
 
         sql = cursor.mogrify(fmt, values)
-        debug(str(sql))
+        # debug(str(sql))
 
         cursor.execute(sql)
         ds = cursor.fetchall()

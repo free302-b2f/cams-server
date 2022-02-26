@@ -43,7 +43,7 @@ def buildSensorSection():
         "Location", "sensor", "location", [], None, "", hidden=not canUpdate
     )
     active = buildLabel_Check(
-        "Active(Receive Data)", "sensor", "active", None, not canUpdateActive
+        "Active", "sensor", "active", None, not canUpdateActive
     )
 
     button = buildButtonRow("sensor", canAdd, not canUpdate)

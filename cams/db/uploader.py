@@ -1,4 +1,4 @@
-"""CAMs 장비의 업로드를 흉내낸다"""
+"""MongoDB 데이터를 Postgresql로 복사"""
 
 print(f"<{__name__}> loading...")
 
@@ -18,7 +18,7 @@ else:
 
 from time import sleep
 from datetime import date, datetime, time, timedelta, timezone
-from utility import debug, loadAppSettings
+from utility import debug, loadAppSettings, info
 from bson.objectid import ObjectId
 
 
@@ -213,22 +213,25 @@ def _save(dics):
     pass
 
 
-def synch_worker():
+def sync_worker():
     """MonogDB에 새로 추가된 데이터를 Postgresql에 복사한다"""
 
     while True:
         t1 = datetime.now()
 
-        start = _get_last_synch()
-        dics, last = ReadMongoBetween(start)
+        try:
+            start = _get_last_synch()
+            dics, last = ReadMongoBetween(start)
 
-        startDati = ObjectId(start).generation_time.astimezone()
-        debug(f"{startDati} => {len(dics)}")
-        # _save(dics)
+            startDati = ObjectId(start).generation_time.astimezone()
+            debug(f"{startDati} => {len(dics)}")
+            # _save(dics)
 
-        if len(dics) > 0:
-            sd.InsertRawDics(dics)
-            _set_last_synch(last)
+            if len(dics) > 0:
+                sd.InsertRawDics(dics)
+                _set_last_synch(last)
+        except:
+            pass        
 
         sec = 30 - (datetime.now() - t1).total_seconds()
         if sec > 0:
@@ -248,13 +251,14 @@ if __name__ == "__main__":
     elif sys.argv[1] == "1":
         simulate()
     elif sys.argv[1] == "2":
-        synch_worker()
+        sync_worker()
     else:
         debug(f"invalid arugment: {sys.argv[1]}")
 else:
     # 웹에서 실행시 - 동기화 쓰레드 시작
     import threading
 
-    _thread = threading.Thread(target=synch_worker, args=())
+    info(f"starting thread: sync_worker")
+    _thread = threading.Thread(target=sync_worker, args=())
     _thread.daemon = True
     _thread.start()

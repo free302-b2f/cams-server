@@ -62,6 +62,7 @@ from . import user
 from . import location
 from . import sensor
 from . import cams_info
+from . import uploader
 
 
 def drop_create_seed():
