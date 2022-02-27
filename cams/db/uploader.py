@@ -216,7 +216,9 @@ def _save(dics):
 def sync_worker(delay=0):
     """MonogDB에 새로 추가된 데이터를 Postgresql에 복사한다"""
 
+    info(sync_worker, f"sleeping {delay} sec")
     sleep(delay)
+    info(sync_worker, f"starting loop")
 
     while True:
         t1 = datetime.now()
@@ -231,7 +233,7 @@ def sync_worker(delay=0):
             if len(dics) > 0:
                 numRows = sd.InsertRawDics(dics)
                 _set_last_synch(last)
-                debug(sync_worker, f"{startDati} =>{numRows}/{len(dics)}")
+                info(sync_worker, f"{startDati} =>{numRows}/{len(dics)}")
 
         except Exception as ex:
             error(sync_worker, f"{ex}")
