@@ -213,8 +213,10 @@ def _save(dics):
     pass
 
 
-def sync_worker():
+def sync_worker(delay=0):
     """MonogDB에 새로 추가된 데이터를 Postgresql에 복사한다"""
+
+    sleep(delay)
 
     while True:
         t1 = datetime.now()
@@ -260,6 +262,6 @@ else:
     import threading
 
     info(f"starting thread: sync_worker")
-    _thread = threading.Thread(target=sync_worker, args=())
+    _thread = threading.Thread(target=sync_worker, args=(60,))
     _thread.daemon = True
     _thread.start()
