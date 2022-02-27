@@ -1,18 +1,24 @@
 {
     "Cams": {
-        "SetTestMode": false,
-        "ShowTempUIs": false,
-        "DB_DO_RESET": false,
-        "DB_SYNC_START_DATE": "2022-01-17T00:00:00.000000+09:00",
         "IS_PRIVATE_SERVER": false,
-        "DB_PRIVATE_SEED_FILE": ["seed-kist.json"],
+        "DB_DO_RESET": false,
+        "DB_SEED_FILES": ["seed-kist.json"],
         "DB_PRIVATE_GROUP_ID": 1,
-        "CSS_FONT_SIZE_%" : 90
+        "DB_SYNC_START_DATE": "2022-02-26T00:00:00+09:00",
+        "CSS_FONT_SIZE_%" : 90,
+        "SetTestMode": true,
+        "ShowTempUIs": false
     },
+
     "logging": {
         "Level": "INFO",
         "DevUi": false
     },
+
+    "LoginManager": {
+        "SECRET_KEY": "605feac2f60784caf7126e08f69932b4915b4fc3bf590881"
+    },
+
     "Mongo": {
         "Name": "MongoDB",
         "Ip": "localhost",
@@ -21,6 +27,7 @@
         "User": "CAMs",
         "Pw": "best"
     },
+
     "Postgres": {
         "Name": "PostgreSQL",
         "Ip": "localhost",
@@ -28,16 +35,5 @@
         "Db": "db_cams",
         "User": "cams",
         "Pw": "best"
-    },
-    "LoginManager": {
-        "SECRET_KEY": "605feac2f60784caf7126e08f69932b4915b4fc3bf590881"
-    },
-    "WebSocket": {
-        "HostName": "local",
-        "host": "bit2farm.iptime.org",
-        "local": "localhost",
-        "port": 28765,
-        "API_KEY": "605FEAC2F60784CAF7126E08F69932B4915B4FC3BF590881",
-        "rate": 1
-    }
+    }    
 }

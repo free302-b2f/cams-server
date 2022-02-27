@@ -59,11 +59,21 @@ def onAddClick(n, gid, name, desc):
 
     try:
         model: Location = Location(name=name, desc=desc, group_id=gid)
+
+        # is storage location?
+        group: Group = Group.query.get(gid)
+        if group is None:
+            raise AdminError(f"group id '{gid}'인 그룹이 존재하지 않음")
+        
         db = fl.g.dba.session
         db.add(model)
         db.commit()
+
+        if not group.storage_id:
+            group.storage_id = model.id
         return *buildLocationOptions(gid, model.id), [f"{model} 추가완료", cnOk]
-    except Exception as ex:
+        
+    except AdminError as ex:
         return no_update, no_update, [f"에러: {ex}", cnError]
     except:
         return no_update, no_update, [f"unknown error", cnError]
@@ -155,7 +165,7 @@ def onDeleteConfirmed(n, src, id):
         model: Location = Location.query.get(id)
         if model == None:
             raise AdminError("삭제됨 - 존재하지 않는 레코드")
-        
+
         # 센서를 현재 위치에서 보관소로 이동
         db = fl.g.dba.session
         for s in model.sensors:

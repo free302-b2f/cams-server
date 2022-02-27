@@ -36,7 +36,7 @@ def seed():
     seed_group_json(SEED_MASTER_FILE)
 
     # ----[ 추가 그룹 ]---- TODO: 파일목록을 셋팅스에
-    files = fl.g.settings["Cams"]["DB_PRIVATE_SEED_FILE"]
+    files = fl.g.settings["Cams"]["DB_SEED_FILES"]
     [seed_group_json(fn) for fn in files]
 
     # ----[ 테스트 그룹 ]----
@@ -90,9 +90,10 @@ def seed_group_json(filename: str) -> Group:
 
             # Sensor 생성
             for jS in jLoc["sensors"]:
-                loc.sensors.append(
-                    Sensor(sn=jS["sn"], name=jS["name"], active=jS["active"])
-                )
+                sensor = Sensor(sn=jS["sn"], name=jS["name"])
+                sensor.activate(active=jS["active"])
+                loc.sensors.append(sensor)
+                
             group.sensors.extend(loc.sensors)
 
         db.add(group)

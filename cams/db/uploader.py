@@ -90,7 +90,7 @@ def _copyOne_M2M(srcSN, destSN):
     # now = now + timedelta(minutes=1)
 
     ti = dict(hour=now.hour, minute=now.minute, second=sec)
-    dati = datetime(2021, 2, now.day % 28, **ti)
+    dati = datetime(2021, 2, 1 + (now.day - 1) % 28, **ti)
     dics = ReadMongo(srcSN, dati, dati)
 
     # 레코드 수정: 테스트 센서, 오늘 날짜로 변경

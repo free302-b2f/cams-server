@@ -42,9 +42,7 @@ def buildSensorSection():
     locs = buildLabel_Dropdown(
         "Location", "sensor", "location", [], None, "", hidden=not canUpdate
     )
-    active = buildLabel_Check(
-        "Active", "sensor", "active", None, not canUpdateActive
-    )
+    active = buildLabel_Check("Active", "sensor", "active", None, not canUpdateActive)
 
     button = buildButtonRow("sensor", canAdd, not canUpdate)
 
@@ -89,7 +87,7 @@ def onAddClick(n, gid, name, sn, locId):
         db.add(model)
         db.commit()
         return *buildSensorOptions(gid, model.id), [f"{model} 추가완료", cnOk]
-    
+
     except AdminError as ex:
         return no_update, no_update, [f"에러: {ex}", cnError]
     except:
@@ -148,8 +146,13 @@ def onUpdateClick(n, id, active, nSubmit):
             return "sensor-update", msg, no_update, no_update
         else:
             # 소유 그룹이 바뀌지 않는 경우 -> 확인없이 업데이트 진행
-            return "sensor-update", "", 1 + (0 if not nSubmit else nSubmit), no_update
-            
+            return (
+                "sensor-update",
+                f"센서 {model} 정보를 업데이트 하겠습니까?",
+                no_update, # 1 + (0 if not nSubmit else nSubmit),
+                no_update,
+            )
+
     except AdminError as ex:
         return no_update, no_update, no_update, [f"에러: {ex}", cnError]
     except:
