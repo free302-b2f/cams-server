@@ -18,7 +18,7 @@ else:
 
 from time import sleep
 from datetime import date, datetime, time, timedelta, timezone
-from utility import debug, loadAppSettings, info
+from utility import debug, loadAppSettings, info, error
 from bson.objectid import ObjectId
 
 
@@ -145,7 +145,7 @@ def simulate():
 
 _set = loadAppSettings("Cams")
 _DB_START_DATI = datetime.fromisoformat(_set["DB_SYNC_START_DATE"])
-_SYNCH_KEY = "db_uploader_last_synch"
+_SYNCH_KEY = "db_uploader_last_sync"
 
 
 def _get_last_synch() -> str:
@@ -224,14 +224,15 @@ def sync_worker():
             dics, last = ReadMongoBetween(start)
 
             startDati = ObjectId(start).generation_time.astimezone()
-            debug(f"{startDati} => {len(dics)}")
             # _save(dics)
 
             if len(dics) > 0:
-                sd.InsertRawDics(dics)
+                numRows = sd.InsertRawDics(dics)
                 _set_last_synch(last)
-        except:
-            pass        
+                debug(sync_worker, f"{startDati} =>{numRows}/{len(dics)}")
+
+        except Exception as ex:
+            error(sync_worker, f"{ex}")
 
         sec = 30 - (datetime.now() - t1).total_seconds()
         if sec > 0:

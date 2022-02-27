@@ -254,9 +254,10 @@ def InsertRawDics(rawDics, sameSn=None, sameDate: datetime = None):
         if sameSn:
             meta0 = queryMeta(sameSn)
             if meta0 is None:
-                return
+                return 0
 
         # DB에 추가
+        numRows = 0
         format = _build_insert()
         for dic in rawDics:
             try:
@@ -271,10 +272,12 @@ def InsertRawDics(rawDics, sameSn=None, sameDate: datetime = None):
                 values = (*meta, dbDate, *[dic[x] for x in sd_cols_raw])
                 sql = cursor.mogrify(format, values)
                 cursor.execute(sql)
+                numRows+=1
             except:
                 error(InsertRawDics, f"failed to insert: {dic['SN']}")
                 continue
         pgc.commit()
+        return numRows
 
     finally:
         cursor.close()
